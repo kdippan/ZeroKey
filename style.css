@@ -1,0 +1,51 @@
+/* Glassmorphism utility */
+.glass-panel {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Base styling for the decrypted text to prepare it for GSAP animation */
+.secret-text-container {
+    position: relative;
+    transform-origin: center;
+}
+
+/* The "Burn" effect classes (triggered by JS later) */
+.disintegrate {
+    animation: ashFade 2s forwards cubic-bezier(0.4, 0, 0.2, 1);
+    filter: blur(0px);
+}
+
+@keyframes ashFade {
+    0% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        filter: blur(4px);
+        color: #f97316; /* Turns orange like embers */
+    }
+    100% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translateY(-20px) scale(0.95);
+    }
+}
+
+/* Custom Webkit Scrollbar for the textarea */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a; 
+}
+::-webkit-scrollbar-thumb {
+    background: #334155; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569; 
+}
