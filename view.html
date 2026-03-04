@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroKey | Read Secret</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0f172a] text-white min-h-screen flex items-center justify-center font-sans p-4">
+
+    <div class="glass-panel p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-700 text-center relative overflow-hidden" id="mainCard">
+        
+        <div id="lockedState" class="block">
+            <div class="inline-block p-4 bg-red-500/10 rounded-full mb-4">
+                <i class="ph ph-warning-circle text-red-500 text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Secure Message</h2>
+            <p class="text-slate-400 mb-6 text-sm">This message will self-destruct from the database permanently the moment you decrypt it. Are you ready?</p>
+            
+            <button id="decryptBtn" 
+                class="w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-3 px-4 rounded-xl transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(220,38,38,0.4)]">
+                <i class="ph ph-fire text-xl"></i> Decrypt & Read
+            </button>
+        </div>
+
+        <div id="decryptedState" class="hidden text-left w-full">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+                <span class="text-emerald-400 font-mono text-sm flex items-center gap-2">
+                    <i class="ph ph-lock-unlocked"></i> Decrypted Locally
+                </span>
+                <span id="countdown" class="text-red-400 font-mono text-sm font-bold flex items-center gap-1">
+                    <i class="ph ph-timer"></i> <span id="time">30</span>s
+                </span>
+            </div>
+            
+            <div class="secret-text-container min-h-[150px]">
+                <p id="secretMessage" class="text-slate-200 font-mono whitespace-pre-wrap leading-relaxed break-words"></p>
+            </div>
+        </div>
+
+        <div id="destroyedState" class="hidden">
+            <div class="inline-block p-4 bg-slate-800 rounded-full mb-4">
+                <i class="ph ph-wind text-slate-500 text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-500 mb-2">Message Destroyed</h2>
+            <p class="text-slate-600 text-sm">This payload has been permanently wiped from the database and your browser.</p>
+        </div>
+
+    </div>
+
+    <script src="view.js"></script>
+</body>
+</html>
