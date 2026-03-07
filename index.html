@@ -4,54 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZeroKey | Secure Client-Side Share</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#0f172a] text-white min-h-screen flex items-center justify-center font-sans p-4 overflow-hidden relative">
-
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <div class="glass-panel p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-700/50 relative overflow-hidden z-10">
-        
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
-
+    <div class="glass-panel p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-700/50 relative overflow-hidden z-10 max-h-[95vh] overflow-y-auto">
         <h1 class="text-3xl font-bold mb-2 flex items-center gap-3 tracking-tight">
-            <i class="ph ph-fingerprint text-blue-500 text-4xl drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"></i> 
-            ZeroKey
+            <i class="ph ph-fingerprint text-blue-500 text-4xl"></i> ZeroKey
         </h1>
-        <p class="text-slate-400 mb-6 text-sm">End-to-end encrypted. The server never sees your key.</p>
+        <p class="text-slate-400 mb-6 text-sm">Enterprise-grade encrypted payload delivery.</p>
 
-        <div class="relative group">
-            <textarea id="secretInput" rows="6" 
-                class="w-full bg-slate-900/50 text-slate-100 border border-slate-600/80 rounded-xl p-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none placeholder-slate-500 shadow-inner" 
-                placeholder="Type your sensitive payload here..."></textarea>
-            
-            <i class="ph ph-lock-key text-slate-500 absolute bottom-4 right-4 opacity-50 group-focus-within:opacity-100 group-focus-within:text-blue-500 transition-all"></i>
+        <div class="relative group mb-4">
+            <textarea id="secretInput" rows="4" class="w-full bg-slate-900/50 text-slate-100 border border-slate-600/80 rounded-xl p-4 focus:outline-none focus:border-blue-500 transition-all resize-none placeholder-slate-500" placeholder="Type sensitive payload..."></textarea>
         </div>
 
-        <button id="encryptBtn" 
-            class="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] active:scale-[0.98]">
-            <i class="ph ph-shield-check text-xl"></i> Encrypt & Generate Link
+        <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-700/50 mb-6 space-y-4">
+            <div>
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1 mb-2">
+                    <i class="ph ph-password"></i> Optional Decryption PIN (PBKDF2)
+                </label>
+                <input type="text" id="pinInput" class="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500" placeholder="Leave blank for auto-generated key">
+            </div>
+
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="geoToggle" class="w-5 h-5 accent-blue-500 bg-slate-800 border-slate-600 rounded">
+                <span class="text-sm text-slate-300 flex items-center gap-1.5">
+                    <i class="ph ph-crosshair text-blue-400"></i> Lock to my current GPS location (50m radius)
+                </span>
+            </label>
+        </div>
+
+        <button id="encryptBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.3)] active:scale-[0.98]">
+            <i class="ph ph-shield-check text-xl"></i> Encrypt Payload
         </button>
 
-        <div id="resultContainer" class="hidden mt-6 p-4 bg-slate-900/80 rounded-xl border border-emerald-500/30 relative shadow-inner">
-            <p class="text-xs text-emerald-400 mb-2 font-semibold flex items-center gap-1.5 uppercase tracking-wider">
+        <div id="resultContainer" class="hidden mt-6 flex flex-col items-center p-4 bg-slate-900/80 rounded-xl border border-emerald-500/30">
+            <p class="text-xs text-emerald-400 mb-4 font-semibold w-full text-left flex items-center gap-1.5 uppercase">
                 <i class="ph ph-check-circle weight-fill"></i> Secure Link Generated
             </p>
-            <input type="text" id="linkOutput" readonly 
-                class="w-full bg-transparent text-slate-200 outline-none text-sm cursor-text font-mono break-all pr-12 selection:bg-emerald-500/30">
             
-            <button id="copyBtn" class="absolute bottom-2.5 right-2.5 p-2 bg-slate-800 rounded-lg hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700 hover:border-slate-500 active:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-                <i class="ph ph-copy text-lg"></i>
-            </button>
+            <div id="qrcode" class="bg-white p-3 rounded-xl mb-4 shadow-lg border-4 border-slate-200"></div>
+            
+            <div class="relative w-full">
+                <input type="text" id="linkOutput" readonly class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-3 pr-12 outline-none text-xs font-mono">
+                <button id="copyBtn" class="absolute right-1 top-1 bottom-1 px-3 bg-slate-700 hover:bg-slate-600 rounded-md text-slate-300 transition-colors">
+                    <i class="ph ph-copy text-lg"></i>
+                </button>
+            </div>
         </div>
     </div>
-
     <script src="app.js"></script>
 </body>
 </html>
