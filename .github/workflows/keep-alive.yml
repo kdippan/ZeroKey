@@ -1,0 +1,18 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Runs at 00:00 every 3rd day
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Allows you to run it manually from the Actions tab
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Vercel API
+        # Replace the URL below with your actual Vercel project URL!
+        run: |
+          curl -X POST https://zerokey.vercel.app/api/getSecret \
+          -H "Content-Type: application/json" \
+          -d '{"id":"00000000-0000-0000-0000-000000000000"}'
