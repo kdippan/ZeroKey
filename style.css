@@ -1,13 +1,12 @@
-/* --- 1. Glassmorphism Utilities --- */
+/* --- Glassmorphism --- */
 .glass-panel {
-    background: rgba(15, 23, 42, 0.65); /* Slate 900 with transparency */
+    background: rgba(15, 23, 42, 0.65);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
-/* --- 2. Page Visibility Lock (The Blur Failsafe) --- */
-/* When .security-blur is applied to the main container, it blurs and darkens all elements EXCEPT the biometric overlay */
+/* --- Visibility API Blur --- */
 .security-blur > *:not(#securityOverlay) {
     filter: blur(16px) brightness(0.3) grayscale(80%);
     pointer-events: none;
@@ -15,65 +14,43 @@
     transition: all 0.3s ease-in-out;
 }
 
-/* Ensure the overlay itself remains perfectly sharp and above everything */
 #securityOverlay {
     z-index: 50;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* --- 3. The "Ash" Disintegration Animation --- */
-.secret-text-container {
-    position: relative;
-    transform-origin: top left;
-}
-
-.disintegrate {
-    /* 2-second burn animation using a smooth bezier curve */
-    animation: ashFade 2s forwards cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* --- Ash Disintegration --- */
+.secret-text-container { position: relative; transform-origin: top left; }
+.disintegrate { animation: ashFade 2s forwards cubic-bezier(0.4, 0, 0.2, 1); }
 
 @keyframes ashFade {
-    0% {
-        opacity: 1;
-        filter: blur(0px) grayscale(0%);
-        transform: translateY(0) scale(1);
-    }
-    40% {
-        opacity: 0.8;
-        filter: blur(3px) grayscale(50%);
-        color: #f97316; /* Flashes bright orange like burning embers */
-        transform: translateY(-5px) scale(0.98);
-    }
-    100% {
-        opacity: 0;
-        filter: blur(15px) grayscale(100%);
-        transform: translateY(-30px) scale(0.9);
-        color: #475569; /* Turns into dark ash gray before disappearing */
-    }
+    0% { opacity: 1; filter: blur(0px) grayscale(0%); transform: translateY(0) scale(1); }
+    40% { opacity: 0.8; filter: blur(3px) grayscale(50%); color: #f97316; transform: translateY(-5px) scale(0.98); }
+    100% { opacity: 0; filter: blur(15px) grayscale(100%); transform: translateY(-30px) scale(0.9); color: #475569; }
 }
 
-/* --- 4. Dynamic SVG Timer Ring --- */
-/* Ensures the red stroke smoothly ticks down every second */
-#burnRing {
-    transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+#burnRing { transition: stroke-dashoffset 1s linear, stroke 0.3s ease; }
+
+/* --- THE GLITCH LOCKOUT ANIMATION --- */
+.glitch-active {
+    animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    background-color: #7f1d1d !important;
 }
 
-/* --- 5. Custom Scrollbars (For long secrets) --- */
-::-webkit-scrollbar {
-    width: 6px;
+.glitch-active * { color: #fca5a5 !important; }
+
+@keyframes glitch-skew {
+    0% { transform: skew(0deg); filter: drop-shadow(-2px 0 0 red) drop-shadow(2px 0 0 blue); }
+    20% { transform: skew(-10deg); filter: drop-shadow(-5px 0 0 red) drop-shadow(5px 0 0 blue); }
+    40% { transform: skew(10deg); filter: drop-shadow(2px 0 0 red) drop-shadow(-2px 0 0 blue); }
+    60% { transform: skew(-5deg); filter: drop-shadow(-2px 0 0 red) drop-shadow(2px 0 0 blue); }
+    80% { transform: skew(5deg); filter: drop-shadow(5px 0 0 red) drop-shadow(-5px 0 0 blue); }
+    100% { transform: skew(0deg); filter: drop-shadow(0 0 0 red) drop-shadow(0 0 0 blue); }
 }
 
-::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5); 
-    border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(51, 65, 85, 0.8); 
-    border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(71, 85, 105, 1); 
-}
+/* --- Custom Scrollbars --- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
