@@ -1,4 +1,6 @@
-// --- Web Crypto Utility Functions ---
+// ==========================================
+// 1. WEB CRYPTO UTILITIES (Encryption)
+// ==========================================
 function bufferToBase64(buffer) {
     const bytes = new Uint8Array(buffer);
     let binary = '';
@@ -11,7 +13,7 @@ function bufferToBase64(buffer) {
 async function generateKey() {
     return await window.crypto.subtle.generateKey(
         { name: "AES-GCM", length: 256 },
-        true, // Extractable
+        true, // Allow the key to be exported to the URL hash
         ["encrypt", "decrypt"]
     );
 }
@@ -37,22 +39,26 @@ async function exportKey(key) {
     return bufferToBase64(exported);
 }
 
-// --- UI Event Listeners ---
+// ==========================================
+// 2. ENCRYPTION & API UPLOAD LOGIC
+// ==========================================
 document.getElementById('encryptBtn').addEventListener('click', async () => {
     const rawText = document.getElementById('secretInput').value;
     if (!rawText) return alert("Please enter a secret payload first!");
 
     const btn = document.getElementById('encryptBtn');
+    
+    // UI Loading State
     btn.innerHTML = '<i class="ph ph-spinner animate-spin text-xl"></i> Encrypting...';
     btn.disabled = true;
 
     try {
-        // 1. Encrypt locally
+        // 1. Encrypt locally in the browser
         const key = await generateKey();
         const { encryptedBase64, ivBase64 } = await encryptMessage(rawText, key);
         const stringKey = await exportKey(key);
 
-        // 2. Send to Vercel Backend
+        // 2. Send the scrambled payload to Vercel
         const response = await fetch('/api/saveSecret', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -64,7 +70,8 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
         const data = await response.json();
         const databaseId = data.id;
 
-        // 3. Build the Zero-Knowledge Link
+        // 3. Construct the Zero-Knowledge Link
+        // The decryption key remains safely in the hash (#)
         const secureLink = `${window.location.origin}/view.html?id=${databaseId}&iv=${encodeURIComponent(ivBase64)}#${encodeURIComponent(stringKey)}`;
 
         // 4. Update UI
@@ -74,23 +81,33 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
 
     } catch (error) {
         console.error("Encryption/Network Error:", error);
-        alert("Something went wrong saving the secret.");
+        alert("Something went wrong saving the secret. Check your connection.");
     } finally {
-        btn.innerHTML = '<i class="ph ph-lock-key text-xl"></i> Encrypt & Generate Link';
+        // Reset Button UI
+        btn.innerHTML = '<i class="ph ph-shield-check text-xl"></i> Encrypt & Generate Link';
         btn.disabled = false;
     }
 });
 
-// --- Copy to Clipboard Logic ---
+// ==========================================
+// 3. COPY TO CLIPBOARD UX
+// ==========================================
 document.getElementById('copyBtn').addEventListener('click', () => {
     const linkInput = document.getElementById('linkOutput');
     linkInput.select();
-    linkInput.setSelectionRange(0, 99999); // For mobile
+    linkInput.setSelectionRange(0, 99999); // Ensures mobile compatibility
+    
     navigator.clipboard.writeText(linkInput.value);
     
     const copyBtn = document.getElementById('copyBtn');
+    
+    // Visual feedback
     copyBtn.innerHTML = '<i class="ph ph-check text-emerald-400 text-lg"></i>';
+    copyBtn.classList.replace('hover:border-slate-500', 'border-emerald-500');
+    
+    // Reset after 2 seconds
     setTimeout(() => {
         copyBtn.innerHTML = '<i class="ph ph-copy text-lg"></i>';
+        copyBtn.classList.replace('border-emerald-500', 'hover:border-slate-500');
     }, 2000);
 });
