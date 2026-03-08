@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer | ZeroKey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans p-4 md:p-8 overflow-x-hidden relative">
+    
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+    <div class="max-w-3xl mx-auto relative z-10">
+        
+        <nav class="mb-8 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-semibold text-sm md:text-base">
+                <i class="ph ph-arrow-left"></i> Back to Vault
+            </a>
+            <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </div>
+        </nav>
+
+        <div class="glass-panel p-6 md:p-10 rounded-2xl shadow-2xl border border-slate-700/50 bg-slate-900/60 backdrop-blur-md">
+            
+            <h1 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="ph ph-warning text-emerald-400"></i> Legal Disclaimer
+            </h1>
+            <p class="text-xs text-slate-500 mb-8 font-mono">LAST UPDATED: MARCH 2026</p>
+            
+            <p class="text-slate-400 mb-8 leading-relaxed text-lg">
+                The information and services provided by <strong>ZeroKey</strong> are for educational, experimental, and privacy-preservation purposes only. 
+            </p>
+
+            <div class="space-y-8">
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-bug text-blue-400 text-2xl"></i> 1. Endpoint Security Warning
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base text-slate-400">
+                        ZeroKey guarantees end-to-end encryption (E2EE) in transit and zero-knowledge storage on our servers. However, <strong>we cannot protect against compromised endpoint devices</strong>. If your device or the recipient's device is infected with malware, keyloggers, or screen-recording software, your plaintext data can be captured before it is encrypted or after it is decrypted. You assume all risks associated with the security of your hardware.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-file-code text-blue-400 text-2xl"></i> 2. "As-Is" Software
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base text-slate-400">
+                        This application is provided "AS IS" without warranties of any kind, either express or implied. The developers of ZeroKey take no responsibility for data loss, premature payload destruction, or intercepted URLs resulting from user error, browser incompatibilities, or third-party link-scanning bots.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-prohibit text-blue-400 text-2xl"></i> 3. No Illegal Use
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base text-slate-400">
+                        ZeroKey is a tool built to protect the fundamental right to digital privacy. It is strictly prohibited to use this platform to facilitate illegal activities, distribute malicious software, or share explicit, non-consensual material. 
+                    </p>
+                </section>
+            </div>
+
+            <div class="mt-12 pt-6 border-t border-slate-700/50 flex flex-wrap justify-center gap-6 text-sm text-slate-500 font-medium">
+                <a href="terms.html" class="hover:text-blue-400 transition-colors">Terms</a>
+                <a href="privacy.html" class="hover:text-blue-400 transition-colors">Privacy</a>
+                <a href="cookie-policy.html" class="hover:text-blue-400 transition-colors">Cookie Policy</a>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
