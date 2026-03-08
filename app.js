@@ -1,37 +1,29 @@
 // ==========================================
-// 1. CRYPTO & PBKDF2 UTILITIES
+// 1. CRYPTO & UTILITIES (Mobile-Safe Buffer)
 // ==========================================
 function bufferToBase64(buffer) {
-    return window.btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) { binary += String.fromCharCode(bytes[i]); }
+    return window.btoa(binary);
 }
 
-// Generates an AES-GCM key derived from a PIN (or auto-generated string) + Salt
 async function deriveKey(pinStr, saltBuffer) {
     const enc = new TextEncoder();
-    const keyMaterial = await window.crypto.subtle.importKey(
-        "raw", enc.encode(pinStr), { name: "PBKDF2" }, false, ["deriveKey"]
-    );
-    
-    // 100,000 iterations prevents brute-forcing the PIN
+    const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(pinStr), { name: "PBKDF2" }, false, ["deriveKey"]);
     return await window.crypto.subtle.deriveKey(
         { name: "PBKDF2", salt: saltBuffer, iterations: 100000, hash: "SHA-256" },
         keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
     );
 }
 
-async function encryptPayload(jsonPayload, key) {
-    const encodedText = new TextEncoder().encode(jsonPayload);
+async function encryptPayload(dataBuffer, key) {
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
-    
-    const encryptedContent = await window.crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: iv }, key, encodedText
-    );
+    const encryptedContent = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, dataBuffer);
     return { encryptedBase64: bufferToBase64(encryptedContent), ivBase64: bufferToBase64(iv) };
 }
 
-// ==========================================
-// 2. GEOFENCING UTILITY
-// ==========================================
 function getCoordinates() {
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) return reject("Geolocation not supported.");
@@ -43,82 +35,126 @@ function getCoordinates() {
 }
 
 // ==========================================
-// 3. ENCRYPTION ENGINE & API UPLOAD
+// 2. MEDIA HANDLING
+// ==========================================
+let selectedMedia = null;
+let selectedMediaBuffer = null;
+
+document.getElementById('attachBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+
+document.getElementById('fileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Strict 2MB Limit for mobile stability and Vercel payload limits
+    if (file.size > 2 * 1024 * 1024) {
+        alert("File is too large. For maximum encryption stability, please keep media under 2MB.");
+        e.target.value = '';
+        return;
+    }
+
+    selectedMedia = file;
+    document.getElementById('fileName').innerHTML = `<i class="ph ph-image text-blue-400 mr-2 text-lg"></i> ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+    document.getElementById('filePreview').classList.remove('hidden');
+    document.getElementById('attachBtn').classList.add('hidden');
+
+    const reader = new FileReader();
+    reader.onload = (event) => { selectedMediaBuffer = event.target.result; };
+    reader.readAsArrayBuffer(file);
+});
+
+document.getElementById('removeFileBtn').addEventListener('click', () => {
+    selectedMedia = null;
+    selectedMediaBuffer = null;
+    document.getElementById('fileInput').value = '';
+    document.getElementById('filePreview').classList.add('hidden');
+    document.getElementById('attachBtn').classList.remove('hidden');
+});
+
+// ==========================================
+// 3. MASTER ENCRYPTION ENGINE
 // ==========================================
 document.getElementById('encryptBtn').addEventListener('click', async () => {
     const rawText = document.getElementById('secretInput').value;
     const pinInput = document.getElementById('pinInput').value.trim();
     const useGeo = document.getElementById('geoToggle').checked;
     
-    if (!rawText) return alert("Please enter a secret payload first!");
+    if (!rawText && !selectedMedia) return alert("Please enter a message or attach a file!");
 
     const btn = document.getElementById('encryptBtn');
-    btn.innerHTML = '<i class="ph ph-spinner animate-spin text-xl"></i> Processing...';
+    btn.innerHTML = '<i class="ph ph-spinner animate-spin text-xl"></i> Cryptographic Processing...';
     btn.disabled = true;
 
     try {
-        // 1. Gather GPS Data if toggled
         let coords = null;
         if (useGeo) {
             btn.innerHTML = '<i class="ph ph-crosshair animate-pulse text-xl"></i> Locking Coordinates...';
             coords = await getCoordinates();
         }
 
-        // 2. Build the JSON Payload
-        const payloadObject = { text: rawText, geo: coords };
-        const payloadString = JSON.stringify(payloadObject);
-
-        // 3. PBKDF2 Key Derivation
-        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        // We include file metadata inside the encrypted text JSON so the receiver knows what to do with the file
+        const payloadObject = { 
+            text: rawText, 
+            geo: coords,
+            hasFile: !!selectedMedia,
+            fileType: selectedMedia ? selectedMedia.type : null,
+            fileName: selectedMedia ? selectedMedia.name : null
+        };
         
-        let hashData;
-        let activePin;
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        let hashData = "LOCKED";
+        let activePin = pinInput;
 
-        if (pinInput) {
-            // User provided a PIN. We put `#LOCKED` in the URL so receiver knows to ask for it.
-            activePin = pinInput;
-            hashData = "LOCKED"; 
-        } else {
-            // No PIN? Generate a random 16-char string to act as the PIN and embed it in the URL.
+        if (!pinInput) {
             activePin = bufferToBase64(window.crypto.getRandomValues(new Uint8Array(12)));
             hashData = activePin;
         }
 
         const cryptoKey = await deriveKey(activePin, salt);
-        const { encryptedBase64, ivBase64 } = await encryptPayload(payloadString, cryptoKey);
 
-        // 4. Send to Vercel Backend
-        btn.innerHTML = '<i class="ph ph-cloud-arrow-up animate-pulse text-xl"></i> Securing Database...';
+        // 1. Encrypt Text Payload
+        const textBuffer = new TextEncoder().encode(JSON.stringify(payloadObject));
+        const { encryptedBase64, ivBase64 } = await encryptPayload(textBuffer, cryptoKey);
+
+        // 2. Encrypt Media Payload (if exists)
+        let finalFileBase64 = null;
+        let finalFileIvBase64 = null;
+
+        if (selectedMediaBuffer) {
+            btn.innerHTML = '<i class="ph ph-file-lock animate-pulse text-xl"></i> Encrypting Media Blob...';
+            const fileEnc = await encryptPayload(selectedMediaBuffer, cryptoKey);
+            finalFileBase64 = fileEnc.encryptedBase64;
+            finalFileIvBase64 = fileEnc.ivBase64;
+        }
+
+        // 3. Send to Database and Storage Bucket
+        btn.innerHTML = '<i class="ph ph-cloud-arrow-up animate-pulse text-xl"></i> Securing Vault...';
         const response = await fetch('/api/saveSecret', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ encryptedBase64, ivBase64 })
+            body: JSON.stringify({ 
+                encryptedBase64, 
+                ivBase64,
+                encryptedFileBase64: finalFileBase64,
+                fileIvBase64: finalFileIvBase64
+            })
         });
 
-        if (!response.ok) throw new Error("Failed to save to database");
+        if (!response.ok) throw new Error("Failed to secure vault on server");
         const { id } = await response.json();
 
-        // 5. Construct Zero-Knowledge Link
-        const saltBase64 = bufferToBase64(salt);
-        const secureLink = `${window.location.origin}/view.html?id=${id}&iv=${encodeURIComponent(ivBase64)}&salt=${encodeURIComponent(saltBase64)}#${encodeURIComponent(hashData)}`;
+        // 4. Generate Link & UI
+        const secureLink = `${window.location.origin}/view.html?id=${id}&iv=${encodeURIComponent(ivBase64)}&salt=${encodeURIComponent(bufferToBase64(salt))}#${encodeURIComponent(hashData)}`;
 
-        // 6. Update UI & Generate QR Code
         document.getElementById('resultContainer').classList.remove('hidden');
         document.getElementById('linkOutput').value = secureLink;
         document.getElementById('secretInput').value = ''; 
         document.getElementById('pinInput').value = '';
+        document.getElementById('removeFileBtn').click(); // Reset file UI
 
-        // Render QR Code for in-person handoffs
         const qrContainer = document.getElementById("qrcode");
-        qrContainer.innerHTML = ""; // Clear previous
-        new QRCode(qrContainer, {
-            text: secureLink,
-            width: 160,
-            height: 160,
-            colorDark : "#0f172a", // Dark slate
-            colorLight : "#ffffff", // White background for scanning
-            correctLevel : QRCode.CorrectLevel.H
-        });
+        qrContainer.innerHTML = ""; 
+        new QRCode(qrContainer, { text: secureLink, width: 160, height: 160, colorDark : "#0f172a", colorLight : "#ffffff" });
 
     } catch (error) {
         console.error("Encryption Error:", error);
@@ -135,7 +171,6 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
 document.getElementById('copyBtn').addEventListener('click', () => {
     const linkInput = document.getElementById('linkOutput');
     linkInput.select();
-    linkInput.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(linkInput.value);
     
     const copyBtn = document.getElementById('copyBtn');
