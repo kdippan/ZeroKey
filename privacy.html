@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | ZeroKey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans p-4 md:p-8 overflow-x-hidden relative">
+    
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+    <div class="max-w-3xl mx-auto relative z-10">
+        
+        <nav class="mb-8 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-semibold text-sm md:text-base">
+                <i class="ph ph-arrow-left"></i> Back to Vault
+            </a>
+            <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </div>
+        </nav>
+
+        <div class="glass-panel p-6 md:p-10 rounded-2xl shadow-2xl border border-slate-700/50 bg-slate-900/60 backdrop-blur-md">
+            
+            <h1 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="ph ph-shield-warning text-emerald-400"></i> Privacy Policy
+            </h1>
+            <p class="text-xs text-slate-500 mb-8 font-mono">LAST UPDATED: MARCH 2026</p>
+            
+            <p class="text-slate-400 mb-8 leading-relaxed text-lg">
+                Welcome to <strong>ZeroKey</strong>. Your privacy isn't just a feature of our service; it is the entire foundation. This policy explains what minimal data we collect and how we ensure your sensitive payloads remain completely unreadable to anyone but the intended recipient.
+            </p>
+
+            <div class="space-y-8">
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-lock-key text-blue-400 text-2xl"></i> 1. Zero-Knowledge Architecture
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base mb-2 text-slate-400">
+                        ZeroKey operates on a strict end-to-end encrypted (E2EE), zero-knowledge model.
+                    </p>
+                    <ul class="list-disc list-inside text-sm md:text-base space-y-2 text-slate-400 pl-2">
+                        <li><strong>Your Payloads:</strong> All text and media files are encrypted locally on your device using AES-GCM encryption <em>before</em> they are ever sent to our servers.</li>
+                        <li><strong>Your Keys:</strong> We do not generate, store, or have access to your decryption keys. The key is generated locally and embedded in the URL fragment, which standard web browsers never transmit over the network.</li>
+                        <li><strong>The Result:</strong> We physically cannot read, scan, or monetize the contents of your messages or files. To us, your data is just random mathematical noise.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-trash text-blue-400 text-2xl"></i> 2. Data Retention & Destruction
+                    </h2>
+                    <ul class="list-disc list-inside text-sm md:text-base space-y-2 text-slate-400 pl-2">
+                        <li><strong>Burn-After-Reading:</strong> The exact moment a secure link is successfully opened and decrypted by the recipient, the encrypted text and associated media blobs are permanently and automatically deleted from our PostgreSQL database and storage buckets.</li>
+                        <li><strong>No Backups:</strong> We do not keep historical backups of deleted payloads. Once a message is burned, it is permanently wiped from the server hardware.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-chart-line-up text-blue-400 text-2xl"></i> 3. Analytics & Tracking
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base mb-2 text-slate-400">
+                        We believe in absolute minimal data collection. We do <strong>not</strong> use invasive tracking scripts, canvas fingerprinting, WebGL hardware rendering checks, or IP logging to monitor your behavior.
+                    </p>
+                    <ul class="list-disc list-inside text-sm md:text-base space-y-2 text-slate-400 pl-2">
+                        <li><strong>Google Analytics:</strong> We utilize Google Analytics strictly to monitor basic, anonymized website traffic (e.g., total daily visitors and general page views). This helps us maintain server capacity and ensure the site remains online.</li>
+                        <li><strong>No Identity Linking:</strong> We do not use this analytics data to track individual user journeys or link identities to specific encrypted payloads.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-scales text-blue-400 text-2xl"></i> 4. Law Enforcement
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base text-slate-400">
+                        Because we utilize true end-to-end encryption and fundamentally do not possess the decryption keys, we cannot provide the plaintext contents of any message or file to law enforcement, government agencies, or third parties, even if legally compelled by subpoena to do so. We can only turn over the encrypted, unreadable blobs currently resting on the server, which are useless without the URL hash key.
+                    </p>
+                </section>
+            </div>
+
+            <div class="mt-12 pt-6 border-t border-slate-700/50 flex flex-wrap justify-center gap-6 text-sm text-slate-500 font-medium">
+                <a href="index.html" class="hover:text-blue-400 transition-colors">Home</a>
+                <a href="about.html" class="hover:text-blue-400 transition-colors">About</a>
+                <a href="terms.html" class="hover:text-blue-400 transition-colors">Terms & Conditions</a>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
