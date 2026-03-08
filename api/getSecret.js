@@ -1,52 +1,38 @@
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
-    // 1. Enforce strict POST method
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
     const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'Missing ID' });
 
-    // 2. Validate ID existence
-    if (!id) {
-        return res.status(400).json({ error: 'Missing Payload ID' });
-    }
-
-    // 3. Initialize Supabase securely
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_ANON_KEY;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
     try {
-        // 4. Fetch the encrypted payload
-        const { data, error: fetchError } = await supabase
-            .from('secrets')
-            .select('encrypted_text')
-            .eq('id', id)
-            .single();
+        const { data, error: fetchError } = await supabase.from('secrets').select('*').eq('id', id).single();
+        if (fetchError || !data) return res.status(404).json({ error: 'Payload not found.' });
 
-        // If it fails or doesn't exist, it likely means it was already read/destroyed
-        if (fetchError || !data) {
-            return res.status(404).json({ error: 'Payload not found. It may have been destroyed or intercepted.' });
+        let encryptedFileBase64 = null;
+
+        // 1. Fetch encrypted file from Storage and instantly delete it
+        if (data.file_path) {
+            const { data: fileData, error: downloadError } = await supabase.storage.from('vault').download(data.file_path);
+            if (!downloadError) {
+                const buffer = await fileData.arrayBuffer();
+                encryptedFileBase64 = Buffer.from(buffer).toString('base64');
+            }
+            await supabase.storage.from('vault').remove([data.file_path]); // BURN FILE
         }
 
-        // 5. BURN AFTER READING: Immediately delete the row from the database
-        const { error: deleteError } = await supabase
-            .from('secrets')
-            .delete()
-            .eq('id', id);
+        // 2. Delete database row
+        await supabase.from('secrets').delete().eq('id', id); // BURN ROW
 
-        if (deleteError) {
-            console.error('Failed to delete secret after reading:', deleteError);
-            // Even if delete fails (rare), we still return the payload so the user gets their message
-        }
-
-        // 6. Return the encrypted payload to the browser for local decryption
-        return res.status(200).json({ encryptedBase64: data.encrypted_text });
-
+        return res.status(200).json({ 
+            encryptedBase64: data.encrypted_text,
+            encryptedFileBase64: encryptedFileBase64,
+            fileIvBase64: data.file_iv
+        });
     } catch (error) {
-        console.error('Database Error during retrieval:', error);
+        console.error('Database Error:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
