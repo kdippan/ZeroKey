@@ -1,38 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
-    // 1. Enforce strict POST method
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
     const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'Missing Payload ID' });
 
-    // 2. Validate incoming data
-    if (!id) {
-        return res.status(400).json({ error: 'Missing Payload ID' });
-    }
-
-    // 3. Initialize Supabase securely using Vercel environment variables
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_ANON_KEY;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
     try {
-        // 4. THE KILL SWITCH: Instantly delete the row matching the ID
-        // We do not read it or return it; we just wipe it.
-        const { error } = await supabase
-            .from('secrets')
-            .delete()
-            .eq('id', id);
+        // Fetch to see if there is an associated file to wipe
+        const { data } = await supabase.from('secrets').select('file_path').eq('id', id).single();
+        
+        if (data && data.file_path) {
+            await supabase.storage.from('vault').remove([data.file_path]);
+        }
 
+        // Wipe the text payload
+        const { error } = await supabase.from('secrets').delete().eq('id', id);
         if (error) throw error;
-
-        // 5. Confirm destruction to the frontend
+        
         return res.status(200).json({ success: true, message: 'Payload permanently wiped.' });
-
     } catch (error) {
-        console.error('Database Error during kill switch execution:', error);
+        console.error('Database Error:', error);
         return res.status(500).json({ error: 'Server error during deletion' });
     }
 }
