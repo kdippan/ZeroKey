@@ -13,18 +13,16 @@ export default async function handler(req, res) {
 
         let encryptedFileBase64 = null;
 
-        // 1. Fetch encrypted file from Storage and instantly delete it
         if (data.file_path) {
             const { data: fileData, error: downloadError } = await supabase.storage.from('vault').download(data.file_path);
             if (!downloadError) {
                 const buffer = await fileData.arrayBuffer();
                 encryptedFileBase64 = Buffer.from(buffer).toString('base64');
             }
-            await supabase.storage.from('vault').remove([data.file_path]); // BURN FILE
+            await supabase.storage.from('vault').remove([data.file_path]);
         }
 
-        // 2. Delete database row
-        await supabase.from('secrets').delete().eq('id', id); // BURN ROW
+        await supabase.from('secrets').delete().eq('id', id);
 
         return res.status(200).json({ 
             encryptedBase64: data.encrypted_text,
