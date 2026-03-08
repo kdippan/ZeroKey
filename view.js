@@ -1,8 +1,6 @@
-// ==========================================
-// 1. SYSTEM & CRYPTOGRAPHY (Mobile Safe)
-// ==========================================
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
+
 function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); }
 
 function playBeep(freq, type, duration, vol) {
@@ -19,7 +17,6 @@ function playBeep(freq, type, duration, vol) {
     osc.stop(audioCtx.currentTime + duration);
 }
 
-// Memory-safe base64 decoding for large files
 function base64ToBuffer(base64) {
     const binaryString = window.atob(base64);
     const len = binaryString.length;
@@ -44,9 +41,6 @@ async function decryptBuffer(encryptedBase64, key, ivBase64) {
     return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: ivBuffer }, key, encryptedBuffer);
 }
 
-// ==========================================
-// 2. BIOMETRICS, GEO & UI
-// ==========================================
 async function verifyBiometrics() {
     try {
         const challenge = new Uint8Array(32);
@@ -95,16 +89,13 @@ function cipherReveal(element, finalString) {
     }, 30);
 }
 
-// ==========================================
-// 3. MASTER DECRYPTION & RENDER LOGIC
-// ==========================================
 const urlParams = new URLSearchParams(window.location.search);
 const payloadId = urlParams.get('id');
 const ivBase64 = urlParams.get('iv');
 const saltBase64 = urlParams.get('salt');
 const hashKey = window.location.hash.substring(1);
 
-let activeObjectUrl = null; // Stores image in RAM
+let activeObjectUrl = null;
 
 document.getElementById('verifyHumanBtn').addEventListener('click', () => {
     initAudio(); playBeep(600, 'sine', 0.1, 0.1);
@@ -148,12 +139,10 @@ document.getElementById('decryptBtn').addEventListener('click', async () => {
         const { encryptedBase64, encryptedFileBase64, fileIvBase64 } = await response.json();
         const cryptoKey = await deriveKey(activePin, saltBase64);
 
-        // 1. Decrypt JSON Text/Metadata
         const decryptedTextBuffer = await decryptBuffer(encryptedBase64, cryptoKey, decodeURIComponent(ivBase64));
         const payloadJson = new TextDecoder().decode(decryptedTextBuffer);
         const payload = JSON.parse(payloadJson);
 
-        // Geofence check
         if (payload.geo) {
             btn.innerHTML = '<i class="ph ph-crosshair animate-pulse text-xl"></i> Verifying GPS...';
             try { 
@@ -169,17 +158,15 @@ document.getElementById('decryptBtn').addEventListener('click', async () => {
             }
         }
 
-        // 2. Decrypt Media Blob (if exists)
         if (payload.hasFile && encryptedFileBase64 && fileIvBase64) {
             btn.innerHTML = '<i class="ph ph-file-lock animate-spin text-xl"></i> Decrypting Media...';
             
             const decryptedFileBuffer = await decryptBuffer(encryptedFileBase64, cryptoKey, decodeURIComponent(fileIvBase64));
             const blob = new Blob([decryptedFileBuffer], { type: payload.fileType });
-            activeObjectUrl = URL.createObjectURL(blob); // Render securely in RAM
+            activeObjectUrl = URL.createObjectURL(blob);
 
             document.getElementById('mediaContainer').classList.remove('hidden');
 
-            // Render Image directly, or create download button for other files
             if (payload.fileType && payload.fileType.startsWith('image/')) {
                 const img = document.getElementById('decryptedImage');
                 img.src = activeObjectUrl;
@@ -234,7 +221,6 @@ function startSelfDestructTimer() {
             playBeep(200, 'square', 0.3, 0.1); 
             if (navigator.vibrate) navigator.vibrate([50, 50, 300]);
             
-            // Wipe Object URL from device Memory instantly
             if (activeObjectUrl) {
                 URL.revokeObjectURL(activeObjectUrl);
                 activeObjectUrl = null;
