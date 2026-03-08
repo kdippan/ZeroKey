@@ -10,7 +10,6 @@ export default async function handler(req, res) {
     let filePath = null;
 
     try {
-        // 1. Process Media Upload
         if (encryptedFileBase64) {
             const fileName = `payload_${Date.now()}_${Math.random().toString(36).substring(7)}.enc`;
             const fileBuffer = Buffer.from(encryptedFileBase64, 'base64');
@@ -19,14 +18,12 @@ export default async function handler(req, res) {
                 .from('vault')
                 .upload(fileName, fileBuffer, { contentType: 'application/octet-stream' });
                 
-            // If Storage fails, send the EXACT error back to the phone
             if (uploadError) {
                 return res.status(403).json({ error: `Supabase Storage Error: ${uploadError.message}` });
             }
             filePath = uploadData.path;
         }
 
-        // 2. Process Database Insert
         const { data, error } = await supabase.from('secrets').insert([{ 
             encrypted_text: encryptedBase64, 
             iv_data: ivBase64,
@@ -34,7 +31,6 @@ export default async function handler(req, res) {
             file_iv: fileIvBase64 || null
         }]).select();
         
-        // If Database fails, send the EXACT error back to the phone
         if (error) {
             return res.status(403).json({ error: `Supabase Database Error: ${error.message}` });
         }
@@ -45,3 +41,11 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: `Server Crash: ${error.message}` });
     }
 }
+
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '5mb'
+        }
+    }
+};
