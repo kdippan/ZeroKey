@@ -8,14 +8,12 @@ export default async function handler(req, res) {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
     try {
-        // Fetch to see if there is an associated file to wipe
         const { data } = await supabase.from('secrets').select('file_path').eq('id', id).single();
         
         if (data && data.file_path) {
             await supabase.storage.from('vault').remove([data.file_path]);
         }
 
-        // Wipe the text payload
         const { error } = await supabase.from('secrets').delete().eq('id', id);
         if (error) throw error;
         
