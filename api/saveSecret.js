@@ -38,3 +38,11 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Failed to securely save payload' });
     }
 }
+// Add this to the very bottom of api/saveSecret.js
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '5mb'
+        }
+    }
+};
