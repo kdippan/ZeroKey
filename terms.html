@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions | ZeroKey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans p-4 md:p-8 overflow-x-hidden relative">
+    
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+    <div class="max-w-3xl mx-auto relative z-10">
+        
+        <nav class="mb-8 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-semibold text-sm md:text-base">
+                <i class="ph ph-arrow-left"></i> Back to Vault
+            </a>
+            <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </div>
+        </nav>
+
+        <div class="glass-panel p-6 md:p-10 rounded-2xl shadow-2xl border border-slate-700/50 bg-slate-900/60 backdrop-blur-md">
+            
+            <h1 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <i class="ph ph-scroll text-emerald-400"></i> Terms & Conditions
+            </h1>
+            <p class="text-xs text-slate-500 mb-8 font-mono">LAST UPDATED: MARCH 2026</p>
+            
+            <p class="text-slate-400 mb-8 leading-relaxed text-lg">
+                By using <strong>ZeroKey</strong>, you agree to the following terms and conditions. If you do not agree with any part of these terms, please do not use the service.
+            </p>
+
+            <div class="space-y-8">
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-gavel text-blue-400 text-2xl"></i> 1. Use of Service
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base text-slate-400">
+                        ZeroKey is provided as a free, experimental tool for secure, ephemeral communication. You agree to use this service strictly for legal purposes. You may not use ZeroKey to transmit illegal content, malware, illicit materials, or any data that violates the rights, privacy, or safety of others. We reserve the right to restrict access to the platform if abuse is detected.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-warning-circle text-blue-400 text-2xl"></i> 2. Disclaimer of Warranties
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base mb-2 text-slate-400">
+                        ZeroKey is provided on an "AS IS" and "AS AVAILABLE" basis.
+                    </p>
+                    <ul class="list-disc list-inside text-sm md:text-base space-y-2 text-slate-400 pl-2">
+                        <li>While we utilize enterprise-grade cryptography (AES-GCM) and strictly adhere to zero-knowledge protocols, web browsers and operating systems can have inherent, unpatched vulnerabilities.</li>
+                        <li>We make no warranties, express or implied, regarding the absolute security of the platform against highly sophisticated endpoint attacks (e.g., malware, keyloggers, or screen-recording software installed on your specific device).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-shield-slash text-blue-400 text-2xl"></i> 3. Limitation of Liability
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base text-slate-400">
+                        Under no circumstances shall the creators, developers, or maintainers of ZeroKey be held liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the service. This includes, but is not limited to, damages for data loss, intercepted data due to compromised client devices, or the premature deletion of unread payloads due to automated link scanners.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-user-focus text-blue-400 text-2xl"></i> 4. User Responsibility
+                    </h2>
+                    <p class="leading-relaxed text-sm md:text-base text-slate-400">
+                        You are solely responsible for securely transmitting the generated link to your intended recipient. The URL fragment (the portion after the <code class="text-emerald-400 font-bold">#</code>) acts as the decryption key. If a third party gains access to the complete URL, they will possess both the encrypted data and the means to decrypt it. It is your responsibility to utilize secure channels to share these links.
+                    </p>
+                </section>
+            </div>
+
+            <div class="mt-12 pt-6 border-t border-slate-700/50 flex flex-wrap justify-center gap-6 text-sm text-slate-500 font-medium">
+                <a href="index.html" class="hover:text-blue-400 transition-colors">Home</a>
+                <a href="about.html" class="hover:text-blue-400 transition-colors">About</a>
+                <a href="privacy.html" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
