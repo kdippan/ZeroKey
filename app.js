@@ -1,5 +1,5 @@
 // ==========================================
-// 1. CRYPTO & UTILITIES (Mobile-Safe Buffer)
+// 1. CRYPTO & UTILITIES 
 // ==========================================
 function bufferToBase64(buffer) {
     let binary = '';
@@ -46,7 +46,6 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Strict 2MB Limit for mobile stability and Vercel payload limits
     if (file.size > 2 * 1024 * 1024) {
         alert("File is too large. For maximum encryption stability, please keep media under 2MB.");
         e.target.value = '';
@@ -92,7 +91,6 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
             coords = await getCoordinates();
         }
 
-        // We include file metadata inside the encrypted text JSON so the receiver knows what to do with the file
         const payloadObject = { 
             text: rawText, 
             geo: coords,
@@ -112,11 +110,9 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
 
         const cryptoKey = await deriveKey(activePin, salt);
 
-        // 1. Encrypt Text Payload
         const textBuffer = new TextEncoder().encode(JSON.stringify(payloadObject));
         const { encryptedBase64, ivBase64 } = await encryptPayload(textBuffer, cryptoKey);
 
-        // 2. Encrypt Media Payload (if exists)
         let finalFileBase64 = null;
         let finalFileIvBase64 = null;
 
@@ -127,8 +123,8 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
             finalFileIvBase64 = fileEnc.ivBase64;
         }
 
-        // 3. Send to Database and Storage Bucket
         btn.innerHTML = '<i class="ph ph-cloud-arrow-up animate-pulse text-xl"></i> Securing Vault...';
+        
         const response = await fetch('/api/saveSecret', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -140,17 +136,27 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
             })
         });
 
-        if (!response.ok) throw new Error("Failed to secure vault on server");
+        // ==========================================
+        // ADVANCED ERROR DIAGNOSTICS
+        // ==========================================
+        if (!response.ok) {
+            let errorMsg = `HTTP Error ${response.status}`;
+            try {
+                const errData = await response.json();
+                errorMsg = errData.error || errorMsg;
+            } catch(e) { /* Fallback to standard error if JSON fails */ }
+            throw new Error(errorMsg);
+        }
+
         const { id } = await response.json();
 
-        // 4. Generate Link & UI
         const secureLink = `${window.location.origin}/view.html?id=${id}&iv=${encodeURIComponent(ivBase64)}&salt=${encodeURIComponent(bufferToBase64(salt))}#${encodeURIComponent(hashData)}`;
 
         document.getElementById('resultContainer').classList.remove('hidden');
         document.getElementById('linkOutput').value = secureLink;
         document.getElementById('secretInput').value = ''; 
         document.getElementById('pinInput').value = '';
-        document.getElementById('removeFileBtn').click(); // Reset file UI
+        document.getElementById('removeFileBtn').click(); 
 
         const qrContainer = document.getElementById("qrcode");
         qrContainer.innerHTML = ""; 
@@ -158,7 +164,8 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
 
     } catch (error) {
         console.error("Encryption Error:", error);
-        alert(error.message || "Failed to secure payload.");
+        // This will now display the exact Supabase error!
+        alert(error.message || "Failed to secure payload."); 
     } finally {
         btn.innerHTML = '<i class="ph ph-shield-check text-xl"></i> Encrypt Payload';
         btn.disabled = false;
