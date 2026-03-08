@@ -1,6 +1,3 @@
-// ==========================================
-// 1. CRYPTO & UTILITIES 
-// ==========================================
 function bufferToBase64(buffer) {
     let binary = '';
     const bytes = new Uint8Array(buffer);
@@ -34,9 +31,6 @@ function getCoordinates() {
     });
 }
 
-// ==========================================
-// 2. MEDIA HANDLING
-// ==========================================
 let selectedMedia = null;
 let selectedMediaBuffer = null;
 
@@ -70,9 +64,6 @@ document.getElementById('removeFileBtn').addEventListener('click', () => {
     document.getElementById('attachBtn').classList.remove('hidden');
 });
 
-// ==========================================
-// 3. MASTER ENCRYPTION ENGINE
-// ==========================================
 document.getElementById('encryptBtn').addEventListener('click', async () => {
     const rawText = document.getElementById('secretInput').value;
     const pinInput = document.getElementById('pinInput').value.trim();
@@ -136,15 +127,12 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
             })
         });
 
-        // ==========================================
-        // ADVANCED ERROR DIAGNOSTICS
-        // ==========================================
         if (!response.ok) {
             let errorMsg = `HTTP Error ${response.status}`;
             try {
                 const errData = await response.json();
                 errorMsg = errData.error || errorMsg;
-            } catch(e) { /* Fallback to standard error if JSON fails */ }
+            } catch(e) {}
             throw new Error(errorMsg);
         }
 
@@ -164,7 +152,6 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
 
     } catch (error) {
         console.error("Encryption Error:", error);
-        // This will now display the exact Supabase error!
         alert(error.message || "Failed to secure payload."); 
     } finally {
         btn.innerHTML = '<i class="ph ph-shield-check text-xl"></i> Encrypt Payload';
@@ -172,9 +159,6 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
     }
 });
 
-// ==========================================
-// 4. COPY TO CLIPBOARD
-// ==========================================
 document.getElementById('copyBtn').addEventListener('click', () => {
     const linkInput = document.getElementById('linkOutput');
     linkInput.select();
