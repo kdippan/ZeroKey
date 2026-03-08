@@ -10,20 +10,23 @@ export default async function handler(req, res) {
     let filePath = null;
 
     try {
-        // 1. If an image is attached, upload the encrypted blob to the 'vault' bucket
+        // 1. Process Media Upload
         if (encryptedFileBase64) {
             const fileName = `payload_${Date.now()}_${Math.random().toString(36).substring(7)}.enc`;
             const fileBuffer = Buffer.from(encryptedFileBase64, 'base64');
             
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('vault')
-                .upload(fileName, fileBuffer, { contentType: 'text/plain' });
+                .upload(fileName, fileBuffer, { contentType: 'application/octet-stream' });
                 
-            if (uploadError) throw uploadError;
+            // If Storage fails, send the EXACT error back to the phone
+            if (uploadError) {
+                return res.status(403).json({ error: `Supabase Storage Error: ${uploadError.message}` });
+            }
             filePath = uploadData.path;
         }
 
-        // 2. Save text and file path to the database
+        // 2. Process Database Insert
         const { data, error } = await supabase.from('secrets').insert([{ 
             encrypted_text: encryptedBase64, 
             iv_data: ivBase64,
@@ -31,18 +34,14 @@ export default async function handler(req, res) {
             file_iv: fileIvBase64 || null
         }]).select();
         
-        if (error) throw error;
+        // If Database fails, send the EXACT error back to the phone
+        if (error) {
+            return res.status(403).json({ error: `Supabase Database Error: ${error.message}` });
+        }
+        
         return res.status(200).json({ id: data[0].id });
+        
     } catch (error) {
-        console.error('Database Error:', error);
-        return res.status(500).json({ error: 'Failed to securely save payload' });
+        return res.status(500).json({ error: `Server Crash: ${error.message}` });
     }
 }
-// Add this to the very bottom of api/saveSecret.js
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '5mb'
-        }
-    }
-};
