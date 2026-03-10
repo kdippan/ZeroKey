@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encrypt Payload Locally | ZeroKey Secure Vault</title>
+    <title>Encrypt Text & Files Online | ZeroKey Secure Vault</title>
     
     <meta name="description" content="Use ZeroKey's client-side AES-GCM encryption tool to secure your messages and files. Generate self-destructing, zero-knowledge links directly in your browser.">
-    <meta name="keywords" content="encrypt text online, AES-GCM encryption tool, secure payload generator, end-to-end encrypted message, zero-knowledge file share, secure link generator">
+    <meta name="keywords" content="encrypt text online, AES-GCM encryption tool, secure payload generator, end-to-end encrypted message, zero-knowledge file share, secure link generator, Web Crypto API">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow">
     
@@ -54,6 +54,27 @@
               "text": "Click 'Encrypt Payload'. The browser will encrypt the data locally and generate a secure #hash link. Copy and share this link."
             }
           ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is my unencrypted data sent to your servers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. ZeroKey uses the native Web Crypto API to encrypt your data locally in your browser before transmission. We only receive the scrambled ciphertext."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the maximum file size I can encrypt?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can encrypt files up to 2MB. This limit ensures browser stability during the heavy client-side encryption process."
+              }
+            }
+          ]
         }
       ]
     }
@@ -68,25 +89,9 @@
     <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="128x128" href="/assets/favicon-128x128.png">
 
-    <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/assets/favicon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/assets/favicon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/assets/favicon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/assets/favicon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon-152x152.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="/assets/favicon-167x167.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
-    <link rel="icon" type="image/png" sizes="256x256" href="/assets/favicon-256x256.png">
-    <link rel="icon" type="image/png" sizes="384x384" href="/assets/favicon-384x384.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
     <link rel="manifest" href="/assets/site.webmanifest">
-
-    <meta name="msapplication-TileColor" content="#0f172a">
-    <meta name="msapplication-TileImage" content="/assets/favicon-144x144.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -130,16 +135,13 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-400 mb-2">Attach File (Max 2MB)</label>
-                    
                     <input type="file" id="fileInput" class="hidden">
-                    
                     <button type="button" id="attachBtn" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner">
                         <i class="ph ph-paperclip text-lg"></i> Choose File
                     </button>
 
                     <div id="filePreview" class="hidden flex items-center justify-between p-4 bg-slate-950/80 border border-blue-500/30 rounded-xl mt-2 shadow-inner">
-                        <span id="fileName" class="text-sm text-slate-300 truncate font-medium flex items-center">
-                            </span>
+                        <span id="fileName" class="text-sm text-slate-300 truncate font-medium flex items-center"></span>
                         <button type="button" id="removeFileBtn" class="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors flex items-center justify-center">
                             <i class="ph ph-trash text-lg"></i>
                         </button>
@@ -191,16 +193,91 @@
             </div>
         </main>
 
-        <article class="space-y-12 border-t border-slate-800/50 pt-12">
-            <div class="text-center max-w-2xl mx-auto">
-                <h2 class="text-2xl font-bold text-white mb-4">Your Browser is the Vault</h2>
+        <article class="space-y-16 border-t border-slate-800/50 pt-12">
+            
+            <section class="max-w-3xl mx-auto text-center">
+                <h2 class="text-2xl font-bold text-white mb-4">What is the ZeroKey Encryptor?</h2>
+                <p class="text-slate-400 leading-relaxed text-sm mb-4">
+                    ZeroKey is an advanced, client-side encryption tool designed for secure, ephemeral payload delivery. By utilizing your browser's native <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Web Crypto API</a>, we ensure that your sensitive messages and files are locked using military-grade AES-256-GCM encryption <em>before</em> they ever leave your device.
+                </p>
                 <p class="text-slate-400 leading-relaxed text-sm mb-6">
-                    By forcing all cryptographic operations to happen locally on your hardware via the Web Crypto API, we mathematically eliminate the possibility of server-side interception. 
+                    Because we operate on a strict zero-knowledge framework, our servers only store unreadable ciphertext. The decryption key is generated locally and embedded in the URL fragment, meaning we fundamentally cannot read your data.
                 </p>
                 <a href="/about" class="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-6 py-2.5 rounded-lg transition-colors text-sm font-medium">
-                    <i class="ph ph-book-open"></i> Read the Technical Whitepaper
+                    <i class="ph ph-book-open"></i> Explore our Technical Architecture
                 </a>
-            </div>
+            </section>
+
+            <hr class="border-slate-800/50">
+
+            <section class="max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-2">
+                    <i class="ph ph-list-numbers text-blue-400"></i> How to Generate a Secure Link
+                </h2>
+                <ol class="space-y-6">
+                    <li class="flex gap-4 p-4 rounded-xl bg-slate-900/30 border border-slate-800/50">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-900/50 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">1</div>
+                        <div>
+                            <h3 class="text-white font-semibold">Draft Your Payload</h3>
+                            <p class="text-sm text-slate-400 mt-1">Type your private message into the text box. Optionally, attach an image or document up to 2MB in size.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4 p-4 rounded-xl bg-slate-900/30 border border-slate-800/50">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-900/50 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">2</div>
+                        <div>
+                            <h3 class="text-white font-semibold">Add Security Constraints (Optional)</h3>
+                            <p class="text-sm text-slate-400 mt-1">Enhance security by requiring a custom PIN to decrypt, or toggle <strong>Geofencing</strong> to restrict decryption to your exact current GPS location.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4 p-4 rounded-xl bg-slate-900/30 border border-slate-800/50">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-900/50 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">3</div>
+                        <div>
+                            <h3 class="text-white font-semibold">Encrypt and Distribute</h3>
+                            <p class="text-sm text-slate-400 mt-1">Click the Encrypt button. Copy the generated `#hash` URL and send it to your recipient. The data will permanently self-destruct from the database immediately after they read it.</p>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+
+            <hr class="border-slate-800/50">
+
+            <section class="max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-2">
+                    <i class="ph ph-question text-emerald-400"></i> Frequently Asked Questions
+                </h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer font-semibold text-white">
+                            Is my unencrypted data sent to your servers?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Absolutely not. ZeroKey relies entirely on client-side encryption. Your data is encrypted locally within your device's RAM. We only receive and store the randomized ciphertext. For more details, read our <a href="/privacy" class="text-blue-400 hover:underline">Privacy Policy</a>.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer font-semibold text-white">
+                            What is the maximum file size I can encrypt?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Currently, the limit is 2MB per payload. Because the Web Crypto API processes encryption entirely in your browser memory, attempting to encrypt massive files can cause mobile browsers to freeze or crash.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer font-semibold text-white">
+                            What happens if someone intercepts the link?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            The link contains the decryption key in the `#hash` fragment. If intercepted, the third party could read it. However, because it is a "burn-after-reading" system, the moment the interceptor reads it, the file is destroyed. When your intended recipient tries to open it, they will see a "Vault Destroyed" error, instantly alerting you that the channel was compromised.
+                        </div>
+                    </details>
+                </div>
+            </section>
+
         </article>
     </div>
 
@@ -211,14 +288,14 @@
                 <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy</a>
                 <a href="/terms" class="hover:text-blue-400 transition-colors">Terms</a>
                 <a href="/disclaimer" class="hover:text-blue-400 transition-colors">Disclaimer</a>
-                <a href="/cookie-policy" class="hover:text-blue-400 transition-colors">Cookies</a>
+                <a href="/donate" class="hover:text-red-400 transition-colors">Donate</a>
             </div>
             <div class="text-center text-xs text-slate-700">
                 <p>&copy; 2026 ZeroKey. Built by Dippan Bhusal.</p>
             </div>
         </div>
     </footer>
-<script src="app.js"></script>
+
     <script src="/script.js"></script>
 </body>
 </html>
