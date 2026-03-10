@@ -3,15 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support ZeroKey | Donate</title>
+    <title>Support ZeroKey & Dippan Bhusal | Donate</title>
     
-    <meta name="description" content="Support the development of ZeroKey. Help keep our zero-knowledge architecture free, secure, and running.">
+    <meta name="description" content="Support Dippan Bhusal, the student developer behind ZeroKey. Help fund open-source privacy tools, maintain Supabase servers, and keep secure communication free.">
+    <meta name="keywords" content="donate to ZeroKey, support Dippan Bhusal, sponsor open source, fund privacy tools, Bitcoin donation, UPI donation, student developer">
+    <meta name="author" content="Dippan Bhusal">
     
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zerokey.vercel.app/donate">
-    <meta property="og:title" content="Support ZeroKey | Donate">
+    <meta property="og:title" content="Support ZeroKey & Dippan Bhusal | Donate">
     <meta property="og:description" content="Help keep ZeroKey's zero-knowledge vault free and operational. Support the developer today.">
     <meta property="og:image" content="https://zerokey.vercel.app/assets/og/about.png"> 
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Support ZeroKey & Dippan Bhusal | Donate">
+    <meta property="twitter:description" content="Help keep ZeroKey's zero-knowledge vault free and operational. Support the developer today.">
+    <meta property="twitter:image" content="https://zerokey.vercel.app/assets/og/about.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Donate to ZeroKey",
+      "description": "Donation page to support Dippan Bhusal and the ZeroKey open-source privacy project.",
+      "url": "https://zerokey.vercel.app/donate",
+      "publisher": {
+        "@type": "Person",
+        "name": "Dippan Bhusal",
+        "jobTitle": "Student Developer & Founder"
+      }
+    }
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -41,9 +63,45 @@
                     <i class="ph ph-heart text-red-500"></i> Fuel the Vault
                 </h1>
                 <p class="text-slate-400 leading-relaxed text-lg max-w-2xl mx-auto">
-                    ZeroKey is an open-source, ad-free, and privacy-first tool. Maintaining the Supabase infrastructure and serverless functions takes resources. If this tool helped secure your data, consider supporting the developer behind it.
+                    ZeroKey is an open-source, ad-free, and privacy-first tool. If this platform has helped you secure your data, consider supporting the mission to keep it running.
                 </p>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <div class="bg-slate-950/40 border border-slate-700/50 rounded-xl p-6 shadow-inner">
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-terminal-window text-blue-400"></i> The Developer
+                    </h2>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-4">
+                        Hi, I'm <strong>Dippan Bhusal</strong>. I am a student developer with a deep passion for ethical hacking, web development, and cryptography. 
+                    </p>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        I built ZeroKey because I believe that paranoid-grade privacy should be a fundamental human right, accessible to everyone, not just those who can afford enterprise security subscriptions.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950/40 border border-slate-700/50 rounded-xl p-6 shadow-inner">
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <i class="ph ph-receipt text-emerald-400"></i> Where Your Funds Go
+                    </h2>
+                    <ul class="text-sm text-slate-400 space-y-3">
+                        <li class="flex items-start gap-2">
+                            <i class="ph ph-database text-blue-400 mt-1"></i>
+                            <span><strong>Infrastructure:</strong> Paying for Supabase database operations, storage buckets, and secure Vercel edge hosting.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="ph ph-globe text-blue-400 mt-1"></i>
+                            <span><strong>Domains & Maintenance:</strong> Keeping the platform ad-free, online, and patched against new vulnerabilities.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="ph ph-coffee text-blue-400 mt-1"></i>
+                            <span><strong>Student Fuel:</strong> Supporting my education and funding late-night coding sessions to build more free, open-source tools for the community.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="border-slate-700/50 mb-10">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
@@ -51,10 +109,16 @@
                     <div class="bg-orange-500/10 p-3 rounded-full mb-4">
                         <i class="ph ph-currency-btc text-orange-400 text-3xl"></i>
                     </div>
-                    <h2 class="text-xl font-semibold text-white mb-2">Bitcoin (BTC)</h2>
-                    <p class="text-xs text-slate-400 mb-6 w-full truncate px-4" title="1AV4KnX6qMiiMSUSGMq2M2fuhwLcQEra8U">
-                        1AV4KnX6qMiiMSUSGMq2M2fuhwLcQEra8U
-                    </p>
+                    <h2 class="text-xl font-semibold text-white mb-3">Bitcoin (BTC)</h2>
+                    
+                    <button onclick="copyAddress('btc')" class="w-full mb-6 bg-slate-900/50 hover:bg-slate-800 border border-slate-700/50 rounded-lg p-3 transition-colors flex flex-col items-center gap-2 group cursor-pointer">
+                        <span class="text-sm text-slate-300 font-mono break-all text-center leading-relaxed">1AV4KnX6qMiiMSUSGMq2M2fuhwLcQEra8U</span>
+                        <div class="flex items-center gap-1.5 text-[10px] text-blue-400 font-semibold uppercase tracking-wider group-hover:text-blue-300 transition-colors">
+                            <i id="btc-icon" class="ph ph-copy"></i>
+                            <span id="btc-text">Click to Copy</span>
+                        </div>
+                    </button>
+
                     <div class="bg-white p-2 rounded-lg shadow-lg mb-4">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=bitcoin:1AV4KnX6qMiiMSUSGMq2M2fuhwLcQEra8U&margin=0" alt="Bitcoin QR Code" class="w-32 h-32 rounded">
                     </div>
@@ -65,10 +129,16 @@
                     <div class="bg-emerald-500/10 p-3 rounded-full mb-4">
                         <i class="ph ph-bank text-emerald-400 text-3xl"></i>
                     </div>
-                    <h2 class="text-xl font-semibold text-white mb-2">UPI Transfer</h2>
-                    <p class="text-sm text-slate-400 font-mono mb-6">
-                        dippan@fam
-                    </p>
+                    <h2 class="text-xl font-semibold text-white mb-3">UPI Transfer</h2>
+                    
+                    <button onclick="copyAddress('upi')" class="w-full mb-6 bg-slate-900/50 hover:bg-slate-800 border border-slate-700/50 rounded-lg p-3 transition-colors flex flex-col items-center gap-2 group cursor-pointer">
+                        <span class="text-sm text-slate-300 font-mono break-all text-center leading-relaxed">dippan@fam</span>
+                        <div class="flex items-center gap-1.5 text-[10px] text-blue-400 font-semibold uppercase tracking-wider group-hover:text-blue-300 transition-colors">
+                            <i id="upi-icon" class="ph ph-copy"></i>
+                            <span id="upi-text">Click to Copy</span>
+                        </div>
+                    </button>
+
                     <div class="bg-white p-2 rounded-lg shadow-lg mb-4">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=dippan@fam&pn=ZeroKey%20Donation&cu=INR&margin=0" alt="UPI QR Code" class="w-32 h-32 rounded">
                     </div>
@@ -101,5 +171,29 @@
 
         </div>
     </div>
+
+    <script>
+        function copyAddress(type) {
+            let textToCopy = type === 'btc' ? '1AV4KnX6qMiiMSUSGMq2M2fuhwLcQEra8U' : 'dippan@fam';
+            let iconElement = document.getElementById(`${type}-icon`);
+            let textElement = document.getElementById(`${type}-text`);
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                iconElement.classList.replace('ph-copy', 'ph-check-circle');
+                iconElement.classList.add('text-emerald-400');
+                textElement.innerText = "Copied!";
+                textElement.classList.add('text-emerald-400');
+                
+                setTimeout(() => {
+                    iconElement.classList.replace('ph-check-circle', 'ph-copy');
+                    iconElement.classList.remove('text-emerald-400');
+                    textElement.innerText = "Click to Copy";
+                    textElement.classList.remove('text-emerald-400');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy!', err);
+            });
+        }
+    </script>
 </body>
 </html>
