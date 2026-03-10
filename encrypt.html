@@ -90,14 +90,15 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="/style.css">
 </head>
-<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30 selection:text-blue-200">
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30 selection:text-blue-200 flex flex-col">
     
-    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 relative z-10">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 relative z-10 flex-grow w-full">
         
         <nav class="mb-8 flex items-center justify-between">
             <a href="/" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-semibold text-sm md:text-base">
@@ -121,36 +122,71 @@
                 </div>
             </div>
 
-            <form id="encryptionForm" class="space-y-6">
+            <div class="space-y-6">
                 <div>
-                    <label for="secretMessage" class="block text-sm font-medium text-slate-400 mb-2">Secret Message</label>
-                    <textarea id="secretMessage" rows="5" placeholder="Type your sensitive data here... It will never leave your device unencrypted." class="w-full bg-slate-950/50 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none"></textarea>
+                    <label for="secretInput" class="block text-sm font-medium text-slate-400 mb-2">Secret Message</label>
+                    <textarea id="secretInput" rows="5" placeholder="Type your sensitive data here... It will never leave your device unencrypted." class="w-full bg-slate-950/50 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="fileAttachment" class="block text-sm font-medium text-slate-400 mb-2">Attach File (Max 2MB)</label>
-                        <input type="file" id="fileAttachment" class="w-full text-sm text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-800 file:text-slate-300 hover:file:bg-slate-700 transition-all border border-slate-700 rounded-xl bg-slate-950/50">
-                    </div>
-                    <div>
-                        <label for="encryptionPin" class="block text-sm font-medium text-slate-400 mb-2">Custom PIN (Optional)</label>
-                        <input type="password" id="encryptionPin" placeholder="Add an extra layer of security" class="w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                    </div>
-                </div>
-
-                <button type="button" id="encryptButton" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 group mt-4">
-                    <i class="ph ph-lock-key text-xl group-hover:scale-110 transition-transform"></i> Encrypt & Generate Link
-                </button>
-            </form>
-            
-            <div id="resultContainer" class="hidden mt-8 p-6 bg-emerald-950/30 border border-emerald-900/50 rounded-xl">
-                <h3 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2"><i class="ph ph-check-circle"></i> Payload Encrypted Successfully</h3>
-                <p class="text-xs text-slate-400 mb-4">Share this link securely. It will burn permanently after one read.</p>
-                <div class="flex gap-2">
-                    <input type="text" id="generatedLink" readonly class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none">
-                    <button id="copyLinkBtn" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-slate-200 transition-colors flex items-center gap-2">
-                        <i class="ph ph-copy"></i> Copy
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Attach File (Max 2MB)</label>
+                    
+                    <input type="file" id="fileInput" class="hidden">
+                    
+                    <button type="button" id="attachBtn" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner">
+                        <i class="ph ph-paperclip text-lg"></i> Choose File
                     </button>
+
+                    <div id="filePreview" class="hidden flex items-center justify-between p-4 bg-slate-950/80 border border-blue-500/30 rounded-xl mt-2 shadow-inner">
+                        <span id="fileName" class="text-sm text-slate-300 truncate font-medium flex items-center">
+                            </span>
+                        <button type="button" id="removeFileBtn" class="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors flex items-center justify-center">
+                            <i class="ph ph-trash text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <div>
+                        <label for="pinInput" class="block text-sm font-medium text-slate-400 mb-2">Custom PIN (Optional)</label>
+                        <input type="password" id="pinInput" placeholder="Add an extra layer of security" class="w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                    </div>
+                    
+                    <div class="flex flex-col justify-center pt-1 md:pt-6">
+                        <label class="relative inline-flex items-center cursor-pointer group">
+                            <input type="checkbox" id="geoToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-800 border border-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
+                            <span class="ml-3 text-sm font-medium text-slate-300 group-hover:text-white transition-colors flex items-center gap-1.5">
+                                <i class="ph ph-map-pin text-emerald-400"></i> Enable Geofencing
+                            </span>
+                        </label>
+                        <p class="text-[10px] text-slate-500 mt-2 ml-14">Locks payload to your current GPS location.</p>
+                    </div>
+                </div>
+
+                <button type="button" id="encryptBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 group mt-6">
+                    <i class="ph ph-shield-check text-xl"></i> Encrypt Payload
+                </button>
+            </div>
+            
+            <div id="resultContainer" class="hidden mt-8 p-6 bg-slate-900 border border-emerald-500/30 rounded-2xl shadow-inner relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <h3 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2 relative z-10"><i class="ph ph-check-circle"></i> Payload Encrypted Successfully</h3>
+                <p class="text-xs text-slate-400 mb-6 relative z-10">Share this link securely. It will burn permanently after one read.</p>
+                
+                <div class="flex gap-2 relative z-10 mb-6">
+                    <input type="text" id="linkOutput" readonly class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-3 text-sm text-slate-300 focus:outline-none font-mono selection:bg-emerald-500/30">
+                    <button id="copyBtn" class="bg-blue-600 hover:bg-blue-500 px-5 py-3 rounded-lg text-white transition-colors flex items-center justify-center shadow-lg">
+                        <i class="ph ph-copy text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="relative z-10 flex flex-col items-center justify-center border-t border-slate-800 pt-6">
+                    <p class="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-4">Scan to Open</p>
+                    <div class="bg-white p-3 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                        <div id="qrcode"></div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -158,73 +194,17 @@
         <article class="space-y-12 border-t border-slate-800/50 pt-12">
             <div class="text-center max-w-2xl mx-auto">
                 <h2 class="text-2xl font-bold text-white mb-4">Your Browser is the Vault</h2>
-                <p class="text-slate-400 leading-relaxed text-sm">
-                    We built ZeroKey on a foundation of absolute trust through zero-knowledge. By forcing all cryptographic operations to happen locally on your hardware, we mathematically eliminate the possibility of server-side interception. 
+                <p class="text-slate-400 leading-relaxed text-sm mb-6">
+                    By forcing all cryptographic operations to happen locally on your hardware via the Web Crypto API, we mathematically eliminate the possibility of server-side interception. 
                 </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <section>
-                    <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-                        <i class="ph ph-list-numbers text-blue-400 text-xl"></i> How to Secure Your Payload
-                    </h3>
-                    <ol class="space-y-6">
-                        <li class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-sm font-bold">1</div>
-                            <div>
-                                <h4 class="text-white font-medium text-sm">Draft the Data</h4>
-                                <p class="text-xs text-slate-400 mt-1">Input your highly sensitive text or attach private documents.</p>
-                            </div>
-                        </li>
-                        <li class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-sm font-bold">2</div>
-                            <div>
-                                <h4 class="text-white font-medium text-sm">Initiate Lockdown</h4>
-                                <p class="text-xs text-slate-400 mt-1">Click encrypt. Your device generates a secure AES key and scrambles the data instantly.</p>
-                            </div>
-                        </li>
-                        <li class="flex gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-sm font-bold">3</div>
-                            <div>
-                                <h4 class="text-white font-medium text-sm">Distribute the Key</h4>
-                                <p class="text-xs text-slate-400 mt-1">Share the generated URL. The decryption key is hidden in the `#hash` fragment of the link.</p>
-                            </div>
-                        </li>
-                    </ol>
-                </section>
-
-                <section class="bg-slate-900/40 p-6 rounded-2xl border border-slate-800">
-                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <i class="ph ph-shield-check text-emerald-400 text-xl"></i> The Cryptographic Engine
-                    </h3>
-                    <p class="text-sm text-slate-400 leading-relaxed mb-4">
-                        ZeroKey utilizes the native <strong>Web Crypto API</strong> built directly into your browser. When you encrypt a payload, we use <strong>AES-256-GCM</strong> (Advanced Encryption Standard with Galois/Counter Mode).
-                    </p>
-                    <ul class="text-sm text-slate-400 space-y-3">
-                        <li class="flex items-start gap-2">
-                            <i class="ph ph-check text-emerald-400 mt-0.5"></i>
-                            <span><strong>No Server Trust:</strong> We never receive your plaintext or your decryption keys.</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="ph ph-check text-emerald-400 mt-0.5"></i>
-                            <span><strong>Tamper-Proof:</strong> GCM mode ensures authenticated encryption. If a single bit is altered in transit, decryption fails safely.</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="ph ph-check text-emerald-400 mt-0.5"></i>
-                            <span><strong>Ephemeral:</strong> Data is violently purged from PostgreSQL the moment it is read.</span>
-                        </li>
-                    </ul>
-                    <div class="mt-6 pt-4 border-t border-slate-800">
-                        <a href="/about" class="text-xs text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1 group">
-                            Read the full technical whitepaper <i class="ph ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        </a>
-                    </div>
-                </section>
+                <a href="/about" class="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-6 py-2.5 rounded-lg transition-colors text-sm font-medium">
+                    <i class="ph ph-book-open"></i> Read the Technical Whitepaper
+                </a>
             </div>
         </article>
     </div>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-8 pb-8 mt-12">
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-8 pb-8 mt-auto">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-wrap justify-center gap-6 text-xs font-medium text-slate-500 mb-4">
                 <a href="/about" class="hover:text-blue-400 transition-colors">Architecture</a>
@@ -234,12 +214,11 @@
                 <a href="/cookie-policy" class="hover:text-blue-400 transition-colors">Cookies</a>
             </div>
             <div class="text-center text-xs text-slate-700">
-                <p>&copy; 2026 ZeroKey.</p>
+                <p>&copy; 2026 ZeroKey. Built by Dippan Bhusal.</p>
             </div>
         </div>
     </footer>
-
-    <script src="/app.js"></script>
-
+<script src="app.js"></script>
+    <script src="/script.js"></script>
 </body>
 </html>
