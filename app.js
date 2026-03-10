@@ -138,7 +138,7 @@ document.getElementById('encryptBtn').addEventListener('click', async () => {
 
         const { id } = await response.json();
 
-        const secureLink = `${window.location.origin}/view.html?id=${id}&iv=${encodeURIComponent(ivBase64)}&salt=${encodeURIComponent(bufferToBase64(salt))}#${encodeURIComponent(hashData)}`;
+        const secureLink = `${window.location.origin}/view?id=${id}&iv=${encodeURIComponent(ivBase64)}&salt=${encodeURIComponent(bufferToBase64(salt))}#${encodeURIComponent(hashData)}`;
 
         document.getElementById('resultContainer').classList.remove('hidden');
         document.getElementById('linkOutput').value = secureLink;
