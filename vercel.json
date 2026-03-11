@@ -1,4 +1,35 @@
 {
-   "cleanUrls": true,
-  "trailingSlash": false
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/encrypt", "destination": "/encrypt.html" },
+    { "source": "/view", "destination": "/view.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/donate", "destination": "/donate.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/disclaimer", "destination": "/disclaimer.html" },
+    { "source": "/cookie-policy", "destination": "/cookie-policy.html" }
+  ]
 }
