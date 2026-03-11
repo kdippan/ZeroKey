@@ -41,6 +41,22 @@ async function decryptBuffer(encryptedBase64, key, ivBase64) {
     return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: ivBuffer }, key, encryptedBuffer);
 }
 
+async function verifyBiometrics() {
+    try {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        await navigator.credentials.create({
+            publicKey: {
+                challenge, rp: { name: "ZeroKey", id: window.location.hostname },
+                user: { id: new Uint8Array(16), name: "user", displayName: "User" },
+                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                authenticatorSelection: { userVerification: "required" }, timeout: 60000
+            }
+        });
+        return true;
+    } catch (err) { return false; }
+}
+
 function getDistance(lat1, lon1, lat2, lon2) {
     const R = 6371e3; const rad = Math.PI / 180;
     const a = Math.sin((lat2-lat1)*rad/2)**2 + Math.cos(lat1*rad)*Math.cos(lat2*rad)*Math.sin((lon2-lon1)*rad/2)**2;
@@ -94,6 +110,20 @@ document.getElementById('decryptBtn').addEventListener('click', async () => {
     if (hashKey === "LOCKED") {
         activePin = document.getElementById('receiverPin').value.trim();
         if (!activePin) return alert("Decryption PIN is required.");
+    } else {
+        const isAuthorized = await verifyBiometrics();
+        if (!isAuthorized) {
+            failedAttempts++;
+            if (failedAttempts >= 3) {
+                await fetch('/api/destroySecret', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: payloadId }) 
+                });
+                return triggerGlitchLockout("Max biometric failures.");
+            }
+            return alert("Authentication required by device owner.");
+        }
     }
 
     const btn = document.getElementById('decryptBtn');
