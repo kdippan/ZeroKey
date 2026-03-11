@@ -1,51 +1,56 @@
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
-    
-    const { encryptedBase64, ivBase64, encryptedFileBase64, fileIvBase64 } = req.body;
-    if (!encryptedBase64 || !ivBase64) return res.status(400).json({ error: 'Missing required fields' });
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-    let filePath = null;
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
+    }
 
     try {
-        if (encryptedFileBase64) {
-            const fileName = `payload_${Date.now()}_${Math.random().toString(36).substring(7)}.enc`;
-            const fileBuffer = Buffer.from(encryptedFileBase64, 'base64');
-            
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('vault')
-                .upload(fileName, fileBuffer, { contentType: 'application/octet-stream' });
-                
-            if (uploadError) {
-                return res.status(403).json({ error: `Supabase Storage Error: ${uploadError.message}` });
-            }
-            filePath = uploadData.path;
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const { 
+            encrypted_payload, 
+            iv, 
+            salt, 
+            has_pin, 
+            has_file, 
+            file_id, 
+            geo_lat, 
+            geo_lng 
+        } = req.body;
+
+        if (!encrypted_payload || !iv || !salt) {
+            return res.status(400).json({ error: 'Missing critical cryptographic parameters' });
         }
 
-        const { data, error } = await supabase.from('secrets').insert([{ 
-            encrypted_text: encryptedBase64, 
-            iv_data: ivBase64,
-            file_path: filePath,
-            file_iv: fileIvBase64 || null
-        }]).select();
-        
-        if (error) {
-            return res.status(403).json({ error: `Supabase Database Error: ${error.message}` });
-        }
-        
-        return res.status(200).json({ id: data[0].id });
-        
+        const { data, error } = await supabase
+            .from('secrets')
+            .insert([{
+                encrypted_payload,
+                iv,
+                salt,
+                has_pin: has_pin || false,
+                has_file: has_file || false,
+                file_id: file_id || null,
+                geo_lat: geo_lat || null,
+                geo_lng: geo_lng || null
+            }])
+            .select('id')
+            .single();
+
+        if (error) throw error;
+
+        return res.status(200).json({ success: true, id: data.id });
+
     } catch (error) {
-        return res.status(500).json({ error: `Server Crash: ${error.message}` });
+        console.error('Save error:', error.message);
+        return res.status(500).json({ error: 'Failed to encrypt and store payload' });
     }
 }
-
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '5mb'
-        }
-    }
-};
