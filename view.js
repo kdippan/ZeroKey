@@ -41,22 +41,6 @@ async function decryptBuffer(encryptedBase64, key, ivBase64) {
     return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: ivBuffer }, key, encryptedBuffer);
 }
 
-async function verifyBiometrics() {
-    try {
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-        await navigator.credentials.create({
-            publicKey: {
-                challenge, rp: { name: "ZeroKey", id: window.location.hostname },
-                user: { id: new Uint8Array(16), name: "user", displayName: "User" },
-                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
-                authenticatorSelection: { userVerification: "required" }, timeout: 60000
-            }
-        });
-        return true;
-    } catch (err) { return false; }
-}
-
 function getDistance(lat1, lon1, lat2, lon2) {
     const R = 6371e3; const rad = Math.PI / 180;
     const a = Math.sin((lat2-lat1)*rad/2)**2 + Math.cos(lat1*rad)*Math.cos(lat2*rad)*Math.sin((lon2-lon1)*rad/2)**2;
@@ -91,11 +75,10 @@ function cipherReveal(element, finalString) {
 
 const urlParams = new URLSearchParams(window.location.search);
 const payloadId = urlParams.get('id');
-const ivBase64 = urlParams.get('iv');
-const saltBase64 = urlParams.get('salt');
 const hashKey = window.location.hash.substring(1);
 
 let activeObjectUrl = null;
+let failedAttempts = 0;
 
 document.getElementById('verifyHumanBtn').addEventListener('click', () => {
     initAudio(); playBeep(600, 'sine', 0.1, 0.1);
@@ -104,25 +87,13 @@ document.getElementById('verifyHumanBtn').addEventListener('click', () => {
     if (hashKey === "LOCKED") document.getElementById('pinContainer').classList.remove('hidden');
 });
 
-let failedAttempts = 0;
-
 document.getElementById('decryptBtn').addEventListener('click', async () => {
-    if (!payloadId || !ivBase64 || !saltBase64 || !hashKey) return alert("Broken link.");
+    if (!payloadId || !hashKey) return alert("Broken link.");
 
     let activePin = hashKey;
     if (hashKey === "LOCKED") {
         activePin = document.getElementById('receiverPin').value.trim();
         if (!activePin) return alert("Decryption PIN is required.");
-    } else {
-        const isAuthorized = await verifyBiometrics();
-        if (!isAuthorized) {
-            failedAttempts++;
-            if (failedAttempts >= 3) {
-                fetch('/api/destroySecret', { method: 'POST', body: JSON.stringify({ id: payloadId }) });
-                return triggerGlitchLockout("Max biometric failures.");
-            }
-            return alert("Authentication required by device owner.");
-        }
     }
 
     const btn = document.getElementById('decryptBtn');
@@ -130,16 +101,13 @@ document.getElementById('decryptBtn').addEventListener('click', async () => {
     btn.disabled = true;
 
     try {
-        const response = await fetch('/api/getSecret', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: payloadId })
-        });
+        const response = await fetch(`/api/getSecret?id=${payloadId}`, { method: 'GET' });
         if (!response.ok) throw new Error("Intercepted or destroyed.");
         
-        const { encryptedBase64, encryptedFileBase64, fileIvBase64 } = await response.json();
-        const cryptoKey = await deriveKey(activePin, saltBase64);
+        const dbData = await response.json();
+        const cryptoKey = await deriveKey(activePin, dbData.salt);
 
-        const decryptedTextBuffer = await decryptBuffer(encryptedBase64, cryptoKey, decodeURIComponent(ivBase64));
+        const decryptedTextBuffer = await decryptBuffer(dbData.encrypted_payload, cryptoKey, dbData.iv);
         const payloadJson = new TextDecoder().decode(decryptedTextBuffer);
         const payload = JSON.parse(payloadJson);
 
@@ -153,34 +121,41 @@ document.getElementById('decryptBtn').addEventListener('click', async () => {
                     }, err => rej("Location denied.")
                 ));
             } catch (geoErr) {
-                fetch('/api/destroySecret', { method: 'POST', body: JSON.stringify({ id: payloadId }) });
+                await fetch('/api/destroySecret', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: payloadId }) 
+                });
                 return triggerGlitchLockout(geoErr);
             }
         }
 
-        if (payload.hasFile && encryptedFileBase64 && fileIvBase64) {
-            btn.innerHTML = '<i class="ph ph-file-lock animate-spin text-xl"></i> Decrypting Media...';
+        if (payload.file) {
+            btn.innerHTML = '<i class="ph ph-file-lock animate-spin text-xl"></i> Rendering Media...';
             
-            const decryptedFileBuffer = await decryptBuffer(encryptedFileBase64, cryptoKey, decodeURIComponent(fileIvBase64));
-            const blob = new Blob([decryptedFileBuffer], { type: payload.fileType });
-            activeObjectUrl = URL.createObjectURL(blob);
-
+            activeObjectUrl = payload.file.data;
             document.getElementById('mediaContainer').classList.remove('hidden');
 
-            if (payload.fileType && payload.fileType.startsWith('image/')) {
+            if (payload.file.type && payload.file.type.startsWith('image/')) {
                 const img = document.getElementById('decryptedImage');
                 img.src = activeObjectUrl;
                 img.classList.remove('hidden');
             } else {
                 const fileDiv = document.getElementById('decryptedFile');
-                document.getElementById('decryptedFileName').innerHTML = `<i class="ph ph-file-dashed text-blue-400 text-xl"></i> <span class="truncate">${payload.fileName}</span>`;
+                document.getElementById('decryptedFileName').innerHTML = `<i class="ph ph-file-dashed text-blue-400 text-xl"></i> <span class="truncate">${payload.file.name}</span>`;
                 const dwnBtn = document.getElementById('downloadFileBtn');
                 dwnBtn.href = activeObjectUrl;
-                dwnBtn.download = payload.fileName;
+                dwnBtn.download = payload.file.name;
                 fileDiv.classList.remove('hidden');
                 fileDiv.classList.add('flex');
             }
         }
+
+        await fetch('/api/destroySecret', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: payloadId }) 
+        });
 
         playBeep(800, 'sine', 0.1, 0.2); 
         window.history.replaceState(null, null, window.location.pathname);
@@ -192,8 +167,16 @@ document.getElementById('decryptBtn').addEventListener('click', async () => {
 
     } catch (error) {
         failedAttempts++;
-        if (failedAttempts >= 3) triggerGlitchLockout("Decryption failed.");
-        else alert("Decryption failed. Wrong PIN or corrupted data.");
+        if (failedAttempts >= 3) {
+            await fetch('/api/destroySecret', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: payloadId }) 
+            });
+            triggerGlitchLockout("Decryption failed.");
+        } else {
+            alert("Decryption failed. Wrong PIN or corrupted data.");
+        }
         btn.innerHTML = '<i class="ph ph-fire text-xl"></i> Decrypt & Read';
         btn.disabled = false;
     }
@@ -213,7 +196,7 @@ function startSelfDestructTimer() {
 
         if (timeLeft <= 10 && timeLeft > 0) {
             playBeep(100, 'sine', 0.1, 0.5); 
-            gsap.to(timeDisplay, { color: "#ef4444", scale: 1.25, yoyo: true, repeat: 1, duration: 0.2 });
+            try { gsap.to(timeDisplay, { color: "#ef4444", scale: 1.25, yoyo: true, repeat: 1, duration: 0.2 }); } catch(e){}
         }
 
         if (timeLeft <= 0) {
@@ -221,23 +204,27 @@ function startSelfDestructTimer() {
             playBeep(200, 'square', 0.3, 0.1); 
             if (navigator.vibrate) navigator.vibrate([50, 50, 300]);
             
-            if (activeObjectUrl) {
-                URL.revokeObjectURL(activeObjectUrl);
-                activeObjectUrl = null;
-            }
-
             secretMessage.classList.add('disintegrate');
             if(document.getElementById('decryptedImage')) document.getElementById('decryptedImage').classList.add('disintegrate');
             
-            gsap.to(containers, {
-                opacity: 0, height: 0, duration: 1.5, delay: 1.5,
-                onComplete: () => {
-                    document.getElementById('decryptedState').classList.add('hidden');
-                    document.getElementById('destroyedState').classList.remove('hidden');
-                    secretMessage.innerText = '';
-                    document.getElementById('decryptedImage').src = '';
-                }
-            });
+            try {
+                gsap.to(containers, {
+                    opacity: 0, height: 0, duration: 1.5, delay: 1.5,
+                    onComplete: () => {
+                        document.getElementById('decryptedState').classList.add('hidden');
+                        document.getElementById('destroyedState').classList.remove('hidden');
+                        secretMessage.innerText = '';
+                        document.getElementById('decryptedImage').src = '';
+                        activeObjectUrl = null;
+                    }
+                });
+            } catch(e) {
+                document.getElementById('decryptedState').classList.add('hidden');
+                document.getElementById('destroyedState').classList.remove('hidden');
+                secretMessage.innerText = '';
+                document.getElementById('decryptedImage').src = '';
+                activeObjectUrl = null;
+            }
         }
     }, 1000);
 }
