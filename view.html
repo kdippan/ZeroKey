@@ -1,138 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
-<link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64x64.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.png">
-<link rel="icon" type="image/png" sizes="128x128" href="/assets/favicon-128x128.png">
-
-<link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="/assets/favicon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="/assets/favicon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/assets/favicon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="/assets/favicon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon-152x152.png">
-<link rel="apple-touch-icon" sizes="167x167" href="/assets/favicon-167x167.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-
-<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
-<link rel="icon" type="image/png" sizes="256x256" href="/assets/favicon-256x256.png">
-<link rel="icon" type="image/png" sizes="384x384" href="/assets/favicon-384x384.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
-<link rel="manifest" href="/assets/site.webmanifest">
-
-<meta name="msapplication-TileColor" content="#0f172a">
-<meta name="msapplication-TileImage" content="/assets/favicon-144x144.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Secure Vault | ZeroKey</title>
-<meta name="description" content="Authenticate to decrypt and view a secure, self-destructing payload locally on your device.">
-<meta name="keywords" content="decrypt message, view secure payload, zero-knowledge decryption, self-destructing message, ZeroKey vault">
+    <title>Secure Vault | ZeroKey</title>
+    
+    <meta name="description" content="Authenticate to decrypt and view a secure, self-destructing payload locally on your device.">
+    <meta name="keywords" content="decrypt message, view secure payload, zero-knowledge decryption, self-destructing message, ZeroKey vault">
+    <meta name="author" content="Dippan Bhusal">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zerokey.vercel.app/view">
+    <meta property="og:title" content="Encrypted Payload | ZeroKey">
+    <meta property="og:description" content="A secure, self-destructing payload has been sent to you. WebAuthn required for decryption.">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/view.png">
 
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://zerokey.vercel.app/view">
-<meta property="og:title" content="Encrypted Payload | ZeroKey">
-<meta property="og:description" content="A secure, self-destructing payload has been sent to you. WebAuthn required for decryption.">
-<meta property="og:image" content="https://zerokey.vercel.app/assets/og/view.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Encrypted Payload | ZeroKey">
+    <meta property="twitter:description" content="A secure, self-destructing payload has been sent to you. WebAuthn required for decryption.">
+    <meta property="twitter:image" content="https://zerokey.vercel.app/assets/og/view.png">
 
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:title" content="Encrypted Payload | ZeroKey">
-<meta property="twitter:description" content="A secure, self-destructing payload has been sent to you. WebAuthn required for decryption.">
-<meta property="twitter:image" content="https://zerokey.vercel.app/assets/og/view.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ZeroKey Vault Viewer",
+      "description": "Client-side decryption gateway for ZeroKey ephemeral payloads.",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "All",
+      "creator": {
+        "@type": "Person",
+        "name": "Dippan Bhusal",
+        "url": "https://github.com/kdippan"
+      }
+    }
+    </script>
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "ZeroKey Vault Viewer",
-  "description": "Client-side decryption gateway for ZeroKey ephemeral payloads.",
-  "applicationCategory": "SecurityApplication",
-  "operatingSystem": "All"
-}
-</script>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64x64.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/assets/favicon-128x128.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/assets/favicon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/favicon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/favicon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/assets/favicon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon-152x152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/assets/favicon-167x167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="/assets/favicon-256x256.png">
+    <link rel="icon" type="image/png" sizes="384x384" href="/assets/favicon-384x384.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <meta name="msapplication-TileImage" content="/assets/favicon-144x144.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
-<body class="bg-[#0f172a] text-white min-h-screen flex items-center justify-center font-sans p-4 overflow-hidden relative">
-    <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-red-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+<body class="bg-[#0f172a] text-white min-h-screen flex flex-col font-sans overflow-x-hidden relative selection:bg-red-500/30 selection:text-red-200">
+    
+    <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="absolute bottom-1/3 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
-    <div id="mainCard" class="glass-panel p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-700/50 text-center relative overflow-hidden transition-all duration-300 max-h-[95vh] overflow-y-auto">
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/about" class="hover:text-white transition-colors">Architecture</a>
+                <a href="/contact" class="hover:text-white transition-colors">Contact</a>
+            </div>
+            <a href="/encrypt" class="bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all border border-slate-700 flex items-center gap-2">
+                <i class="ph ph-plus"></i> New Payload
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow flex items-center justify-center w-full px-4 py-12">
         
-        <div id="antiBotState" class="block py-6">
-            <i class="ph ph-robot-slash text-5xl text-slate-500 mb-4"></i>
-            <h2 class="text-2xl font-bold mb-2">Human Verification</h2>
-            <p class="text-slate-400 mb-8 text-sm px-4">To prevent automated bots from destroying this payload, please initialize the connection manually.</p>
-            <button id="verifyHumanBtn" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-4 px-4 rounded-xl transition-all border border-slate-500 shadow-inner">
-                Initialize Secure Link
-            </button>
-        </div>
-
-        <div id="lockedState" class="hidden">
-            <div class="inline-block p-4 bg-red-500/10 rounded-full mb-4 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
-                <i class="ph ph-warning-circle text-red-500 text-5xl"></i>
-            </div>
-            <h2 class="text-2xl font-bold mb-2">Highly Secure Payload</h2>
-            <p class="text-slate-400 mb-6 text-sm px-2">This message and attached media will self-destruct from the server permanently the moment you decrypt it.</p>
+        <div id="mainCard" class="glass-panel p-8 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-full max-w-lg border border-slate-700/50 bg-slate-900/80 backdrop-blur-md text-center relative overflow-hidden transition-all duration-300 max-h-[85vh] overflow-y-auto">
             
-            <div id="pinContainer" class="hidden mb-6 text-left">
-                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block"><i class="ph ph-password"></i> Decryption PIN Required</label>
-                <input type="password" id="receiverPin" class="w-full bg-slate-900 text-slate-200 border border-slate-600 rounded-lg p-3 text-center tracking-[0.5em] focus:outline-none focus:border-red-500" placeholder="••••">
+            <div id="antiBotState" class="block py-6">
+                <i class="ph ph-robot-slash text-5xl text-slate-500 mb-4"></i>
+                <h2 class="text-2xl font-bold mb-2">Human Verification</h2>
+                <p class="text-slate-400 mb-8 text-sm px-4">To prevent automated bots from destroying this payload, please initialize the connection manually.</p>
+                <button id="verifyHumanBtn" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-4 px-4 rounded-xl transition-all border border-slate-500 shadow-inner">
+                    Initialize Secure Link
+                </button>
             </div>
 
-            <button id="decryptBtn" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl transition-all flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
-                <i class="ph ph-fire text-xl"></i> Decrypt & Read
-            </button>
-        </div>
-
-        <div id="decryptedState" class="hidden text-left w-full relative">
-            <div class="flex justify-between items-center mb-6 border-b border-slate-700/80 pb-4">
-                <span class="text-emerald-400 font-mono text-sm flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-                    <i class="ph ph-lock-unlocked weight-fill"></i> Decrypted Locally
-                </span>
-                <div class="relative w-12 h-12 flex items-center justify-center">
-                    <svg class="absolute inset-0 w-full h-full transform -rotate-90">
-                        <circle cx="24" cy="24" r="20" stroke="rgba(51, 65, 85, 0.4)" stroke-width="4" fill="none" />
-                        <circle id="burnRing" cx="24" cy="24" r="20" stroke="#ef4444" stroke-width="4" fill="none" stroke-dasharray="125.6" stroke-dashoffset="0" stroke-linecap="round" />
-                    </svg>
-                    <span id="time" class="text-white font-mono text-sm font-bold z-10 drop-shadow-md">30</span>
+            <div id="lockedState" class="hidden">
+                <div class="inline-block p-4 bg-red-500/10 rounded-full mb-4 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                    <i class="ph ph-warning-circle text-red-500 text-5xl"></i>
                 </div>
+                <h2 class="text-2xl font-bold mb-2">Highly Secure Payload</h2>
+                <p class="text-slate-400 mb-6 text-sm px-2">This message and attached media will self-destruct from the server permanently the moment you decrypt it.</p>
+                
+                <div id="pinContainer" class="hidden mb-6 text-left">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block"><i class="ph ph-password"></i> Decryption PIN Required</label>
+                    <input type="password" id="receiverPin" class="w-full bg-slate-950 text-slate-200 border border-slate-700 rounded-lg p-3 text-center tracking-[0.5em] focus:outline-none focus:border-red-500 transition-colors shadow-inner" placeholder="••••">
+                </div>
+
+                <button id="decryptBtn" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl transition-all flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
+                    <i class="ph ph-fire text-xl"></i> Decrypt & Read
+                </button>
             </div>
 
-            <div id="mediaContainer" class="hidden mb-4 secret-text-container p-2 bg-slate-900/40 rounded-xl border border-slate-700/50">
-                <img id="decryptedImage" class="hidden w-full h-auto rounded-lg object-contain max-h-64 shadow-inner" src="" alt="Secure Media">
-                <div id="decryptedFile" class="hidden flex items-center justify-between p-3 bg-slate-800 rounded-lg">
-                    <span id="decryptedFileName" class="text-sm font-mono text-slate-200 truncate flex items-center gap-2 max-w-[70%]">
-                        <i class="ph ph-file-dashed text-blue-400 text-xl"></i> <span class="truncate">filename.ext</span>
+            <div id="decryptedState" class="hidden text-left w-full relative">
+                <div class="flex justify-between items-center mb-6 border-b border-slate-700/80 pb-4">
+                    <span class="text-emerald-400 font-mono text-sm flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                        <i class="ph ph-lock-unlocked weight-fill"></i> Decrypted Locally
                     </span>
-                    <a id="downloadFileBtn" href="#" download class="bg-blue-600 hover:bg-blue-500 text-white p-2.5 rounded-lg transition-colors shadow-md">
-                        <i class="ph ph-download-simple"></i>
-                    </a>
+                    <div class="relative w-12 h-12 flex items-center justify-center">
+                        <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                            <circle cx="24" cy="24" r="20" stroke="rgba(51, 65, 85, 0.4)" stroke-width="4" fill="none" />
+                            <circle id="burnRing" cx="24" cy="24" r="20" stroke="#ef4444" stroke-width="4" fill="none" stroke-dasharray="125.6" stroke-dashoffset="0" stroke-linecap="round" />
+                        </svg>
+                        <span id="time" class="text-white font-mono text-sm font-bold z-10 drop-shadow-md">30</span>
+                    </div>
+                </div>
+
+                <div id="mediaContainer" class="hidden mb-4 p-2 bg-slate-950/60 rounded-xl border border-slate-700/50 shadow-inner">
+                    <img id="decryptedImage" class="hidden w-full h-auto rounded-lg object-contain max-h-64" src="" alt="Secure Media">
+                    <div id="decryptedFile" class="hidden flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                        <span id="decryptedFileName" class="text-sm font-mono text-slate-200 truncate flex items-center gap-2 max-w-[70%]">
+                            <i class="ph ph-file-dashed text-blue-400 text-xl"></i> <span class="truncate">filename.ext</span>
+                        </span>
+                        <a id="downloadFileBtn" href="#" download class="bg-blue-600 hover:bg-blue-500 text-white p-2.5 rounded-lg transition-colors shadow-md">
+                            <i class="ph ph-download-simple"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="min-h-[100px] bg-slate-950/60 p-5 rounded-xl border border-slate-700/50 shadow-inner overflow-y-auto max-h-60">
+                    <p id="secretMessage" class="text-slate-200 font-mono text-sm whitespace-pre-wrap leading-relaxed break-words"></p>
                 </div>
             </div>
 
-            <div class="secret-text-container min-h-[100px] bg-slate-900/40 p-5 rounded-xl border border-slate-700/50 shadow-inner">
-                <p id="secretMessage" class="text-slate-200 font-mono text-sm whitespace-pre-wrap leading-relaxed break-words"></p>
+            <div id="destroyedState" class="hidden pt-6 pb-2">
+                <div class="inline-block p-4 bg-slate-800/80 rounded-full mb-4 border border-slate-700 shadow-inner">
+                    <i class="ph ph-wind text-slate-400 text-5xl" id="destroyIcon"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-400 mb-2" id="destroyTitle">Vault Destroyed</h2>
+                <p class="text-slate-500 text-sm px-4" id="destroyDesc">This payload and media have been permanently wiped from the server and your device.</p>
             </div>
         </div>
 
-        <div id="destroyedState" class="hidden pt-6 pb-2">
-            <div class="inline-block p-4 bg-slate-800/80 rounded-full mb-4 border border-slate-700 shadow-inner">
-                <i class="ph ph-wind text-slate-400 text-5xl" id="destroyIcon"></i>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-8 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-center gap-6 text-xs font-medium text-slate-500 mb-4">
+                <a href="/about" class="hover:text-blue-400 transition-colors">Architecture</a>
+                <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy</a>
+                <a href="/terms" class="hover:text-blue-400 transition-colors">Terms</a>
+                <a href="/disclaimer" class="hover:text-blue-400 transition-colors">Disclaimer</a>
+                <a href="/cookie-policy" class="hover:text-blue-400 transition-colors">Cookies</a>
+                <a href="/donate" class="hover:text-red-400 transition-colors text-red-500/70">Donate</a>
             </div>
-            <h2 class="text-2xl font-bold text-slate-400 mb-2" id="destroyTitle">Vault Destroyed</h2>
-            <p class="text-slate-500 text-sm px-4" id="destroyDesc">This payload and media have been permanently wiped from the server and your device.</p>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-4 mt-4">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
-    </div>
-    <script src="view.js"></script>
+    </footer>
+
+    <script src="/view.js"></script>
 </body>
 </html>
