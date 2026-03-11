@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Support | ZeroKey</title>
@@ -31,7 +39,8 @@
       "mainEntity": {
         "@type": "Person",
         "name": "Dippan Bhusal",
-        "email": "Dippan.connect@gmail.com"
+        "email": "Dippan.connect@gmail.com",
+        "url": "https://github.com/kdippan"
       }
     }
     </script>
@@ -44,7 +53,6 @@
     <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64x64.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="128x128" href="/assets/favicon-128x128.png">
-
     <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon-72x72.png">
@@ -55,13 +63,11 @@
     <link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon-152x152.png">
     <link rel="apple-touch-icon" sizes="167x167" href="/assets/favicon-167x167.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
     <link rel="icon" type="image/png" sizes="256x256" href="/assets/favicon-256x256.png">
     <link rel="icon" type="image/png" sizes="384x384" href="/assets/favicon-384x384.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
     <link rel="manifest" href="/assets/site.webmanifest">
-
     <meta name="msapplication-TileColor" content="#0f172a">
     <meta name="msapplication-TileImage" content="/assets/favicon-144x144.png">
 
@@ -142,16 +148,24 @@
         </main>
     </div>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-8 pb-8 mt-auto">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap justify-center gap-6 text-xs font-medium text-slate-500 mb-4">
-                <a href="/about" class="hover:text-blue-400 transition-colors">Architecture</a>
-                <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy</a>
-                <a href="/terms" class="hover:text-blue-400 transition-colors">Terms</a>
-                <a href="/donate" class="hover:text-red-400 transition-colors text-red-500/70">Donate</a>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight">
+                    <i class="ph ph-fingerprint text-slate-500"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/terms" class="hover:text-blue-400 transition-colors">Terms & Conditions</a>
+                    <a href="/disclaimer" class="hover:text-blue-400 transition-colors">Disclaimer</a>
+                    <a href="/cookie-policy" class="hover:text-blue-400 transition-colors">Cookie Policy</a>
+                    <a href="/donate" class="hover:text-red-400 transition-colors text-red-500/70">Donate</a>
+                </div>
             </div>
-            <div class="text-center text-xs text-slate-700">
-                <p>&copy; 2026 ZeroKey. Built by Dippan Bhusal.</p>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
             </div>
         </div>
     </footer>
