@@ -1,36 +1,40 @@
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
-    const { id } = req.body;
-    if (!id) return res.status(400).json({ error: 'Missing ID' });
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
+    }
 
     try {
-        const { data, error: fetchError } = await supabase.from('secrets').select('*').eq('id', id).single();
-        if (fetchError || !data) return res.status(404).json({ error: 'Payload not found.' });
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const supabase = createClient(supabaseUrl, supabaseKey);
 
-        let encryptedFileBase64 = null;
+        const { id } = req.query;
 
-        if (data.file_path) {
-            const { data: fileData, error: downloadError } = await supabase.storage.from('vault').download(data.file_path);
-            if (!downloadError) {
-                const buffer = await fileData.arrayBuffer();
-                encryptedFileBase64 = Buffer.from(buffer).toString('base64');
-            }
-            await supabase.storage.from('vault').remove([data.file_path]);
+        if (!id) {
+            return res.status(400).json({ error: 'Missing payload ID' });
         }
 
-        await supabase.from('secrets').delete().eq('id', id);
+        const { data, error } = await supabase
+            .from('secrets')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-        return res.status(200).json({ 
-            encryptedBase64: data.encrypted_text,
-            encryptedFileBase64: encryptedFileBase64,
-            fileIvBase64: data.file_iv
-        });
+        if (error || !data) {
+            return res.status(404).json({ error: 'Vault destroyed or not found' });
+        }
+
+        return res.status(200).json(data);
+
     } catch (error) {
-        console.error('Database Error:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Retrieval error:', error.message);
+        return res.status(500).json({ error: 'Failed to retrieve payload' });
     }
 }
