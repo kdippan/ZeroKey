@@ -1,0 +1,11 @@
+# https://zerokey.vercel.app/robots.txt
+# Rules for all search engine bots
+User-agent: *
+Allow: /
+
+# SECURITY: Do NOT index user payload viewing links
+Disallow: /view
+Disallow: /view?id=*
+
+# Link to the sitemap
+Sitemap: https://zerokey.vercel.app/sitemap.xml
