@@ -28,9 +28,45 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
     <meta name="msapplication-TileColor" content="#0f172a">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
     <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30">
     
@@ -77,14 +113,14 @@
                 </div>
             </header>
 
-            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
                 
                 <p class="text-xl text-slate-200 leading-relaxed font-medium">
                     Uploading raw, unencrypted files directly to an S3 bucket or a cloud database is a massive liability. If you are building a secure messaging app, a whistleblower portal, or a document-sharing platform, you must assume your servers will eventually be compromised.
                 </p>
                 
                 <p>
-                    The safest approach is <strong class="text-white">client-side encryption</strong>. By encrypting the file in the user's browser before it ever hits the network, you ensure that your backend only stores unreadable ciphertext. In this tutorial, we will use Vanilla JavaScript and the native <code class="bg-slate-800 px-1 rounded">window.crypto.subtle</code> API to encrypt a file using AES-256-GCM.
+                    The safest approach is <strong class="text-white">client-side encryption</strong>. By encrypting the file in the user's browser before it ever hits the network, you ensure that your backend only stores unreadable ciphertext. In this tutorial, we will use Vanilla JavaScript and the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">window.crypto.subtle</code> API to encrypt a file using AES-256-GCM.
                 </p>
 
                 <h2 class="text-2xl font-bold pt-8">Why Use the Web Crypto API?</h2>
@@ -94,7 +130,7 @@
 
                 <h2 class="text-2xl font-bold pt-8">Step 1: Reading the File as an ArrayBuffer</h2>
                 <p>
-                    Cryptographic functions do not understand standard DOM File objects. Before we can encrypt a file, we must convert it into raw binary data using an <code class="bg-slate-800 px-1 rounded">ArrayBuffer</code>.
+                    Cryptographic functions do not understand standard DOM File objects. Before we can encrypt a file, we must convert it into raw binary data using an <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">ArrayBuffer</code>.
                 </p>
 
 <pre><code class="language-javascript">const fileInput = document.getElementById('myFileInput');
@@ -162,7 +198,7 @@ fileInput.addEventListener('change', async (event) => {
                     The code above successfully converts a file into secure ciphertext. However, the hardest part of building a zero-knowledge application is <strong class="text-white">Key Exchange</strong>. How do you give the receiving user the decryption key without sending it to your database?
                 </p>
                 <p>
-                    A common technique is the <strong class="text-white">URL Fragment Exploit</strong>. You append the exported decryption key to the end of a shareable link after a hash symbol (e.g., <code>https://yoursite.com/view#SECRET_KEY</code>). Because browsers do not transmit URL fragments to the server, the backend remains completely blind to the key.
+                    A common technique is the <strong class="text-white">URL Fragment Exploit</strong>. You append the exported decryption key to the end of a shareable link after a hash symbol (e.g., <code class="font-mono text-emerald-300">https://yoursite.com/view#SECRET_KEY</code>). Because browsers do not transmit URL fragments to the server, the backend remains completely blind to the key.
                 </p>
 
                 <div class="glass-panel p-8 rounded-2xl border-2 border-purple-600/50 bg-purple-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-purple-500/80 transition-all">
@@ -194,6 +230,7 @@ fileInput.addEventListener('change', async (event) => {
                 </p>
 
             </div>
+            
             <footer class="mt-16 border-t border-slate-800 pt-10">
                 <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
                     <div class="flex items-center gap-4">
@@ -219,5 +256,8 @@ fileInput.addEventListener('change', async (event) => {
             <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
         </div>
     </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 </body>
 </html>
