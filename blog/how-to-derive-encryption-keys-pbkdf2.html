@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Derive AES Encryption Keys from Passwords (PBKDF2 Tutorial)</title>
+    <meta name="description" content="Learn how to securely convert human-readable passwords into AES-256 encryption keys using the Web Crypto API, PBKDF2, cryptographic salts, and iteration stretching.">
+    <meta name="keywords" content="PBKDF2 tutorial javascript, derive AES key from password, Web Crypto API deriveKey, password hashing browser, mitigate brute force attacks, secure PIN encryption javascript, zero-knowledge architecture">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/how-to-derive-encryption-keys-pbkdf2">
+    <meta property="og:title" content="How to Derive AES Encryption Keys from Passwords using PBKDF2">
+    <meta property="og:description" content="Stop using plain passwords for encryption. Learn how to stretch and salt passwords securely in the browser.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-indigo-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-indigo-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-math-operations"></i> Cryptography Engineering
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Derive AES Encryption Keys from Passwords (PBKDF2)
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> March 29, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-indigo-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 9 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    If you are building an end-to-end encrypted application, you cannot just pass a user's password directly into an encryption algorithm like AES-256-GCM. AES requires exactly 256 bits of highly randomized, uniform data to act as a key. Humans type passwords like <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">apple123</code>, which are short, predictable, and easily brute-forced.
+                </p>
+                
+                <p>
+                    To bridge the gap between human-readable passwords and military-grade encryption keys, we must use a <strong class="text-white">Key Derivation Function (KDF)</strong>. In this tutorial, we will use the native Web Crypto API to implement <strong class="text-white">PBKDF2</strong> (Password-Based Key Derivation Function 2) entirely in the browser.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Role of Salts and Iterations</h2>
+                <p>
+                    PBKDF2 protects against brute-force and rainbow table attacks using two critical mechanisms:
+                </p>
+                <ul class="list-disc list-outside pl-6 space-y-3">
+                    <li><strong class="text-white">Cryptographic Salt:</strong> A random string of data appended to the password before hashing. This ensures that even if two users choose the exact same password, their resulting encryption keys will be completely different.</li>
+                    <li><strong class="text-white">Iteration Count:</strong> PBKDF2 runs the hashing algorithm (like SHA-256) over and over again. By setting the iterations to 100,000 or more, we intentionally make the process computationally expensive. It takes the browser a fraction of a second to compute it once, but it would take an attacker centuries to compute it billions of times.</li>
+                </ul>
+
+                <h2 class="text-2xl font-bold pt-8">Step 1: Preparing the Raw Materials</h2>
+                <p>
+                    The Web Crypto API only accepts <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">ArrayBuffer</code> objects. First, we need to convert the user's password string into a buffer, and generate a 16-byte random salt.
+                </p>
+
+<pre><code class="language-javascript">// 1. Encode the password string into a Uint8Array
+const passwordString = "mySuperSecretPIN99!";
+const encoder = new TextEncoder();
+const passwordBuffer = encoder.encode(passwordString);
+
+// 2. Generate a 16-byte cryptographically secure random salt
+const salt = window.crypto.getRandomValues(new Uint8Array(16));
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 2: Importing the Key Material</h2>
+                <p>
+                    Before we can stretch the password, we must import it into the Web Crypto API as raw key material. Note that this is not an encryption key yet; it is just the raw material we will feed into PBKDF2.
+                </p>
+
+<pre><code class="language-javascript">async function importPasswordKey(passwordBuffer) {
+    return await window.crypto.subtle.importKey(
+        "raw",                 // Format of the key
+        passwordBuffer,        // The encoded password
+        { name: "PBKDF2" },    // Algorithm to use it with
+        false,                 // Not extractable
+        ["deriveKey"]          // What we will do with this key
+    );
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 3: Deriving the AES-256 Key</h2>
+                <p>
+                    Now we execute the heavy lifting. We take the imported password material, apply the salt, and run it through 100,000 iterations of SHA-256. The output will be a perfect, 256-bit AES-GCM encryption key.
+                </p>
+
+<pre><code class="language-javascript">async function deriveAESKey(keyMaterial, salt) {
+    return await window.crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 100000, // Make brute-forcing mathematically unfeasible
+            hash: "SHA-256"
+        },
+        keyMaterial,
+        { 
+            name: "AES-GCM", 
+            length: 256 // We want a 256-bit key output
+        },
+        false, // Do not allow the raw key to be exported
+        ["encrypt", "decrypt"]
+    );
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">The Complete Workflow</h2>
+                <p>
+                    Putting it all together, here is the complete wrapper function. When a user creates a secure payload, you run their PIN through this function to get the key used for encryption.
+                </p>
+
+<pre><code class="language-javascript">async function getEncryptionKeyFromPIN(pinString) {
+    // 1. Setup
+    const encoder = new TextEncoder();
+    const pinBuffer = encoder.encode(pinString);
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+
+    // 2. Import & Derive
+    const keyMaterial = await window.crypto.subtle.importKey(
+        "raw", pinBuffer, { name: "PBKDF2" }, false, ["deriveKey"]
+    );
+    
+    const aesKey = await window.crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+    );
+
+    // You MUST save the salt alongside the ciphertext in your database.
+    // The recipient will need the exact same salt to reverse the process.
+    return { aesKey, salt };
+}
+</code></pre>
+                
+                <p class="border-l-4 border-indigo-500 pl-6 text-xl italic text-slate-100 bg-indigo-950/20 py-6 rounded-r-xl mt-8">
+                    <i class="ph-fill ph-warning-circle text-indigo-400 mr-2"></i> <strong class="text-white">Crucial Detail:</strong> The salt is not a secret. It must be stored in plaintext in your database alongside the encrypted payload. When the recipient enters the PIN, you must pull that exact salt from the database and feed it into the exact same PBKDF2 function to derive the matching decryption key.
+                </p>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-indigo-600/50 bg-indigo-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-indigo-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-password text-[160px] text-indigo-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">See PBKDF2 in Production</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            We implemented this exact PBKDF2 architecture in <strong class="text-indigo-400">ZeroKey</strong> to allow users to lock their burn-after-reading payloads with a custom PIN. 
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            The heavy computational stretching happens instantly on the client's GPU/CPU, ensuring that the backend server never sees the raw PIN or the derived AES key.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-lock-key"></i> Lock a Payload
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View Cryptography Logic
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    Key derivation is the unsung hero of applied cryptography. By leveraging PBKDF2 through the native Web Crypto API, you can confidently take human-readable inputs and stretch them into unbreakable, mathematically random AES-256 keys directly in the browser, leaving no attack vector for your backend.
+                </p>
+
+            </div>
+            
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-indigo-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-indigo-400 hover:text-indigo-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
