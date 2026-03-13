@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Build a Geofenced Web App (Restrict Access by Location in JS)</title>
+    <meta name="description" content="Learn how to restrict access to web content based on a user's physical location using the Geolocation API and the Haversine formula in Vanilla JavaScript.">
+    <meta name="keywords" content="geofencing javascript tutorial, restrict access by location web app, navigator.geolocation example, calculate distance between two coordinates javascript, haversine formula javascript, location based security, physical security layer web app">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/how-to-build-geofencing-javascript">
+    <meta property="og:title" content="How to Build a Geofenced Web App (Restrict Access by Location)">
+    <meta property="og:description" content="Stop remote attacks by adding a physical boundary to your web application using the Geolocation API.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-rose-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-rose-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-map-pin"></i> Location Based Security
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Build a Geofenced Web App in JavaScript
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> April 2, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-rose-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 7 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-rose-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    In cybersecurity, we often focus entirely on cryptographic boundaries—passwords, encryption keys, and tokens. But sometimes, the strongest security layer is a physical one. What if you want to share a WiFi password, but only with someone physically standing inside your office?
+                </p>
+                
+                <p>
+                    By implementing a <strong class="text-white">Geofence</strong>, we can restrict access to web content based on the user's GPS coordinates. In this tutorial, we will use the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">navigator.geolocation</code> API and the Haversine formula to build a client-side location lock in Vanilla JavaScript.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Step 1: Fetching the User's Coordinates</h2>
+                <p>
+                    Before we can verify if a user is inside a permitted area, we need to ask their browser for their current location. Modern browsers require the site to be served over HTTPS to access this API, and it will trigger a permission prompt for the user.
+                </p>
+
+<pre><code class="language-javascript">function getUserLocation() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject("Geolocation is not supported by your browser.");
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    resolve({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    reject("Location access denied or unavailable.");
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+    });
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 2: The Math (The Haversine Formula)</h2>
+                <p>
+                    The Earth is not flat. If you have two sets of GPS coordinates (the target location and the user's current location), you cannot simply use the Pythagorean theorem to find the distance between them. 
+                </p>
+                <p>
+                    Instead, we must use the <strong class="text-white">Haversine formula</strong>, which calculates the shortest distance over the earth's surface, giving an "as-the-crow-flies" distance. Here is the highly optimized JavaScript implementation of that formula:
+                </p>
+
+<pre><code class="language-javascript">function getDistanceInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // Earth's radius in meters
+    const rad = Math.PI / 180; // Conversion factor to radians
+    
+    // Convert latitudes to radians
+    const phi1 = lat1 * rad;
+    const phi2 = lat2 * rad;
+    
+    // Calculate differences in radians
+    const deltaPhi = (lat2 - lat1) * rad;
+    const deltaLambda = (lon2 - lon1) * rad;
+
+    // Haversine core math
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+              Math.cos(phi1) * Math.cos(phi2) *
+              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+              
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    // Return the final distance in meters
+    return R * c; 
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 3: Creating the Geofence Logic</h2>
+                <p>
+                    Now we combine our two functions. Let's say we have an encrypted document, and the sender locked it to a specific coffee shop's coordinates. We only want to decrypt the document if the person opening the link is within 50 meters of that coffee shop.
+                </p>
+
+<pre><code class="language-javascript">async function verifyGeofence(targetLat, targetLng, maxRadiusInMeters) {
+    try {
+        console.log("Requesting GPS coordinates...");
+        const userLocation = await getUserLocation();
+        
+        const distance = getDistanceInMeters(
+            targetLat, targetLng, 
+            userLocation.lat, userLocation.lng
+        );
+
+        if (distance <= maxRadiusInMeters) {
+            console.log(`Success! You are ${Math.round(distance)}m away.`);
+            return true; // Proceed with decryption/access
+        } else {
+            console.error(`Access Denied: Out of bounds by ${Math.round(distance)}m.`);
+            return false; // Lock the app or destroy the payload
+        }
+        
+    } catch (error) {
+        console.error("Geofence check failed:", error);
+        return false;
+    }
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Security Considerations</h2>
+                <p>
+                    It is important to understand that client-side GPS coordinates can be spoofed by advanced users using developer tools or VPNs with location spoofing. Therefore, a geofence should never be your *only* layer of security. It should be used as a "defense-in-depth" measure alongside strong encryption and authentication.
+                </p>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-rose-600/50 bg-rose-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-rose-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-crosshair text-[160px] text-rose-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">See Geofencing in Production</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            We implemented this exact Haversine formula inside <strong class="text-rose-400">ZeroKey</strong>, allowing users to lock their encrypted payloads to their current physical location.
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            If the recipient attempts to open the link outside of a 50-meter radius, the system detects the boundary breach, triggers a UI lockout, and immediately purges the payload from the server.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(244,63,94,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-map-pin-line"></i> Create a Geofenced Link
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View Source Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    By combining the Geolocation API with some basic trigonometry, you can add a powerful physical security layer to your web applications. Whether you are building a secure check-in system, a localized file drop, or a burn-after-reading vault, geofencing is an excellent tool to have in your frontend architecture toolkit.
+                </p>
+
+            </div>
+            
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-rose-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-rose-400 hover:text-rose-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
