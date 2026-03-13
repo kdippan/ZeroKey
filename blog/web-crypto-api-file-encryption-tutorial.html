@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Encrypt Files in the Browser Using the Web Crypto API (Vanilla JS)</title>
+    <meta name="description" content="A complete tutorial on how to encrypt files locally in the browser using Vanilla JavaScript, AES-256-GCM, and the native Web Crypto API.">
+    <meta name="keywords" content="web crypto api tutorial, encrypt files in browser javascript, client-side file encryption, AES-GCM javascript example, vanilla js cryptography, zero-knowledge file sharing, javascript encrypt file before upload">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/web-crypto-api-file-encryption-tutorial">
+    <meta property="og:title" content="How to Encrypt Files in the Browser Using the Web Crypto API">
+    <meta property="og:description" content="Learn how to build zero-knowledge file sharing by encrypting files locally before they ever reach your server.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-purple-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-code"></i> Technical Tutorial
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Encrypt Files in the Browser Using the Web Crypto API
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> March 16, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-blue-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 10 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    Uploading raw, unencrypted files directly to an S3 bucket or a cloud database is a massive liability. If you are building a secure messaging app, a whistleblower portal, or a document-sharing platform, you must assume your servers will eventually be compromised.
+                </p>
+                
+                <p>
+                    The safest approach is <strong class="text-white">client-side encryption</strong>. By encrypting the file in the user's browser before it ever hits the network, you ensure that your backend only stores unreadable ciphertext. In this tutorial, we will use Vanilla JavaScript and the native <code class="bg-slate-800 px-1 rounded">window.crypto.subtle</code> API to encrypt a file using AES-256-GCM.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Why Use the Web Crypto API?</h2>
+                <p>
+                    In the past, developers relied on heavy external libraries like Crypto-JS to handle browser cryptography. Today, the Web Crypto API is built directly into all modern browsers. It is significantly faster because it has access to the device's underlying hardware acceleration, and it introduces zero supply-chain vulnerabilities because there are no NPM packages to install.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Step 1: Reading the File as an ArrayBuffer</h2>
+                <p>
+                    Cryptographic functions do not understand standard DOM File objects. Before we can encrypt a file, we must convert it into raw binary data using an <code class="bg-slate-800 px-1 rounded">ArrayBuffer</code>.
+                </p>
+
+<pre><code class="language-javascript">const fileInput = document.getElementById('myFileInput');
+
+fileInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Read the file as raw binary data
+    const arrayBuffer = await file.arrayBuffer();
+    
+    // Proceed to encryption...
+    await encryptMyFile(arrayBuffer);
+});
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 2: Generating a Cryptographic Key</h2>
+                <p>
+                    For this example, we will generate a fresh AES-256 symmetric key. In a real-world application, you might derive this key from a user's password using PBKDF2, but for simplicity, we will let the browser generate a secure random key.
+                </p>
+
+<pre><code class="language-javascript">async function generateAESKey() {
+    return await window.crypto.subtle.generateKey(
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        true, // Allow the key to be exported later if needed
+        ["encrypt", "decrypt"] // Key usage
+    );
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 3: Encrypting the ArrayBuffer</h2>
+                <p>
+                    AES-GCM (Galois/Counter Mode) is the industry standard for symmetric encryption because it provides both confidentiality and data authenticity. It requires an Initialization Vector (IV)—a piece of random data that ensures the same file encrypted twice will yield different ciphertext.
+                </p>
+
+<pre><code class="language-javascript">async function encryptMyFile(fileBuffer) {
+    const key = await generateAESKey();
+    
+    // Generate a 12-byte random Initialization Vector (IV)
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+    // Encrypt the file data
+    const encryptedBuffer = await window.crypto.subtle.encrypt(
+        {
+            name: "AES-GCM",
+            iv: iv
+        },
+        key,
+        fileBuffer
+    );
+
+    console.log("File successfully encrypted locally!");
+    
+    // At this point, you would send 'encryptedBuffer' and 'iv' 
+    // to your backend, NOT the original file.
+    return { encryptedBuffer, iv, key };
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">The Hard Part: Key Management</h2>
+                <p>
+                    The code above successfully converts a file into secure ciphertext. However, the hardest part of building a zero-knowledge application is <strong class="text-white">Key Exchange</strong>. How do you give the receiving user the decryption key without sending it to your database?
+                </p>
+                <p>
+                    A common technique is the <strong class="text-white">URL Fragment Exploit</strong>. You append the exported decryption key to the end of a shareable link after a hash symbol (e.g., <code>https://yoursite.com/view#SECRET_KEY</code>). Because browsers do not transmit URL fragments to the server, the backend remains completely blind to the key.
+                </p>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-purple-600/50 bg-purple-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-purple-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-file-dashed text-[160px] text-purple-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">See this code in production</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            Want to see exactly how to implement this architecture at scale? <strong class="text-purple-400">ZeroKey</strong> is an open-source, burn-after-reading file sharing vault built on this exact Web Crypto API logic. 
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            It handles PBKDF2 key derivation, URL fragment routing, and Supabase Row Level Security to ensure true zero-knowledge file transfers.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(147,51,234,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-upload-simple"></i> Encrypt a File Now
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View Source Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    By shifting cryptographic operations to the client-side, you completely eliminate the liability of storing sensitive user data. The Web Crypto API makes it remarkably simple to integrate military-grade AES-256-GCM encryption directly into your frontend JavaScript applications without relying on third-party libraries.
+                </p>
+
+            </div>
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-blue-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+</body>
+</html>
