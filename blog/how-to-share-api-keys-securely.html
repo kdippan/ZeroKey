@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Securely Share API Keys and Passwords in 2026 (Stop Using Slack)</title>
+    <meta name="description" content="Learn why sending API keys, `.env` files, and passwords over Slack, Discord, or Email is a massive security risk, and discover the best open-source, burn-after-reading alternatives.">
+    <meta name="keywords" content="how to share API keys securely, send passwords to clients, secure secret sharing, Privnote alternative open source, share .env file, send passwords securely link, burn after reading vault">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/how-to-share-api-keys-securely">
+    <meta property="og:title" content="How to Securely Share API Keys and Passwords in 2026">
+    <meta property="og:description" content="Stop sending production secrets over chat apps. Here is the cryptographically secure way to share sensitive data.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30">
+    
+    <div class="fixed top-0 right-1/4 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-red-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-warning-octagon"></i> Developer Operations
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Securely Share API Keys and Passwords (Stop Using Slack)
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> March 13, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-blue-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 6 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    Every developer has done it at least once. A coworker pings you for the production database password, or a client needs an AWS API key. In a rush, you paste it directly into Slack, Microsoft Teams, or Discord. <strong class="text-white">You have just created a permanent, searchable record of your most critical infrastructure secrets.</strong>
+                </p>
+                
+                <p>
+                    Enterprise chat applications are designed for collaboration and retention, not secure secret management. If a team member's account is compromised, or if a disgruntled ex-employee retains access, they can simply search the chat history for keywords like <code>password</code>, <code>bearer</code>, or <code>sk_live</code>.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Why "Delete Message" Isn't Enough</h2>
+                <p>
+                    You might think, "I'll just paste the API key and delete the message after they copy it." Unfortunately, modern cloud architecture doesn't work that way.
+                </p>
+                <ul class="list-disc list-outside pl-6 space-y-3">
+                    <li><strong class="text-white">Push Notifications:</strong> The secret has already been broadcasted in plaintext to the recipient's mobile lock screen or smartwatch.</li>
+                    <li><strong class="text-white">Server Logs:</strong> Chat applications routinely back up databases and retain logs for legal compliance. Deleting a message hides it from the UI, but it rarely purges it from the underlying data lakes immediately.</li>
+                    <li><strong class="text-white">Webhook Integrations:</strong> If your chat channel is connected to external logging or notification bots, the secret has already been duplicated to a third-party server.</li>
+                </ul>
+
+                <h2 class="text-2xl font-bold pt-8">The Solution: Ephemeral, Client-Side Encryption</h2>
+                <p>
+                    The only truly secure way to transmit a sensitive string—like an `.env` file or an API key—is to use an out-of-band, <strong class="text-white">burn-after-reading</strong> vault that utilizes client-side encryption.
+                </p>
+
+                <p>
+                    A proper secret-sharing tool must satisfy three strict rules:
+                </p>
+                <ol class="list-decimal list-outside pl-6 space-y-3">
+                    <li><strong>End-to-End Encryption (E2EE):</strong> The server generating the link must mathematically not be able to read the secret.</li>
+                    <li><strong>Zero Retention:</strong> The data must be permanently deleted from the database the exact millisecond it is read.</li>
+                    <li><strong>No Traceability:</strong> The link itself should not reveal the identity of the sender or the receiver.</li>
+                </ol>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-file-lock text-[160px] text-emerald-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Share Secrets with ZeroKey</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            Instead of relying on third-party servers, use <strong class="text-emerald-400">ZeroKey</strong>. It uses the Web Crypto API to encrypt your API keys and passwords locally via AES-256-GCM. The decryption key is passed via the URL fragment, meaning the server is completely blind.
+                        </p>
+                        <ul class="mb-6 space-y-2 text-sm text-slate-400">
+                            <li><i class="ph-fill ph-check-circle text-emerald-500"></i> Auto-destructs upon opening</li>
+                            <li><i class="ph-fill ph-check-circle text-emerald-500"></i> Open-source & verifiable</li>
+                            <li><i class="ph-fill ph-check-circle text-emerald-500"></i> No logins or tracking</li>
+                        </ul>
+                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
+                            <i class="ph ph-lock-key"></i> Create a Secure Link
+                        </a>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">How to safely share an API Key (A Step-by-Step Workflow)</h2>
+                <p>
+                    Next time a developer asks for a credential, follow this workflow:
+                </p>
+                <ul class="list-disc list-outside pl-6 space-y-3">
+                    <li><strong>Step 1:</strong> Navigate to an open-source, client-side encrypted vault (like ZeroKey).</li>
+                    <li><strong>Step 2:</strong> Paste the API key into the text field. Do NOT include context. (e.g., Paste <code>sk_live_12345</code>, do not write "Here is the Stripe API Key: sk_live_12345"). If the link is intercepted, the attacker shouldn't know what the key is for.</li>
+                    <li><strong>Step 3:</strong> Encrypt the payload and copy the generated one-time link.</li>
+                    <li><strong>Step 4:</strong> Send the link to your coworker over Slack. </li>
+                    <li><strong>Step 5:</strong> When they click it, the payload is decrypted locally in their browser, and the backend database permanently deletes the ciphertext. If anyone clicks that link again in the Slack history, they will simply get a 404 error.</li>
+                </ul>
+
+                <h2 class="text-2xl font-bold pt-8">The Open Source Advantage</h2>
+                <p>
+                    When sharing cryptographic secrets, never trust a black box. You should only use tools where the encryption logic is open-source and verifiable. You can view the entire cryptographic pipeline and backend architecture of ZeroKey directly on <a href="https://github.com/kdippan/zerokey" target="_blank">GitHub</a>.
+                </p>
+                <p>
+                    Stop risking your infrastructure for the sake of a quick copy-paste. Encrypt locally, burn it globally.
+                </p>
+
+            </div>
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-blue-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+</body>
+</html>
