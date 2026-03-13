@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Build a P2P File Sharer with WebRTC (No Servers Required)</title>
+    <meta name="description" content="Learn how to bypass cloud storage costs entirely by sending files directly from browser to browser using Vanilla JavaScript and the WebRTC RTCDataChannel.">
+    <meta name="keywords" content="WebRTC data channel tutorial, P2P file sharing javascript, send files browser to browser, bypass server upload limits, WebRTC vanilla js example, RTCDataChannel file transfer, zero server architecture">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/how-to-build-p2p-file-sharing-webrtc">
+    <meta property="og:title" content="How to Build a P2P File Sharer with WebRTC">
+    <meta property="og:description" content="Stop paying for cloud storage. Learn how to connect two browsers directly using WebRTC Data Channels.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-plugs-connected"></i> Peer-to-Peer Architecture
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Build a P2P File Sharer with WebRTC
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> April 30, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-emerald-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 8 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    Cloud storage is expensive. If you are building an application that allows users to send 500MB video files to each other, routing that traffic through AWS S3 or Supabase Storage will bankrupt your project overnight. 
+                </p>
+                
+                <p>
+                    The ultimate architectural cheat code for file sharing is <strong class="text-white">WebRTC</strong> (Web Real-Time Communication). While most developers know WebRTC for video calling (like Zoom or Google Meet), it possesses a hidden superpower: the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">RTCDataChannel</code>. This API allows you to stream raw binary files directly from one browser to another, bypassing the server entirely.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Myth of the "Serverless" Connection</h2>
+                <p>
+                    Before two browsers can establish a direct P2P connection, they need to know how to find each other on the chaotic public internet. They must exchange IP addresses, ports, and cryptographic session keys. 
+                </p>
+                <p>
+                    This initial handshake requires a <strong class="text-white">Signaling Server</strong>. However, the signaling server only passes tiny JSON messages (Offers and Answers) for a few seconds. Once the connection is established, the server steps out of the way, and the heavy file transfer happens entirely P2P.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Step 1: Establishing the Peer Connection</h2>
+                <p>
+                    First, we initialize the <code class="font-mono">RTCPeerConnection</code> object. We provide STUN servers (free public servers provided by Google) that help the browser figure out its own public IP address.
+                </p>
+
+<pre><code class="language-javascript">const configuration = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+};
+
+// Initialize the connection
+const peerConnection = new RTCPeerConnection(configuration);
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 2: Creating the Data Channel</h2>
+                <p>
+                    Before we generate the connection "Offer", the sender must create the Data Channel. We configure it to send raw <code class="font-mono">arraybuffer</code> data, which is perfect for file transfers.
+                </p>
+
+<pre><code class="language-javascript">// The sender creates the channel
+const dataChannel = peerConnection.createDataChannel('fileTransferChannel');
+dataChannel.binaryType = 'arraybuffer';
+
+dataChannel.onopen = () => {
+    console.log("P2P Connection Established! Ready to send files.");
+};
+
+dataChannel.onclose = () => {
+    console.log("P2P Connection Closed.");
+};
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 3: Streaming the File in Chunks</h2>
+                <p>
+                    You cannot shove a 500MB file through a WebRTC channel all at once; it will overflow the browser's internal buffer and crash. You must slice the <code class="font-mono">ArrayBuffer</code> into smaller chunks (usually 16KB to 64KB) and send them sequentially.
+                </p>
+
+<pre><code class="language-javascript">/**
+ * Streams a raw file buffer over a WebRTC Data Channel
+ * @param {ArrayBuffer} fileBuffer - The raw file data
+ * @param {RTCDataChannel} channel - The open WebRTC channel
+ */
+function sendFileInChunks(fileBuffer, channel) {
+    const CHUNK_SIZE = 64 * 1024; // 64KB chunks
+    let offset = 0;
+
+    const sendChunk = () => {
+        // While there is still data to send
+        while (offset < fileBuffer.byteLength) {
+            // Check if the WebRTC buffer is getting full
+            if (channel.bufferedAmount > channel.bufferedAmountLowThreshold) {
+                // Pause and wait for the buffer to clear
+                channel.onbufferedamountlow = () => {
+                    channel.onbufferedamountlow = null;
+                    sendChunk();
+                };
+                return;
+            }
+
+            // Slice the buffer and send the chunk
+            const chunk = fileBuffer.slice(offset, offset + CHUNK_SIZE);
+            channel.send(chunk);
+            offset += CHUNK_SIZE;
+            
+            // Optional: Update a progress bar UI here
+        }
+        
+        console.log("File transfer complete!");
+        // Send an EOF (End of File) signal so the receiver knows we're done
+        channel.send(JSON.stringify({ type: 'EOF' }));
+    };
+
+    sendChunk();
+}
+</code></pre>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-graph text-[160px] text-emerald-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Experience Serverless Sharing</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            We utilized this exact WebRTC <code class="font-mono">RTCDataChannel</code> architecture to build <strong class="text-emerald-400">ZeroShare</strong>, a completely serverless, peer-to-peer file and text sharing application. 
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            Because the files travel directly between devices, there are zero file size limits, zero cloud storage costs, and absolute privacy. Our servers never touch your files.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="https://github.com/kdippan/zeroshare" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-slate-900 font-bold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-share-network text-lg"></i> Explore ZeroShare
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">The Receiving End</h2>
+                <p>
+                    On the receiver's side, you simply listen to the <code class="font-mono">channel.onmessage</code> event. As the 64KB chunks arrive, you push them into an array. Once you receive the 'EOF' signal, you combine the array into a <code class="font-mono">Blob</code> and trigger the download using the <code class="font-mono">URL.createObjectURL()</code> method we discussed in our previous post.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    WebRTC is complex, but the payoff is immense. By offloading the heavy lifting of file transfers to the users' own network connections, you can build infinitely scalable file-sharing applications with effectively zero hosting costs. Combine WebRTC with the Web Crypto API, and you have the ultimate privacy-first architecture.
+                </p>
+
+            </div>
+            
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-emerald-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey & ZeroShare. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-emerald-400 hover:text-emerald-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
