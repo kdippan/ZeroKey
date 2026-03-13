@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Convert ArrayBuffers to Base64 (Storing Web Crypto Data)</title>
+    <meta name="description" content="Learn how to solve the empty JSON object problem when using the Web Crypto API. Convert raw ArrayBuffers to Base64 strings for safe database storage.">
+    <meta name="keywords" content="convert arraybuffer to base64 javascript, store uint8array in json, javascript web crypto api encoding, JSON.stringify arraybuffer empty, base64 to arraybuffer, store encrypted data supabase, buffer to string javascript">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/how-to-convert-arraybuffer-to-base64">
+    <meta property="og:title" content="How to Convert ArrayBuffers to Base64 (Storing Web Crypto Data)">
+    <meta property="og:description" content="If your encrypted data disappears when you JSON.stringify it, you have a serialization problem. Here is the Vanilla JS fix.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-violet-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-violet-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-brackets-curly"></i> Data Serialization
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Convert ArrayBuffers to Base64 (Web Crypto Storage)
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> April 26, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-violet-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 5 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-violet-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    You just successfully implemented the Web Crypto API. You encrypted your user's text, you created the Initialization Vector (IV), and you have the raw ciphertext ready to go. You call <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">JSON.stringify()</code> to send the data to your backend, but when you check your database, the payload is completely empty: <code class="font-mono text-violet-300">{}</code>.
+                </p>
+                
+                <p>
+                    What happened? The Web Crypto API outputs raw binary data in the form of <code class="font-mono">ArrayBuffer</code> objects. JSON (JavaScript Object Notation) is a text-based format. It simply does not know how to handle raw binary memory streams, so it silently strips them out.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Solution: Base64 Encoding</h2>
+                <p>
+                    To safely transport cryptographic data across HTTP requests and store it in PostgreSQL or MongoDB, we must convert the raw binary into a safe, text-based string. The industry standard for this is <strong class="text-white">Base64 Encoding</strong>.
+                </p>
+                <p>
+                    Base64 takes binary data and translates it into a string containing only safe ASCII characters (A-Z, a-z, 0-9, +, and /). 
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Encoding: ArrayBuffer to Base64</h2>
+                <p>
+                    Here is the highly optimized Vanilla JavaScript utility to take the output of your AES-GCM encryption and convert it into a safe string for your database. We use a <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">Uint8Array</code> to read the bytes, and the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">window.btoa()</code> function to generate the Base64 string.
+                </p>
+
+<pre><code class="language-javascript">/**
+ * Converts an ArrayBuffer into a Base64 string.
+ * @param {ArrayBuffer} buffer - The raw cryptographic output
+ * @returns {string} - Safe Base64 string for JSON transport
+ */
+function bufferToBase64(buffer) {
+    // 1. Create a typed array to view the raw memory buffer
+    const bytes = new Uint8Array(buffer);
+    
+    // 2. Iterate through the bytes and convert them to binary characters
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    
+    // 3. Convert the binary string to Base64 natively
+    return window.btoa(binary);
+}
+
+// Usage Example:
+// const encryptedBuffer = await window.crypto.subtle.encrypt(...);
+// const safeStringForDatabase = bufferToBase64(encryptedBuffer);
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Decoding: Base64 back to ArrayBuffer</h2>
+                <p>
+                    When a user clicks your secure link, the frontend downloads the Base64 string from your backend. However, the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">crypto.subtle.decrypt()</code> function will immediately reject a string. It requires an <code class="font-mono">ArrayBuffer</code>. 
+                </p>
+                <p>
+                    We must reverse the process using <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">window.atob()</code> before attempting decryption.
+                </p>
+
+<pre><code class="language-javascript">/**
+ * Converts a Base64 string back into an ArrayBuffer for decryption.
+ * @param {string} base64 - The string fetched from the database
+ * @returns {ArrayBuffer} - The raw memory buffer ready for Web Crypto
+ */
+function base64ToBuffer(base64) {
+    // 1. Decode the Base64 string back to binary characters
+    const binaryString = window.atob(base64);
+    
+    // 2. Create an empty typed array of the exact required length
+    const bytes = new Uint8Array(binaryString.length);
+    
+    // 3. Fill the typed array with the byte values
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    // 4. Return the underlying ArrayBuffer
+    return bytes.buffer;
+}
+
+// Usage Example:
+// const rawBuffer = base64ToBuffer(databaseData.ciphertextBase64);
+// const plaintext = await window.crypto.subtle.decrypt(..., rawBuffer);
+</code></pre>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-violet-600/50 bg-violet-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-violet-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-arrows-left-right text-[160px] text-violet-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Seamless Data Transport</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            In <strong class="text-violet-400">ZeroKey</strong>, every single Initialization Vector (IV), PBKDF2 Salt, and ciphertext block is processed through these exact Base64 utility functions.
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            This guarantees that our encrypted payloads can be securely serialized via JSON, transmitted over Vercel API routes, and stored cleanly as <code class="font-mono">TEXT</code> fields in our Supabase PostgreSQL database without any risk of data corruption or encoding loss.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-violet-600 hover:bg-violet-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-shield-check"></i> Encrypt & Serialize Payload
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View the Encoding Utilities
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    JavaScript is incredibly flexible, but it has strict boundaries when crossing the bridge from cryptographic math to network transport. By strictly managing your data types and wrapping your `ArrayBuffers` in Base64 strings, you ensure your cryptographic architecture remains robust, predictable, and perfectly compatible with modern REST APIs.
+                </p>
+
+            </div>
+            
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-violet-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-violet-400 hover:text-violet-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
