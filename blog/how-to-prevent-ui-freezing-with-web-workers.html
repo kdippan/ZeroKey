@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Prevent UI Freezing During Cryptography (Web Workers Tutorial)</title>
+    <meta name="description" content="Learn how to offload heavy Web Crypto API operations like PBKDF2 and AES encryption to background threads using Web Workers in Vanilla JavaScript.">
+    <meta name="keywords" content="prevent UI freezing javascript, Web Workers tutorial vanilla js, offload heavy tasks javascript, Web Crypto API web worker, javascript threading, multithreading browser, UI blocked javascript fix">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/how-to-prevent-ui-freezing-with-web-workers">
+    <meta property="og:title" content="How to Prevent UI Freezing During Cryptography (Web Workers)">
+    <meta property="og:description" content="Stop freezing your CSS animations. Learn how to move heavy mathematical operations to background threads.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-orange-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-orange-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-orange-600 hover:bg-orange-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(234,88,12,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-orange-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-cpu"></i> Performance & Threading
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Prevent UI Freezing During Cryptography
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> May 2, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-orange-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 8 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-orange-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    You have perfectly implemented client-side encryption using the Web Crypto API. Your user selects a 10MB file, types in their secure PIN, and clicks "Encrypt." Suddenly, your beautiful CSS loading spinner freezes completely. The browser tab becomes unresponsive for two solid seconds.
+                </p>
+                
+                <p>
+                    What went wrong? JavaScript is <strong class="text-white">single-threaded</strong>. It has one main thread to handle DOM updates, CSS animations, click events, and JavaScript execution. When you force that single thread to compute 100,000 iterations of PBKDF2 hashing, everything else grinds to a halt. To build a premium user experience, we must utilize <strong class="text-white">Web Workers</strong>.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Solution: Background Threads</h2>
+                <p>
+                    A Web Worker allows you to spawn a completely separate background thread in the user's browser. This background thread has its own CPU allocation. It cannot access the DOM directly, but it *can* access the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle</code> API.
+                </p>
+                <p>
+                    By offloading the heavy cryptographic math to the Worker, your Main Thread remains completely free to render smooth 60fps animations and handle user interactions.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Step 1: Create the Worker File</h2>
+                <p>
+                    First, we create a separate JavaScript file that will run in the background. It listens for messages from the Main Thread, does the heavy lifting, and sends the result back.
+                </p>
+
+<pre><code class="language-javascript">// crypto-worker.js
+
+// Listen for messages from the main UI thread
+self.addEventListener('message', async (event) => {
+    const { action, payload, key } = event.data;
+
+    if (action === 'ENCRYPT_FILE') {
+        try {
+            // Generate Initialization Vector
+            const iv = self.crypto.getRandomValues(new Uint8Array(12));
+
+            // Perform the heavy AES-GCM encryption in the background
+            const ciphertext = await self.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                payload
+            );
+
+            // Send the result back to the main thread
+            self.postMessage({ status: 'SUCCESS', ciphertext, iv });
+            
+        } catch (error) {
+            self.postMessage({ status: 'ERROR', error: error.message });
+        }
+    }
+});
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 2: Communicate with the Worker</h2>
+                <p>
+                    In your main application file (the one connected to your HTML), you instantiate the Web Worker and set up a communication bridge using the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">postMessage</code> API.
+                </p>
+
+<pre><code class="language-javascript">// main.js
+
+// 1. Initialize the background worker
+const worker = new Worker('crypto-worker.js');
+
+function encryptFileAsync(fileBuffer, cryptoKey) {
+    return new Promise((resolve, reject) => {
+        
+        // 2. Set up the listener for when the worker finishes
+        worker.onmessage = (event) => {
+            const { status, ciphertext, iv, error } = event.data;
+            if (status === 'SUCCESS') {
+                resolve({ ciphertext, iv });
+            } else {
+                reject(error);
+            }
+        };
+
+        // 3. Send the heavy data to the background thread
+        worker.postMessage({ 
+            action: 'ENCRYPT_FILE', 
+            payload: fileBuffer, 
+            key: cryptoKey 
+        });
+        
+        console.log("Encryption started in background. UI is still responsive!");
+    });
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Transferable Objects: The Performance Secret</h2>
+                <p>
+                    When you use <code class="font-mono">postMessage()</code> to send a 10MB file buffer to a Web Worker, the browser creates a complete copy (clone) of that 10MB file by default. This consumes extra RAM and slows down the transfer.
+                </p>
+                <p>
+                    To achieve maximum performance, you should use <strong class="text-white">Transferable Objects</strong>. This allows you to transfer *ownership* of the memory from the Main Thread to the Worker Thread instantly, with zero copying overhead.
+                </p>
+
+<pre><code class="language-javascript">// Optimized Main Thread transfer
+worker.postMessage(
+    { action: 'ENCRYPT_FILE', payload: fileBuffer, key: cryptoKey },
+    [fileBuffer] // <-- This array passes ownership instantly!
+);
+</code></pre>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-orange-600/50 bg-orange-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-orange-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-rocket-launch text-[160px] text-orange-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Experience Zero UI Blocking</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            When building <strong class="text-orange-400">ZeroKey</strong>, we knew that waiting for a payload to encrypt on a mobile device could feel sluggish. We heavily utilized Web Workers for both PBKDF2 key derivation and AES file encryption.
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            Because the math happens in a background thread, our matrix-style decryption animations render at a flawless 60fps, completely uninterrupted by the heavy cryptography happening under the hood.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-orange-600 hover:bg-orange-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-lightning"></i> Test Encryption Speed
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View Worker Logic
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    Building a secure application is only half the battle; the other half is making it usable. If your security features degrade the user experience by freezing the browser, users will find less secure ways to share their data. By mastering Web Workers and Transferable Objects, you can deliver military-grade cryptography with native-app smoothness.
+                </p>
+
+            </div>
+            
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-orange-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-orange-400 hover:text-orange-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
