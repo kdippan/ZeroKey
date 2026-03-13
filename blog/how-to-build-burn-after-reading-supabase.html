@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>How to Build a True "Burn-After-Reading" App with Supabase & Vercel</title>
+    <meta name="description" content="Learn why soft-deletes are dangerous for privacy tools, and how to implement a true burn-after-reading architecture using Supabase RLS and Vercel Serverless functions.">
+    <meta name="keywords" content="Supabase RLS tutorial, PostgreSQL row level security, build a burn after reading app, Vercel serverless functions, Privnote open source alternative, secure database deletion, zero retention architecture">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/how-to-build-burn-after-reading-supabase">
+    <meta property="og:title" content="How to Build a True 'Burn-After-Reading' App with Supabase">
+    <meta property="og:description" content="Stop using soft-deletes. Learn how to architect zero-retention databases using PostgreSQL Row Level Security.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-database"></i> Database Architecture
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    How to Build a True "Burn-After-Reading" App with Supabase
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> March 19, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-blue-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 7 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    Many privacy-focused messaging apps claim to offer "burn-after-reading" functionality. The reality is often much darker: they utilize <strong class="text-white">soft-deletes</strong>. The data disappears from your UI, but it remains fully intact in the backend database, simply flagged as <code>is_deleted = true</code>.
+                </p>
+                
+                <p>
+                    If you are building a secure payload delivery system, soft deletes are a massive security vulnerability. In this tutorial, we will explore how to architect a <strong class="text-white">true zero-retention database</strong> using PostgreSQL Row Level Security (RLS) via Supabase, controlled by Vercel Serverless Functions.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Danger of Public APIs</h2>
+                <p>
+                    A common mistake developers make when using Backend-as-a-Service (BaaS) platforms like Supabase or Firebase is leaving the database accessible via the public anonymous key. If an attacker discovers your table schema, they can query the database directly, bypassing your frontend application entirely.
+                </p>
+                <p>
+                    To build a secure vault, we must completely lock down the database. No public reads. No public writes.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Step 1: PostgreSQL Row Level Security (RLS)</h2>
+                <p>
+                    Supabase sits on top of a powerful PostgreSQL database. We can use RLS to ensure that the public internet cannot interact with our <code>secrets</code> table under any circumstances.
+                </p>
+
+<pre><code class="language-sql">-- 1. Create the table for encrypted payloads
+CREATE TABLE public.secrets (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    encrypted_payload TEXT NOT NULL,
+    iv TEXT NOT NULL,
+    salt TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2. Enable Row Level Security
+ALTER TABLE public.secrets ENABLE ROW LEVEL SECURITY;
+
+-- 3. Intentionally omit creating any public policies.
+-- Result: The table is 100% locked.
+</code></pre>
+                <p>
+                    By enabling RLS but creating zero public policies, we have created a vault. The only way to bypass this lock is by using a secure <code class="bg-slate-800 px-1 rounded">Service Role Key</code>, which should never be exposed to the frontend.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Step 2: The Serverless "Executioner"</h2>
+                <p>
+                    Since the browser cannot talk to the database directly, we use a Vercel Serverless Function as a secure middleman. This function holds the Service Role Key in its secure environment variables. 
+                </p>
+                <p>
+                    When the frontend requests a secret, the serverless function executes a strict two-step process: <strong>Fetch, then immediately Hard Delete.</strong>
+                </p>
+
+<pre><code class="language-javascript">// api/getAndDestroy.js (Vercel Serverless Function)
+import { createClient } from '@supabase/supabase-js';
+
+export default async function handler(req, res) {
+    // Initialize Supabase bypassing RLS with the Service Key
+    const supabase = createClient(
+        process.env.SUPABASE_URL, 
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { id } = req.body;
+
+    // 1. Fetch the payload
+    const { data, error } = await supabase
+        .from('secrets')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error || !data) {
+        return res.status(404).json({ error: 'Vault destroyed or not found' });
+    }
+
+    // 2. HARD DELETE the row immediately
+    await supabase.from('secrets').delete().eq('id', id);
+
+    // 3. Return the ciphertext to the client for local decryption
+    return res.status(200).json(data);
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Handling Edge Cases: What if they never open it?</h2>
+                <p>
+                    A true burn-after-reading system also needs a garbage collector. If a user generates a secure link but never sends it, the encrypted payload will sit in your database forever, wasting storage space.
+                </p>
+                <p>
+                    We can solve this natively inside PostgreSQL using the <code>pg_cron</code> extension to automatically wipe unread payloads after 7 days.
+                </p>
+
+<pre><code class="language-sql">-- Enable cron scheduling
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+-- Schedule a nightly purge of stale secrets
+SELECT cron.schedule(
+    'cleanup-stale-secrets',
+    '0 0 * * *', -- Runs at midnight
+    $$ DELETE FROM public.secrets WHERE created_at < NOW() - INTERVAL '7 days'; $$
+);
+</code></pre>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">See this architecture in action</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            We used this exact Supabase + Vercel architecture to build <strong class="text-emerald-400">ZeroKey</strong>, an open-source payload delivery system. 
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            If you want to test the destruction protocol yourself, generate a payload, open the link, and then refresh the page. You will see a 404 error because the database row has been permanently purged.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-shield-check"></i> Test the Burn Protocol
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View the SQL Schema
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Summary</h2>
+                <p>
+                    Trusting a frontend client to simply "hide" a message is not security. True burn-after-reading requires strict backend enforcement. By leveraging Supabase RLS to block public access and Vercel Serverless functions to act as the executioner, you can guarantee absolute zero data retention for your users.
+                </p>
+
+            </div>
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-blue-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+</body>
+</html>
