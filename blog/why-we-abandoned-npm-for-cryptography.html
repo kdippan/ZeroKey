@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Why We Abandoned NPM Packages for Cryptography (Web Crypto API)</title>
+    <meta name="description" content="Learn why using third-party NPM packages like Crypto-JS is a security risk, and how to migrate to the native Web Crypto API for zero-dependency client-side encryption.">
+    <meta name="keywords" content="Crypto-JS alternative, Web Crypto API vs Crypto JS, NPM supply chain attack, zero dependency cryptography javascript, native AES encryption browser, reduce bundle size cryptography, javascript security">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/why-we-abandoned-npm-for-cryptography">
+    <meta property="og:title" content="Why We Abandoned NPM Packages for Cryptography">
+    <meta property="og:description" content="Every time you run npm install, you trust hundreds of strangers with your app's security. It's time to drop Crypto-JS.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-lime-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-lime-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-lime-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-package"></i> Dependency Management
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    Why We Abandoned NPM Packages for Cryptography
+                </h1>
+                <div class="flex items-center justify-center gap-6 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> April 18, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-lime-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 7 Min Read
+                    </div>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-lime-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    For years, the standard way to encrypt data in a JavaScript application was to run <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">npm install crypto-js</code>. It was easy, ubiquitous, and heavily documented. But if you are building a modern, secure application today, relying on third-party cryptographic libraries is a massive architectural liability.
+                </p>
+                
+                <p>
+                    When we architected ZeroKey, we made a strict decision: <strong class="text-white">Zero external dependencies for cryptographic operations.</strong> Here is why we abandoned NPM for cryptography, and why you should migrate to native browser APIs immediately.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Threat: Supply Chain Attacks</h2>
+                <p>
+                    Every time you import a package from NPM, you are inherently trusting the maintainer of that package—and the maintainers of all of their sub-dependencies. 
+                </p>
+                <p>
+                    In recent years, we have seen a massive rise in <strong class="text-white">Supply Chain Attacks</strong>. Hackers compromise a popular open-source developer's NPM account and inject malicious code into a widely used package. If your application relies on an external library for AES encryption, a compromised package update could silently exfiltrate your users' plaintext passwords and encryption keys before the data is ever scrambled.
+                </p>
+                <p class="border-l-4 border-lime-500 pl-6 text-slate-400 italic">
+                    Note: As of recently, the popular <code class="font-mono">crypto-js</code> library is officially unmaintained, meaning no future security patches will be released. Using it in production is now highly discouraged.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Performance Cost: Bundle Bloat</h2>
+                <p>
+                    Beyond security, shipping cryptography libraries in your JavaScript bundle destroys your application's load time.
+                </p>
+                <ul class="list-disc list-outside pl-6 space-y-3">
+                    <li><strong class="text-white">Heavy Payloads:</strong> Importing a full suite of hashing algorithms, block ciphers, and encoding utilities can easily add 100kb+ of parsed JavaScript to your client's browser.</li>
+                    <li><strong class="text-white">Single-Threaded Bottlenecks:</strong> JavaScript is single-threaded. When a third-party library performs 100,000 iterations of PBKDF2 to hash a password, it completely blocks the main thread, freezing your UI and causing the browser to stutter.</li>
+                </ul>
+
+                <h2 class="text-2xl font-bold pt-8">The Solution: The Native Web Crypto API</h2>
+                <p>
+                    Modern browsers already have military-grade cryptographic libraries written in highly optimized C++ built right into them. You can access these engines directly using <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle</code>.
+                </p>
+
+                <h3 class="text-xl font-bold text-lime-400 mt-6">Advantage 1: Absolute Security</h3>
+                <p>
+                    Because the Web Crypto API is part of the browser's core engine, it cannot be hijacked by a rogue NPM package update. It is audited by the security teams at Google, Apple, and Mozilla.
+                </p>
+
+                <h3 class="text-xl font-bold text-lime-400 mt-6">Advantage 2: Hardware Acceleration</h3>
+                <p>
+                    The Web Crypto API doesn't run in the standard JavaScript event loop. It offloads heavy cryptographic math (like AES-GCM encryption and RSA key generation) directly to the device's hardware, running asynchronously. This means you can encrypt a 2MB file without freezing the user's screen.
+                </p>
+
+                <h3 class="text-xl font-bold text-lime-400 mt-6">Example: AES-256-GCM without Dependencies</h3>
+                <p>
+                    Here is how simple it is to encrypt data natively, with zero NPM installs required:
+                </p>
+
+<pre><code class="language-javascript">// No import statements needed!
+
+async function nativeEncrypt(text, key) {
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(text);
+    
+    // Generate an Initialization Vector
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+    // Perform the encryption asynchronously using native browser C++ engines
+    const ciphertext = await window.crypto.subtle.encrypt(
+        { name: "AES-GCM", iv: iv },
+        key,
+        encodedData
+    );
+
+    return { ciphertext, iv };
+}
+</code></pre>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-lime-600/50 bg-lime-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-lime-500/80 transition-all">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-shield-check text-[160px] text-lime-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Zero Dependencies. Zero Knowledge.</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            We built <strong class="text-lime-400">ZeroKey</strong> to be as lightweight and secure as mathematically possible. If you audit our frontend source code, you will find exactly <strong class="text-white">zero</strong> cryptographic dependencies in our <code class="font-mono">package.json</code>.
+                        </p>
+                        <p class="text-slate-400 mb-6 text-sm">
+                            Every single AES encryption, PBKDF2 hash, and CSPRNG token is generated entirely by your own device's hardware through native Web APIs.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-lime-600 hover:bg-lime-500 text-slate-900 font-bold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(132,204,22,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-lock-key text-lg"></i> Test the Native Vault
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo text-lg"></i> Audit our package.json
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Conclusion</h2>
+                <p>
+                    Every dependency you add to your project increases your attack surface. When it comes to handling your users' most sensitive data, you must remove the middlemen. Drop the legacy libraries, embrace the Web Crypto API, and let the browser do the heavy lifting safely.
+                </p>
+
+            </div>
+            
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-lime-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-lime-400 hover:text-lime-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
