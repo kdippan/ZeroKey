@@ -28,11 +28,47 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
     <meta name="msapplication-TileColor" content="#0f172a">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <link rel="stylesheet" href="/style.css">
+
+    <style>
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+    </style>
 </head>
-<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30">
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30">
     
     <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
     <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
@@ -77,10 +113,10 @@
                 </div>
             </header>
 
-            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
                 
                 <p class="text-xl text-slate-200 leading-relaxed font-medium">
-                    Many privacy-focused messaging apps claim to offer "burn-after-reading" functionality. The reality is often much darker: they utilize <strong class="text-white">soft-deletes</strong>. The data disappears from your UI, but it remains fully intact in the backend database, simply flagged as <code>is_deleted = true</code>.
+                    Many privacy-focused messaging apps claim to offer "burn-after-reading" functionality. The reality is often much darker: they utilize <strong class="text-white">soft-deletes</strong>. The data disappears from your UI, but it remains fully intact in the backend database, simply flagged as <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">is_deleted = true</code>.
                 </p>
                 
                 <p>
@@ -97,7 +133,7 @@
 
                 <h2 class="text-2xl font-bold pt-8">Step 1: PostgreSQL Row Level Security (RLS)</h2>
                 <p>
-                    Supabase sits on top of a powerful PostgreSQL database. We can use RLS to ensure that the public internet cannot interact with our <code>secrets</code> table under any circumstances.
+                    Supabase sits on top of a powerful PostgreSQL database. We can use RLS to ensure that the public internet cannot interact with our <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">secrets</code> table under any circumstances.
                 </p>
 
 <pre><code class="language-sql">-- 1. Create the table for encrypted payloads
@@ -116,7 +152,7 @@ ALTER TABLE public.secrets ENABLE ROW LEVEL SECURITY;
 -- Result: The table is 100% locked.
 </code></pre>
                 <p>
-                    By enabling RLS but creating zero public policies, we have created a vault. The only way to bypass this lock is by using a secure <code class="bg-slate-800 px-1 rounded">Service Role Key</code>, which should never be exposed to the frontend.
+                    By enabling RLS but creating zero public policies, we have created a vault. The only way to bypass this lock is by using a secure <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">Service Role Key</code>, which should never be exposed to the frontend.
                 </p>
 
                 <h2 class="text-2xl font-bold pt-8">Step 2: The Serverless "Executioner"</h2>
@@ -163,7 +199,7 @@ export default async function handler(req, res) {
                     A true burn-after-reading system also needs a garbage collector. If a user generates a secure link but never sends it, the encrypted payload will sit in your database forever, wasting storage space.
                 </p>
                 <p>
-                    We can solve this natively inside PostgreSQL using the <code>pg_cron</code> extension to automatically wipe unread payloads after 7 days.
+                    We can solve this natively inside PostgreSQL using the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">pg_cron</code> extension to automatically wipe unread payloads after 7 days.
                 </p>
 
 <pre><code class="language-sql">-- Enable cron scheduling
@@ -231,5 +267,9 @@ SELECT cron.schedule(
             <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
         </div>
     </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
 </body>
 </html>
