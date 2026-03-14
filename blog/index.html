@@ -12,14 +12,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Engineering Blog | ZeroKey - Zero-Knowledge Security Insights</title>
-    <meta name="description" content="Deep dives into cryptography, browser security, and privacy-first engineering by Dippan Bhusal.">
+    <meta name="description" content="Deep dives into cryptography, browser security, and privacy-first engineering.">
     
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
@@ -35,6 +37,8 @@
             }
         }
     </script>
+
+    <link rel="stylesheet" href="/style.css">
 
     <style>
         .glass-card {
@@ -53,31 +57,34 @@
         }
     </style>
 </head>
-<body class="bg-[#020617] text-slate-300 min-h-screen font-sans selection:bg-indigo-500/30">
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans selection:bg-indigo-500/30 flex flex-col">
 
     <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
-    <nav class="relative z-10 border-b border-slate-800/50 bg-[#020617]/80 backdrop-blur-md sticky top-0">
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <a href="/" class="flex items-center gap-2 text-white font-bold text-xl tracking-tight">
-                <i class="ph ph-fingerprint text-indigo-500"></i> ZeroKey <span class="text-slate-500 font-medium">/ Blog</span>
+                <i class="ph ph-fingerprint text-indigo-500 text-2xl"></i> ZeroKey <span class="text-slate-500 font-medium">/ Blog</span>
             </a>
             <div class="flex gap-4">
-                <a href="https://github.com/kdippan" target="_blank" class="text-slate-400 hover:text-white transition-colors text-xl">
+                <a href="https://github.com/kdippan" target="_blank" class="text-slate-400 hover:text-white transition-colors text-2xl">
                     <i class="ph ph-github-logo"></i>
                 </a>
             </div>
         </div>
     </nav>
 
-    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-grow w-full">
         
         <header class="max-w-3xl mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Engineering Hub</h1>
-            <p class="text-lg text-slate-400">Deep dives into zero-knowledge architecture, client-side cryptography, and building secure systems in a hostile web.</p>
+            <div class="flex items-center gap-2 text-indigo-400 text-sm font-mono uppercase tracking-widest mb-3">
+                <i class="ph ph-books"></i> Technical Library
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Engineering Hub</h1>
+            <p class="text-lg text-slate-400 leading-relaxed">Deep dives into zero-knowledge architecture, client-side cryptography, and building secure systems in a hostile web.</p>
         </header>
 
-        <div class="relative max-w-2xl mb-12">
+        <div class="relative max-w-2xl mb-16">
             <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl"></i>
             <input type="text" id="blogSearch" placeholder="Search topics (e.g. 'WebRTC', 'Encryption', 'XSS')..." 
                    class="w-full bg-slate-900/50 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 search-input transition-all">
@@ -87,37 +94,153 @@
             </div>
 
         <div id="noResults" class="hidden py-20 text-center">
-            <i class="ph ph-detective text-5xl text-slate-700 mb-4"></i>
-            <p class="text-slate-500">No articles match your search query.</p>
+            <i class="ph ph-detective text-6xl text-slate-700 mb-4 inline-block"></i>
+            <h3 class="text-xl font-bold text-slate-300 mb-2">No articles found</h3>
+            <p class="text-slate-500">Try adjusting your search terms.</p>
         </div>
     </main>
 
-    <footer class="relative z-10 border-t border-slate-900 py-12 mt-20">
+    <footer class="relative z-10 border-t border-slate-900 py-12 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-sm text-slate-600">&copy; 2026 ZeroKey Engineering. Authored by <a href="https://github.com/kdippan" class="text-indigo-400">Dippan Bhusal</a>.</p>
+            <p class="text-sm text-slate-600">&copy; 2026 ZeroKey Engineering. Authored by <a href="https://github.com/kdippan" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors">Dippan Bhusal</a>.</p>
         </div>
     </footer>
 
     <script>
         const blogs = [
-            { title: "Securely Sharing ENV Files", desc: "Why sharing .env files over Slack is a risk and how to build a zero-knowledge alternative.", url: "/blog/how-to-securely-share-env-files", tags: ["Security", "DevOps"], icon: "ph-shield-check" },
-            { title: "The URL Fragment Exploit", desc: "Understanding the 'Hash' in URLs and how it enables zero-knowledge data sharing.", url: "/blog/the-url-fragment-exploit-zero-knowledge", tags: ["Cryptography", "Web"], icon: "ph-link" },
-            { title: "Bypassing Vercel Payload Limits", desc: "How to handle large file uploads on serverless platforms using direct S3/Supabase uploads.", url: "/blog/how-to-bypass-vercel-payload-limit", tags: ["Vercel", "Performance"], icon: "ph-cloud-arrow-up" },
-            { title: "Why XSS Defeats Encryption", desc: "Why even the best AES-256 implementation is useless if your site is vulnerable to script injection.", url: "/blog/why-xss-defeats-client-side-encryption", tags: ["Security", "XSS"], icon: "ph-bug" },
-            { title: "Web Workers & UI Freezing", desc: "Offload heavy Web Crypto operations to background threads for 60fps performance.", url: "/blog/how-to-prevent-ui-freezing-with-web-workers", tags: ["JavaScript", "Performance"], icon: "ph-cpu" },
-            { title: "Clipboard Hijacking Prevention", desc: "Stop attackers from swapping crypto addresses using the modern Clipboard API.", url: "/blog/how-to-prevent-clipboard-hijacking-javascript", tags: ["Security", "API"], icon: "ph-copy" },
-            { title: "P2P Sharing with WebRTC", desc: "Building a serverless file sharing tool that works directly between browsers.", url: "/blog/how-to-build-p2p-file-sharing-webrtc", tags: ["WebRTC", "Networking"], icon: "ph-users-three" },
-            { title: "Key Derivation with PBKDF2", desc: "How to turn a weak user password into a cryptographically strong 256-bit key.", url: "/blog/how-to-derive-encryption-keys-pbkdf2", tags: ["Cryptography", "Auth"], icon: "ph-key" },
-            { title: "Geofencing in JavaScript", desc: "Restricting data access based on physical location using the Geolocation API.", url: "/blog/how-to-build-geofencing-javascript", tags: ["Geolocation", "Privacy"], icon: "ph-map-pin" },
-            { title: "Burn After Reading with Supabase", desc: "Implementing self-destructing data using Supabase edge functions and TTL.", url: "/blog/how-to-build-burn-after-reading-supabase", tags: ["Database", "Privacy"], icon: "ph-fire" },
-            { title: "WebAuthn & Biometrics", desc: "Replacing passwords with FaceID and TouchID using the WebAuthn standard.", url: "/blog/how-to-implement-webauthn-biometrics", tags: ["Security", "Auth"], icon: "ph-fingerprint" },
-            { title: "Don't Use Math.random()", desc: "Why standard random numbers are predictable and how to use crypto.getRandomValues().", url: "/blog/why-never-use-math-random-for-cryptography", tags: ["Cryptography", "JavaScript"], icon: "ph-dice-five" },
-            { title: "Abandoning NPM for Crypto", desc: "The supply-chain risks of third-party libraries and why we chose native Web Crypto.", url: "/blog/why-abandoned-npm-for-cryptography", tags: ["Security", "Engineering"], icon: "ph-package" },
-            { title: "LocalStorage Security Risks", desc: "Why you should never store unencrypted keys in LocalStorage or Cookies.", url: "/blog/why-never-store-keys-in-localstorage", tags: ["Security", "Web"], icon: "ph-database" },
-            { title: "ArrayBuffer to Base64", desc: "Efficiently handling binary data for transport over JSON APIs.", url: "/blog/how-to-convert-arraybuffer-to-base64", tags: ["JavaScript", "Data"], icon: "ph-code" },
-            { title: "Secure Downloads in JS", desc: "How to trigger a browser download for decrypted binary Blobs safely.", url: "/blog/how-to-trigger-secure-downloads-in-javascript", tags: ["Web", "Data"], icon: "ph-download-simple" },
-            { title: "Encrypting Large Files", desc: "Using Streams API to encrypt multi-gigabyte files without crashing the browser RAM.", url: "/blog/how-to-encrypt-large-files-javascript-streams", tags: ["Performance", "Data"], icon: "ph-waves" },
-            { title: "Sharing API Keys Securely", desc: "Best practices for ephemeral API key distribution in development teams.", url: "/blog/how-to-share-api-keys-securely", tags: ["Security", "Team"], icon: "ph-identification-badge" }
+            {
+                title: "How to Securely Clear Memory in JavaScript",
+                desc: "Don't leave your AES keys sitting in RAM. Learn how to manually wipe memory buffers using TypedArray.fill(0).",
+                url: "/blog/how-to-securely-clear-memory-javascript",
+                tags: ["Memory", "Security"],
+                icon: "ph-memory"
+            },
+            {
+                title: "How to Encrypt Large Files Without Crashing",
+                desc: "Stop loading 2GB files into RAM. Learn how to encrypt and upload massive files in chunks using the Streams API.",
+                url: "/blog/how-to-encrypt-large-files-javascript-streams",
+                tags: ["Performance", "Data"],
+                icon: "ph-waves"
+            },
+            {
+                title: "How to Prevent Clipboard Hijacking",
+                desc: "Stop using document.execCommand. Learn the modern, cryptographically secure way to interact with the system clipboard.",
+                url: "/blog/how-to-prevent-clipboard-hijacking-javascript",
+                tags: ["Security", "API"],
+                icon: "ph-copy"
+            },
+            {
+                title: "Preventing UI Freezing with Web Workers",
+                desc: "Stop freezing your CSS animations. Learn how to move heavy mathematical operations to background threads.",
+                url: "/blog/how-to-prevent-ui-freezing-with-web-workers",
+                tags: ["Performance", "JavaScript"],
+                icon: "ph-cpu"
+            },
+            {
+                title: "P2P File Sharing with WebRTC",
+                desc: "Stop paying for cloud storage. Learn how to connect two browsers directly using WebRTC Data Channels.",
+                url: "/blog/how-to-build-p2p-file-sharing-webrtc",
+                tags: ["Networking", "WebRTC"],
+                icon: "ph-plugs-connected"
+            },
+            {
+                title: "Converting ArrayBuffers to Base64",
+                desc: "If your encrypted data disappears when you JSON.stringify it, you have a serialization problem. Here is the fix.",
+                url: "/blog/how-to-convert-arraybuffer-to-base64",
+                tags: ["Data", "JavaScript"],
+                icon: "ph-brackets-curly"
+            },
+            {
+                title: "Triggering Secure Downloads in JavaScript",
+                desc: "You decrypted the file in the browser. Now how do you let the user download it without sending it to the server?",
+                url: "/blog/how-to-trigger-secure-downloads-in-javascript",
+                tags: ["Web", "API"],
+                icon: "ph-download-simple"
+            },
+            {
+                title: "Bypassing Vercel Payload Limits",
+                desc: "Stop sending files through your serverless APIs. Learn the enterprise architecture for direct-to-cloud uploads.",
+                url: "/blog/how-to-bypass-vercel-payload-limit",
+                tags: ["Vercel", "Cloud"],
+                icon: "ph-cloud-arrow-up"
+            },
+            {
+                title: "Why We Abandoned NPM for Cryptography",
+                desc: "Every time you run npm install, you trust strangers with your app's security. It's time to drop Crypto-JS.",
+                url: "/blog/why-we-abandoned-npm-for-cryptography",
+                tags: ["Security", "DevOps"],
+                icon: "ph-package"
+            },
+            {
+                title: "How to Securely Share .env Files",
+                desc: "Never paste your database URIs into chat apps. Learn the cryptographically secure way to onboard developers.",
+                url: "/blog/how-to-securely-share-env-files",
+                tags: ["DevOps", "Security"],
+                icon: "ph-file-lock"
+            },
+            {
+                title: "Never Store Keys in localStorage",
+                desc: "localStorage is a honeypot for hackers. Learn the secure way to manage sensitive tokens and cryptographic keys.",
+                url: "/blog/why-never-store-keys-in-localstorage",
+                tags: ["Security", "Web"],
+                icon: "ph-warning"
+            },
+            {
+                title: "Never Use Math.random() for Cryptography",
+                desc: "If you use Math.random() to generate passwords or keys, your app is already compromised. Here is the fix.",
+                url: "/blog/why-never-use-math-random-for-cryptography",
+                tags: ["Cryptography", "JavaScript"],
+                icon: "ph-dice-five"
+            },
+            {
+                title: "Why XSS Defeats Client-Side Encryption",
+                desc: "Military-grade AES encryption is useless if an attacker can run JavaScript on your page. Lock down your frontend.",
+                url: "/blog/why-xss-defeats-client-side-encryption",
+                tags: ["Security", "XSS"],
+                icon: "ph-bug"
+            },
+            {
+                title: "Building Geofencing in JavaScript",
+                desc: "Stop remote attacks by adding a physical boundary to your web application using the Geolocation API.",
+                url: "/blog/how-to-build-geofencing-javascript",
+                tags: ["Geolocation", "API"],
+                icon: "ph-map-pin"
+            },
+            {
+                title: "Deriving Encryption Keys with PBKDF2",
+                desc: "Stop using plain passwords for encryption. Learn how to stretch and salt passwords securely in the browser.",
+                url: "/blog/how-to-derive-encryption-keys-pbkdf2",
+                tags: ["Cryptography", "Auth"],
+                icon: "ph-password"
+            },
+            {
+                title: "The URL Fragment Exploit",
+                desc: "Stop putting decryption keys in URL parameters. Here is the native web feature that makes zero-knowledge links possible.",
+                url: "/blog/the-url-fragment-exploit-zero-knowledge",
+                tags: ["Networking", "Cryptography"],
+                icon: "ph-link"
+            },
+            {
+                title: "Burn-After-Reading Apps with Supabase",
+                desc: "Stop using soft-deletes. Learn how to architect zero-retention databases using PostgreSQL Row Level Security.",
+                url: "/blog/how-to-build-burn-after-reading-supabase",
+                tags: ["Database", "Architecture"],
+                icon: "ph-fire"
+            },
+            {
+                title: "Implementing WebAuthn & Biometrics",
+                desc: "Stop using passwords and CAPTCHAs. Secure your web apps with native device biometrics using the WebAuthn API.",
+                url: "/blog/how-to-implement-webauthn-biometrics",
+                tags: ["Auth", "Security"],
+                icon: "ph-fingerprint"
+            },
+            {
+                title: "How to Share API Keys Securely",
+                desc: "Distribute your production API keys without risking a leak. Build an ephemeral sharing workflow for your team.",
+                url: "/blog/how-to-share-api-keys-securely",
+                tags: ["DevOps", "Security"],
+                icon: "ph-identification-badge"
+            }
         ];
 
         const blogGrid = document.getElementById('blogGrid');
@@ -125,36 +248,45 @@
         const noResults = document.getElementById('noResults');
 
         function renderBlogs(filter = '') {
+            const searchTerm = filter.toLowerCase();
             const filtered = blogs.filter(b => 
-                b.title.toLowerCase().includes(filter.toLowerCase()) || 
-                b.desc.toLowerCase().includes(filter.toLowerCase()) ||
-                b.tags.some(t => t.toLowerCase().includes(filter.toLowerCase()))
+                b.title.toLowerCase().includes(searchTerm) || 
+                b.desc.toLowerCase().includes(searchTerm) ||
+                b.tags.some(t => t.toLowerCase().includes(searchTerm))
             );
 
             blogGrid.innerHTML = filtered.map(blog => `
-                <a href="${blog.url}" class="glass-card p-6 rounded-2xl flex flex-col group">
-                    <div class="mb-4 flex justify-between items-start">
-                        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-2xl group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                <a href="${blog.url}" class="glass-card p-6 rounded-2xl flex flex-col group h-full">
+                    <div class="mb-5 flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-2xl group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-inner border border-indigo-500/20">
                             <i class="ph ${blog.icon}"></i>
                         </div>
                         <div class="flex gap-2">
-                            ${blog.tags.map(t => `<span class="text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 px-2 py-1 rounded-md">${t}</span>`).join('')}
+                            ${blog.tags.map(t => `<span class="text-[10px] font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 border border-slate-700 px-2 py-1 rounded-md">${t}</span>`).join('')}
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">${blog.title}</h3>
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors leading-tight">${blog.title}</h3>
                     <p class="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">${blog.desc}</p>
-                    <div class="flex items-center text-indigo-400 text-sm font-semibold gap-1">
-                        Read Analysis <i class="ph ph-arrow-right"></i>
+                    <div class="flex items-center text-indigo-400 text-sm font-semibold gap-2 group-hover:gap-3 transition-all mt-auto">
+                        Read Article <i class="ph ph-arrow-right font-bold"></i>
                     </div>
                 </a>
             `).join('');
 
-            noResults.classList.toggle('hidden', filtered.length > 0);
+            // Toggle visibility of the 'No Results' state
+            if (filtered.length === 0) {
+                blogGrid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            } else {
+                blogGrid.classList.remove('hidden');
+                noResults.classList.add('hidden');
+            }
         }
 
+        // Attach event listener for real-time search
         searchInput.addEventListener('input', (e) => renderBlogs(e.target.value));
         
-        // Initial render
+        // Initial render on page load
         renderBlogs();
     </script>
 </body>
