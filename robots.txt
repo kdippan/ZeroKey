@@ -1,11 +1,17 @@
 # https://zerokey.vercel.app/robots.txt
+
 # Rules for all search engine bots
 User-agent: *
 Allow: /
 
-# SECURITY: Do NOT index user payload viewing links
+# SECURITY: Do NOT index or crawl user payload viewing links
+# This prevents search engine bots from triggering the burn-after-reading protocol
 Disallow: /view
 Disallow: /view?id=*
 
-# Link to the sitemap
+# INFRASTRUCTURE: Do NOT crawl backend serverless functions
+# This prevents bots from wasting Vercel compute resources and bandwidth
+Disallow: /api/
+
+# Link to the updated sitemap containing the core app and engineering blog
 Sitemap: https://zerokey.vercel.app/sitemap.xml
