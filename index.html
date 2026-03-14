@@ -12,6 +12,7 @@
     
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zerokey.vercel.app/">
+    <meta property="og:site_name" content="ZeroKey">
     <meta property="og:title" content="ZeroKey | Client-Side Encrypted Payloads">
     <meta property="og:description" content="Share secrets without leaving a trace. Client-side encryption, zero-knowledge architecture, and self-destructing media.">
     <meta property="og:image" content="https://zerokey.vercel.app/assets/og/index.png"> 
@@ -25,6 +26,12 @@
     {
       "@context": "https://schema.org",
       "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "ZeroKey",
+          "alternateName": ["Zero Key"],
+          "url": "https://zerokey.vercel.app/"
+        },
         {
           "@type": "SoftwareApplication",
           "name": "ZeroKey",
@@ -71,28 +78,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="/style.css">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-SLS94VX99N');
-</script>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30 selection:text-blue-200">
     
     <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
     <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
 
-    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
+    <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
                 <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
             </div>
-            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400 items-center">
                 <a href="/about" class="hover:text-white transition-colors">How it Works</a>
+                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
                 <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
                 <a href="/contact" class="hover:text-white transition-colors">Contact</a>
                 <a href="/donate" class="hover:text-red-400 transition-colors flex items-center gap-1"><i class="ph-fill ph-heart text-red-500"></i> Support</a>
@@ -196,7 +203,51 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-8">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                    <i class="ph-fill ph-books"></i> Open Source Architecture
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">ZeroKey Engineering Blog</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">Dive deep into client-side cryptography, browser security, and how we built a truly zero-knowledge payload delivery system.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <a href="/blog/the-url-fragment-exploit-zero-knowledge" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-indigo-500/50 transition-all group flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-2xl mb-4 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-inner">
+                        <i class="ph ph-link"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">The URL Fragment Exploit</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow">How we use the URL hash to securely pass decryption keys without the server ever seeing them.</p>
+                    <div class="text-indigo-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">Read Article <i class="ph ph-arrow-right font-bold"></i></div>
+                </a>
+
+                <a href="/blog/why-xss-defeats-client-side-encryption" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-fuchsia-500/50 transition-all group flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-fuchsia-500/10 flex items-center justify-center text-fuchsia-400 text-2xl mb-4 group-hover:bg-fuchsia-500 group-hover:text-white transition-all shadow-inner">
+                        <i class="ph ph-bug"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-fuchsia-400 transition-colors">Why XSS Defeats Encryption</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow">Military-grade AES encryption is useless if an attacker can run JavaScript on your page.</p>
+                    <div class="text-fuchsia-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">Read Article <i class="ph ph-arrow-right font-bold"></i></div>
+                </a>
+
+                <a href="/blog/how-to-prevent-ui-freezing-with-web-workers" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all group flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 text-2xl mb-4 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-inner">
+                        <i class="ph ph-cpu"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">Preventing UI Freezing</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow">Offload heavy Web Crypto API operations to background threads using Web Workers.</p>
+                    <div class="text-orange-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">Read Article <i class="ph ph-arrow-right font-bold"></i></div>
+                </a>
+            </div>
+
+            <div class="text-center">
+                <a href="/blog" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold transition-all hover:shadow-lg">
+                    View All Technical Articles <i class="ph ph-arrow-right font-bold"></i>
+                </a>
             </div>
         </section>
 
@@ -248,6 +299,7 @@
                 </div>
                 <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
                     <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
                     <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
                     <a href="/terms" class="hover:text-blue-400 transition-colors">Terms & Conditions</a>
                     <a href="/disclaimer" class="hover:text-blue-400 transition-colors">Disclaimer</a>
