@@ -45,16 +45,25 @@ async function verifyBiometrics() {
     try {
         const challenge = new Uint8Array(32);
         window.crypto.getRandomValues(challenge);
+        
         await navigator.credentials.create({
             publicKey: {
-                challenge, rp: { name: "ZeroKey", id: window.location.hostname },
+                challenge, 
+                rp: { name: "ZeroKey", id: window.location.hostname },
                 user: { id: new Uint8Array(16), name: "user", displayName: "User" },
                 pubKeyCredParams: [{ type: "public-key", alg: -7 }],
-                authenticatorSelection: { userVerification: "required" }, timeout: 60000
+                authenticatorSelection: { 
+                    authenticatorAttachment: "platform", // Forces local device lock screen/biometrics
+                    userVerification: "required" 
+                }, 
+                timeout: 60000
             }
         });
         return true;
-    } catch (err) { return false; }
+    } catch (err) { 
+        console.error("Biometric failed or cancelled:", err);
+        return false; 
+    }
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
