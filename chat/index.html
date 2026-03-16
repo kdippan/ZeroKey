@@ -3,28 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZeroChat | E2EE Real-Time Messaging</title>
-    
+    <title>ZeroChat | Secure Group Rooms</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } } }
     </script>
     <link rel="stylesheet" href="/style.css">
 </head>
@@ -35,59 +22,91 @@
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
             <a href="/" class="flex items-center gap-2 text-white font-bold text-xl tracking-tight">
-                <i class="ph ph-fingerprint text-indigo-500 text-2xl"></i> ZeroKey <span class="text-slate-500 font-medium">/ Chat</span>
+                <i class="ph ph-fingerprint text-indigo-500 text-2xl"></i> ZeroKey <span class="text-slate-500 font-medium">/ Rooms</span>
             </a>
-            <div class="flex items-center gap-2 text-xs font-mono bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                E2EE Active
-            </div>
+            <div id="authStatus" class="text-sm font-medium text-slate-400">Loading...</div>
         </div>
     </nav>
 
     <main class="relative z-10 flex-grow max-w-4xl mx-auto w-full flex flex-col p-4 h-[calc(100vh-4rem)]">
         
-        <div class="glass-panel p-4 rounded-2xl bg-slate-900/40 border border-slate-800 mb-4 flex justify-between items-center">
-            <div id="statusText" class="text-sm font-semibold text-slate-400 flex items-center gap-2">
-                <i class="ph ph-spinner animate-spin text-indigo-400 text-lg"></i> Connecting to Secure Channel...
+        <div id="lobbyView" class="flex flex-col items-center justify-center h-full w-full max-w-md mx-auto space-y-6 hidden">
+            <div class="text-center mb-4">
+                <i class="ph-fill ph-shield-check text-5xl text-indigo-500 mb-2"></i>
+                <h1 class="text-2xl font-bold text-white">Secure Rooms</h1>
+                <p class="text-slate-400 text-sm mt-1">End-to-End Encrypted Group Chat</p>
             </div>
-            <button id="generateKeysBtn" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)]">
-                Generate Identity Keys
-            </button>
-        </div>
 
-        <div id="invitePanel" class="glass-panel p-4 rounded-2xl bg-indigo-900/20 border border-indigo-500/30 mb-4 flex flex-col sm:flex-row items-center gap-4 hidden">
-            <div class="flex-grow w-full">
-                <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider mb-1">Invite a Peer</p>
-                <input type="text" id="inviteLinkInput" readonly class="w-full bg-slate-900/80 border border-slate-700 rounded-lg py-2 px-3 text-slate-300 text-sm font-mono focus:outline-none selection:bg-indigo-500/30">
+            <div id="authSection" class="w-full glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hidden">
+                <h2 class="text-lg font-bold text-white mb-4">Creator Login</h2>
+                <input type="email" id="emailInput" placeholder="Email Address" class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-white mb-3 focus:border-indigo-500 outline-none">
+                <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-white mb-4 focus:border-indigo-500 outline-none">
+                <div class="flex gap-2">
+                    <button id="loginBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold transition-all">Log In</button>
+                    <button id="signupBtn" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-semibold transition-all">Sign Up</button>
+                </div>
             </div>
-            <button id="copyInviteBtn" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2 mt-4 sm:mt-0">
-                <i class="ph ph-copy text-lg"></i> Copy Link
-            </button>
-        </div>
 
-        <div id="messagesContainer" class="flex-grow overflow-y-auto space-y-4 mb-2 pr-2 custom-scrollbar">
-            <div class="text-center text-slate-600 text-xs font-mono py-10">
-                <i class="ph ph-lock-key text-3xl mb-2"></i><br>
-                Messages are End-to-End Encrypted.<br>Nobody outside of this channel, not even ZeroKey, can read them.
+            <div id="createRoomSection" class="w-full glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hidden">
+                <h2 class="text-lg font-bold text-white mb-4">Create New Room</h2>
+                <input type="text" id="newRoomName" placeholder="Room Name (e.g. Project Alpha)" class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-white mb-3 focus:border-indigo-500 outline-none">
+                <input type="text" id="newRoomPassword" placeholder="Room Password (Optional)" class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-white mb-3 focus:border-indigo-500 outline-none">
+                <select id="retentionSelect" class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-white mb-4 focus:border-indigo-500 outline-none">
+                    <option value="24">Self-Destruct in 24 Hours</option>
+                    <option value="48">Self-Destruct in 48 Hours</option>
+                </select>
+                <button id="createRoomBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
+                    <i class="ph ph-plus-circle text-lg"></i> Deploy Room
+                </button>
+            </div>
+
+            <div id="joinRoomSection" class="w-full glass-panel p-6 rounded-2xl bg-slate-900/40 border border-indigo-500/30 hidden">
+                <h2 class="text-lg font-bold text-white mb-2">Join Room</h2>
+                <p id="joinRoomName" class="text-sm text-indigo-400 font-mono mb-4">Fetching details...</p>
+                <input type="text" id="guestNameInput" placeholder="Enter a temporary display name" class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-white mb-3 focus:border-indigo-500 outline-none">
+                <input type="password" id="joinPasswordInput" placeholder="Room Password" class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-white mb-4 focus:border-indigo-500 outline-none hidden">
+                <button id="joinRoomBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
+                    <i class="ph ph-sign-in text-lg"></i> Enter Vault
+                </button>
             </div>
         </div>
 
-        <div id="typingIndicator" class="hidden text-xs text-indigo-400 font-mono mb-2 px-2 animate-pulse flex items-center gap-2">
-            <i class="ph ph-chat-teardrop-dots text-lg"></i> Peer is typing...
-        </div>
+        <div id="chatView" class="flex-grow flex flex-col h-full hidden">
+            <div class="glass-panel p-4 rounded-2xl bg-slate-900/40 border border-slate-800 mb-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400"><i class="ph-fill ph-users text-xl"></i></div>
+                    <div>
+                        <h2 id="chatRoomTitle" class="text-white font-bold leading-tight">Room Name</h2>
+                        <p class="text-xs text-emerald-400 font-mono flex items-center gap-1"><i class="ph-fill ph-lock-key"></i> E2EE Active</p>
+                    </div>
+                </div>
+                <button id="inviteBtn" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all border border-slate-700 flex items-center gap-2">
+                    <i class="ph ph-user-plus"></i> Invite
+                </button>
+            </div>
 
-        <form id="chatForm" class="relative mt-auto border-t border-slate-800 pt-4">
-            <input type="text" id="messageInput" autocomplete="off" disabled placeholder="Waiting for secure connection..." 
-                   class="w-full bg-slate-900/80 border border-slate-700 rounded-xl py-4 pl-4 pr-16 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            <button type="submit" id="sendBtn" disabled class="absolute right-2 top-1/2 -translate-y-1/2 mt-2 w-10 h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(79,70,229,0.4)]">
-                <i class="ph-fill ph-paper-plane-right text-lg"></i>
-            </button>
-        </form>
+            <div id="inviteModal" class="hidden absolute top-20 right-4 z-50 glass-panel p-4 rounded-xl border border-indigo-500/50 bg-slate-900 shadow-2xl w-80">
+                <p class="text-xs text-slate-400 mb-1">Share this link to invite guests:</p>
+                <input type="text" id="shareUrl" readonly class="w-full bg-slate-800 border border-slate-700 rounded py-1 px-2 text-xs font-mono text-white mb-2">
+                <p id="sharePwdDisplay" class="text-xs text-red-400 font-mono mb-3 hidden">Password: <span></span></p>
+                <button id="copyShareBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded text-xs font-bold transition-all">Copy Link</button>
+            </div>
+
+            <div id="messagesContainer" class="flex-grow overflow-y-auto space-y-4 mb-2 pr-2 custom-scrollbar">
+                </div>
+
+            <div id="typingIndicator" class="hidden text-xs text-indigo-400 font-mono mb-2 px-2 animate-pulse flex items-center gap-2">
+                <i class="ph ph-chat-teardrop-dots text-lg"></i> Someone is typing...
+            </div>
+
+            <form id="chatForm" class="relative mt-auto border-t border-slate-800 pt-4">
+                <input type="text" id="messageInput" autocomplete="off" placeholder="Type a secure message..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl py-4 pl-4 pr-16 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-all">
+                <button type="submit" id="sendBtn" class="absolute right-2 top-1/2 -translate-y-1/2 mt-2 w-10 h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center justify-center transition-all shadow-[0_0_10px_rgba(79,70,229,0.4)]">
+                    <i class="ph-fill ph-paper-plane-right text-lg"></i>
+                </button>
+            </form>
+        </div>
     </main>
-
     <script src="/chat/chat.js"></script>
 </body>
 </html>
