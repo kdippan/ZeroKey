@@ -4,6 +4,7 @@ const chatView = document.getElementById('chatView');
 const authSection = document.getElementById('authSection');
 const createRoomSection = document.getElementById('createRoomSection');
 const joinRoomSection = document.getElementById('joinRoomSection');
+const authStatus = document.getElementById('authStatus');
 
 // --- STATE ---
 let supabase;
@@ -45,53 +46,69 @@ async function decryptData(ciphertextB64, ivB64) {
     } catch (e) { return "⚠️ [Decryption Failed]"; }
 }
 
-// --- INITIALIZATION ---
+// --- INITIALIZATION (WITH ERROR HANDLING) ---
 async function initApp() {
-    const config = await (await fetch('/api/getConfig')).json();
-    supabase = window.supabase.createClient(config.url, config.anonKey);
+    try {
+        authStatus.innerText = "Fetching Config...";
+        const configRes = await fetch('/api/getConfig');
+        if (!configRes.ok) throw new Error("Could not load Vercel API Config");
+        const config = await configRes.json();
 
-    // Check Auth
-    const { data: { session } } = await supabase.auth.getSession();
-    currentUser = session?.user || null;
-    document.getElementById('authStatus').innerText = currentUser ? `Logged in as ${currentUser.email}` : 'Guest Mode';
+        authStatus.innerText = "Connecting DB...";
+        supabase = window.supabase.createClient(config.url, config.anonKey);
 
-    // Route based on URL
-    const hash = window.location.hash.substring(1);
-    lobbyView.classList.remove('hidden');
-
-    if (hash) {
-        // Joining a room
-        const parts = hash.split('|');
-        currentRoomId = parts[0];
-        const isUrlKey = parts.length > 1; // If key is in URL, it's an open room
-
-        const { data: roomData } = await supabase.from('chat_rooms').select('room_name, is_protected').eq('id', currentRoomId).single();
-        if (!roomData) return alert("Room not found or expired.");
-
-        document.getElementById('joinRoomName').innerText = `Room: ${roomData.room_name}`;
-        if (roomData.is_protected && !isUrlKey) document.getElementById('joinPasswordInput').classList.remove('hidden');
+        authStatus.innerText = "Checking Auth...";
+        const { data: { session }, error: authErr } = await supabase.auth.getSession();
+        if (authErr) throw authErr;
         
-        authSection.classList.add('hidden');
-        createRoomSection.classList.add('hidden');
-        joinRoomSection.classList.remove('hidden');
-    } else {
-        // Creating a room
-        if (currentUser) {
+        currentUser = session?.user || null;
+        authStatus.innerText = currentUser ? `Logged in as ${currentUser.email}` : 'Guest Mode';
+
+        // Route based on URL
+        const hash = window.location.hash.substring(1);
+        lobbyView.classList.remove('hidden');
+
+        if (hash) {
+            // Joining a room
+            const parts = hash.split('|');
+            currentRoomId = parts[0];
+            const isUrlKey = parts.length > 1;
+
+            const { data: roomData, error: dbErr } = await supabase.from('chat_rooms').select('room_name, is_protected').eq('id', currentRoomId).single();
+            if (dbErr || !roomData) return alert("Room not found or has expired and been deleted.");
+
+            document.getElementById('joinRoomName').innerText = `Room: ${roomData.room_name}`;
+            if (roomData.is_protected && !isUrlKey) document.getElementById('joinPasswordInput').classList.remove('hidden');
+            
             authSection.classList.add('hidden');
-            createRoomSection.classList.remove('hidden');
-        } else {
-            authSection.classList.remove('hidden');
             createRoomSection.classList.add('hidden');
+            joinRoomSection.classList.remove('hidden');
+        } else {
+            // Creating a room
+            if (currentUser) {
+                authSection.classList.add('hidden');
+                createRoomSection.classList.remove('hidden');
+            } else {
+                authSection.classList.remove('hidden');
+                createRoomSection.classList.add('hidden');
+            }
         }
+    } catch (err) {
+        console.error("Boot Error:", err);
+        authStatus.innerHTML = `<span class="text-red-400"><i class="ph ph-warning"></i> Error: ${err.message || "Failed to load"}</span>`;
     }
 }
 
 // --- AUTH LOGIC ---
 document.getElementById('signupBtn').onclick = async () => {
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
     const { error } = await supabase.auth.signUp({ email: emailInput.value, password: passwordInput.value });
     if (error) alert(error.message); else { alert("Account created! Logging in..."); location.reload(); }
 };
 document.getElementById('loginBtn').onclick = async () => {
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
     const { error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
     if (error) alert(error.message); else location.reload();
 };
@@ -113,7 +130,7 @@ document.getElementById('createRoomBtn').onclick = async () => {
         creator_id: currentUser.id
     }]).select().single();
 
-    if (error) return alert("Error creating room.");
+    if (error) return alert("Error creating room: " + error.message);
 
     // 2. Generate Cryptography
     let urlHash = `#${data.id}`;
@@ -141,10 +158,8 @@ document.getElementById('joinRoomBtn').onclick = async () => {
 
     try {
         if (parts.length > 1) {
-            // Open room: Key is in URL
             masterAesKey = await window.crypto.subtle.importKey("raw", base64ToBuffer(parts[1]), { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
         } else {
-            // Protected room: Derive from password
             if (!pwd) throw new Error("Password required");
             masterAesKey = await deriveKeyFromPassword(pwd, currentRoomId);
         }
@@ -153,7 +168,7 @@ document.getElementById('joinRoomBtn').onclick = async () => {
         enterChat(roomData.room_name);
     } catch (e) {
         alert("Invalid Password or corrupted link.");
-        document.getElementById('joinRoomBtn').innerText = "Enter Vault";
+        document.getElementById('joinRoomBtn').innerHTML = `<i class="ph ph-sign-in text-lg"></i> Enter Vault`;
     }
 };
 
@@ -182,13 +197,13 @@ async function enterChat(roomName, rawPwd = null) {
     // 2. Subscribe to new DB messages
     supabase.channel('public:chat_messages')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${currentRoomId}` }, async (payload) => {
-            if (payload.new.sender_name === myDisplayName) return; // We render our own locally
+            if (payload.new.sender_name === myDisplayName) return; 
             document.getElementById('typingIndicator').classList.add('hidden');
             const plain = await decryptData(payload.new.ciphertext, payload.new.iv);
             renderMessage(plain, payload.new.sender_name, false);
         }).subscribe();
 
-    // 3. Subscribe to Realtime Typing Broadcasts
+    // 3. Subscribe to Realtime Typing
     roomChannel = supabase.channel(`typing:${currentRoomId}`);
     roomChannel.on('broadcast', { event: 'typing' }, (p) => {
         if (p.payload.sender === myDisplayName) return;
