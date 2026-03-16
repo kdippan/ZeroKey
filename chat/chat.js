@@ -10,75 +10,184 @@ const roomId = window.location.hash.substring(1) || 'secure-lobby';
 let myClientId = crypto.randomUUID(); 
 let roomChannel;
 
-// Initialize the app by fetching Vercel Env Vars first
+// Cryptography State
+let myKeyPair = null;
+let sharedAesKey = null;
+
+// --- CRYPTOGRAPHY & SERIALIZATION HELPERS ---
+
+function bufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+}
+
+function base64ToBuffer(base64) {
+    const binaryString = window.atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+// 1. Generate ECDH Public/Private Key Pair
+async function generateIdentityKeys() {
+    myKeyPair = await window.crypto.subtle.generateKey(
+        { name: "ECDH", namedCurve: "P-256" },
+        true,
+        ["deriveKey"]
+    );
+    
+    // Export Public Key to send to the other user
+    const exportedPubKey = await window.crypto.subtle.exportKey("raw", myKeyPair.publicKey);
+    const pubKeyBase64 = bufferToBase64(exportedPubKey);
+    
+    // Broadcast public key
+    await roomChannel.send({
+        type: 'broadcast',
+        event: 'key-exchange',
+        payload: { senderId: myClientId, publicKey: pubKeyBase64 }
+    });
+    
+    statusText.innerHTML = `<i class="ph-fill ph-spinner animate-spin text-indigo-400 text-lg"></i> Waiting for peer's public key...`;
+    generateKeysBtn.classList.add('hidden');
+}
+
+// 2. Derive the Shared AES-GCM Key
+async function deriveSharedSecret(peerPublicKeyBase64) {
+    const peerKeyBuffer = base64ToBuffer(peerPublicKeyBase64);
+    const peerPublicKey = await window.crypto.subtle.importKey(
+        "raw",
+        peerKeyBuffer,
+        { name: "ECDH", namedCurve: "P-256" },
+        true,
+        []
+    );
+
+    sharedAesKey = await window.crypto.subtle.deriveKey(
+        { name: "ECDH", public: peerPublicKey },
+        myKeyPair.privateKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+    );
+
+    statusText.innerHTML = `<i class="ph-fill ph-shield-check text-emerald-400 text-lg"></i> AES-256 Tunnel Secured`;
+    messageInput.disabled = false;
+    sendBtn.disabled = false;
+    messageInput.placeholder = "Type a secure message...";
+    messageInput.focus();
+}
+
+// 3. Encrypt Message
+async function encryptMessage(text) {
+    const enc = new TextEncoder();
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const ciphertextBuffer = await window.crypto.subtle.encrypt(
+        { name: "AES-GCM", iv: iv },
+        sharedAesKey,
+        enc.encode(text)
+    );
+    return {
+        ciphertext: bufferToBase64(ciphertextBuffer),
+        iv: bufferToBase64(iv)
+    };
+}
+
+// 4. Decrypt Message
+async function decryptMessage(ciphertextBase64, ivBase64) {
+    try {
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: base64ToBuffer(ivBase64) },
+            sharedAesKey,
+            base64ToBuffer(ciphertextBase64)
+        );
+        return new TextDecoder().decode(decryptedBuffer);
+    } catch (e) {
+        return "⚠️ [Decryption Failed - Keys do not match]";
+    }
+}
+
+// --- NETWORK INITIALIZATION ---
+
 async function initChat() {
     try {
-        // 1. Fetch the Supabase config from our Vercel API
         const configResponse = await fetch('/api/getConfig');
         const config = await configResponse.json();
-
-        // 2. Initialize Supabase
         const supabase = window.supabase.createClient(config.url, config.anonKey);
 
-        // 3. Initialize the Realtime Channel
         roomChannel = supabase.channel(`room:${roomId}`, {
-            config: {
-                broadcast: { self: true } // Allows us to see our own messages
+            config: { broadcast: { self: false } } // Set to false so we render our own messages locally instantly
+        });
+
+        // Handle Key Exchange
+        roomChannel.on('broadcast', { event: 'key-exchange' }, async (payload) => {
+            if (payload.payload.senderId === myClientId) return;
+            
+            // If we don't have keys yet, generate them to reply
+            if (!myKeyPair) await generateIdentityKeys();
+            
+            // Derive the shared secret using their public key
+            await deriveSharedSecret(payload.payload.publicKey);
+        });
+
+        // Handle Encrypted Messages
+        roomChannel.on('broadcast', { event: 'secure-message' }, async (payload) => {
+            if (payload.payload.senderId === myClientId) return;
+            
+            if (!sharedAesKey) {
+                renderMessage("⚠️ [Encrypted message received, but AES channel is not secure]", false);
+                return;
             }
+            
+            const decryptedText = await decryptMessage(payload.payload.ciphertext, payload.payload.iv);
+            renderMessage(decryptedText, false);
         });
 
-        // 4. Listen for incoming broadcasts
-        roomChannel.on('broadcast', { event: 'secure-message' }, (payload) => {
-            console.log('Broadcast received:', payload);
-            const isMe = payload.payload.senderId === myClientId;
-            renderMessage(payload.payload.ciphertext, isMe);
-        });
-
-        // 5. Subscribe and open the WebSocket
         roomChannel.subscribe((status) => {
             if (status === 'SUBSCRIBED') {
-                statusText.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i> Secure Channel Established: <span class="font-mono text-emerald-300">${roomId}</span>`;
-                messageInput.disabled = false;
-                sendBtn.disabled = false;
-                messageInput.placeholder = "Type an encrypted message...";
+                statusText.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i> Room Connected. Handshake required.`;
                 generateKeysBtn.classList.remove('hidden');
+                generateKeysBtn.addEventListener('click', generateIdentityKeys);
             } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
                 statusText.innerHTML = `<i class="ph-fill ph-warning text-red-400 text-lg"></i> Connection lost.`;
-                messageInput.disabled = true;
-                sendBtn.disabled = true;
             }
         });
 
     } catch (error) {
-        console.error("Failed to initialize secure chat:", error);
-        statusText.innerHTML = `<i class="ph-fill ph-warning text-red-400 text-lg"></i> Failed to load secure configuration.`;
+        statusText.innerHTML = `<i class="ph-fill ph-warning text-red-400 text-lg"></i> Failed to load config.`;
     }
 }
 
-// 6. Handle sending messages
+// --- UI INTERACTIONS ---
+
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const rawText = messageInput.value.trim();
-    if (!rawText || !roomChannel) return;
+    if (!rawText || !sharedAesKey) return;
 
-    // TODO: ECDH & AES-GCM encryption will happen right here.
-    const mockCiphertext = `[ENCRYPTED] ${btoa(rawText)}`;
+    // Render locally immediately
+    renderMessage(rawText, true);
+    messageInput.value = '';
 
-    // Blast the message over the WebSocket
+    // Encrypt and broadcast
+    const encryptedData = await encryptMessage(rawText);
+    
     await roomChannel.send({
         type: 'broadcast',
         event: 'secure-message',
         payload: {
             senderId: myClientId,
-            ciphertext: mockCiphertext,
-            iv: "mock-iv-data"
+            ciphertext: encryptedData.ciphertext,
+            iv: encryptedData.iv
         }
     });
-
-    messageInput.value = '';
 });
 
-// UI Helper to draw chat bubbles
 function renderMessage(text, isMe) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
@@ -93,9 +202,7 @@ function renderMessage(text, isMe) {
     
     msgDiv.appendChild(bubble);
     messagesContainer.appendChild(msgDiv);
-    
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Boot up the application
 initChat();
