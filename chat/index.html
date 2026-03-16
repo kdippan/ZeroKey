@@ -8,8 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -53,6 +55,16 @@
             </div>
             <button id="generateKeysBtn" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)]">
                 Generate Identity Keys
+            </button>
+        </div>
+
+        <div id="invitePanel" class="glass-panel p-4 rounded-2xl bg-indigo-900/20 border border-indigo-500/30 mb-4 flex flex-col sm:flex-row items-center gap-4 hidden">
+            <div class="flex-grow w-full">
+                <p class="text-xs text-indigo-300 font-semibold uppercase tracking-wider mb-1">Invite a Peer</p>
+                <input type="text" id="inviteLinkInput" readonly class="w-full bg-slate-900/80 border border-slate-700 rounded-lg py-2 px-3 text-slate-300 text-sm font-mono focus:outline-none selection:bg-indigo-500/30">
+            </div>
+            <button id="copyInviteBtn" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2 mt-4 sm:mt-0">
+                <i class="ph ph-copy text-lg"></i> Copy Link
             </button>
         </div>
 
