@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroChat | E2EE Real-Time Messaging</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans flex flex-col selection:bg-indigo-500/30">
+
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-white font-bold text-xl tracking-tight">
+                <i class="ph ph-fingerprint text-indigo-500 text-2xl"></i> ZeroKey <span class="text-slate-500 font-medium">/ Chat</span>
+            </a>
+            <div class="flex items-center gap-2 text-xs font-mono bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                E2EE Active
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow max-w-4xl mx-auto w-full flex flex-col p-4 h-[calc(100vh-4rem)]">
+        
+        <div class="glass-panel p-4 rounded-2xl bg-slate-900/40 border border-slate-800 mb-4 flex justify-between items-center">
+            <div id="statusText" class="text-sm font-semibold text-slate-400 flex items-center gap-2">
+                <i class="ph ph-spinner animate-spin text-indigo-400 text-lg"></i> Connecting to Secure Channel...
+            </div>
+            <button id="generateKeysBtn" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)]">
+                Generate Identity Keys
+            </button>
+        </div>
+
+        <div id="messagesContainer" class="flex-grow overflow-y-auto space-y-4 mb-4 pr-2 custom-scrollbar">
+            <div class="text-center text-slate-600 text-xs font-mono py-10">
+                <i class="ph ph-lock-key text-3xl mb-2"></i><br>
+                Messages are End-to-End Encrypted.<br>Nobody outside of this channel, not even ZeroKey, can read them.
+            </div>
+        </div>
+
+        <form id="chatForm" class="relative mt-auto">
+            <input type="text" id="messageInput" autocomplete="off" disabled placeholder="Waiting for secure connection..." 
+                   class="w-full bg-slate-900/80 border border-slate-700 rounded-xl py-4 pl-4 pr-16 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="submit" id="sendBtn" disabled class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(79,70,229,0.4)]">
+                <i class="ph-fill ph-paper-plane-right text-lg"></i>
+            </button>
+        </form>
+    </main>
+
+    <script src="chat.js"></script>
+</body>
+</html>
