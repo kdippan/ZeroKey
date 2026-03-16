@@ -1,214 +1,235 @@
-// DOM Elements
-const statusText = document.getElementById('statusText');
-const messagesContainer = document.getElementById('messagesContainer');
-const chatForm = document.getElementById('chatForm');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const generateKeysBtn = document.getElementById('generateKeysBtn');
-const typingIndicator = document.getElementById('typingIndicator');
-const invitePanel = document.getElementById('invitePanel');
-const inviteLinkInput = document.getElementById('inviteLinkInput');
-const copyInviteBtn = document.getElementById('copyInviteBtn');
+// --- DOM ELEMENTS ---
+const lobbyView = document.getElementById('lobbyView');
+const chatView = document.getElementById('chatView');
+const authSection = document.getElementById('authSection');
+const createRoomSection = document.getElementById('createRoomSection');
+const joinRoomSection = document.getElementById('joinRoomSection');
 
-// --- ROOM GENERATION LOGIC ---
-// If the user visits /chat without a room hash, generate a secure random one!
-let roomId = window.location.hash.substring(1);
-if (!roomId) {
-    // Create a random 12-character string
-    roomId = 'room-' + Math.random().toString(36).substring(2, 14);
-    // Update the URL without reloading the page
-    window.history.replaceState(null, null, `#${roomId}`);
-}
-
-let myClientId = crypto.randomUUID(); 
+// --- STATE ---
+let supabase;
+let currentUser = null;
+let currentRoomId = null;
+let masterAesKey = null;
+let myDisplayName = "Creator";
 let roomChannel;
-
-// Cryptography & State
-let myKeyPair = null;
-let sharedAesKey = null;
 let amITyping = false;
 let typingTimeout = null;
 
-// --- CRYPTOGRAPHY & SERIALIZATION HELPERS ---
+// --- CRYPTO HELPERS ---
+function bufferToBase64(buf) { return window.btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function base64ToBuffer(b64) { return new Uint8Array([...window.atob(b64)].map(c => c.charCodeAt(0))).buffer; }
 
-function bufferToBase64(buffer) {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) { binary += String.fromCharCode(bytes[i]); }
-    return window.btoa(binary);
-}
-
-function base64ToBuffer(base64) {
-    const binaryString = window.atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) { bytes[i] = binaryString.charCodeAt(i); }
-    return bytes.buffer;
-}
-
-// 1. Generate ECDH Public/Private Key Pair
-async function generateIdentityKeys() {
-    myKeyPair = await window.crypto.subtle.generateKey(
-        { name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey"]
+async function deriveKeyFromPassword(password, salt) {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
+    return await window.crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: enc.encode(salt), iterations: 100000, hash: "SHA-256" },
+        keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
     );
-    const exportedPubKey = await window.crypto.subtle.exportKey("raw", myKeyPair.publicKey);
-    
-    await roomChannel.send({
-        type: 'broadcast',
-        event: 'key-exchange',
-        payload: { senderId: myClientId, publicKey: bufferToBase64(exportedPubKey) }
-    });
-    
-    statusText.innerHTML = `<i class="ph-fill ph-spinner animate-spin text-indigo-400 text-lg"></i> Waiting for peer's public key...`;
-    generateKeysBtn.classList.add('hidden');
 }
 
-// 2. Derive the Shared AES-GCM Key
-async function deriveSharedSecret(peerPublicKeyBase64) {
-    const peerPublicKey = await window.crypto.subtle.importKey(
-        "raw", base64ToBuffer(peerPublicKeyBase64), { name: "ECDH", namedCurve: "P-256" }, true, []
-    );
-
-    sharedAesKey = await window.crypto.subtle.deriveKey(
-        { name: "ECDH", public: peerPublicKey }, myKeyPair.privateKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
-    );
-
-    statusText.innerHTML = `<i class="ph-fill ph-shield-check text-emerald-400 text-lg"></i> AES-256 Tunnel Secured`;
-    messageInput.disabled = false;
-    sendBtn.disabled = false;
-    messageInput.placeholder = "Type a secure message...";
-    invitePanel.classList.add('hidden'); // Hide the invite link once secured
-    messageInput.focus();
+async function generateRandomKey() {
+    return await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
 }
 
-// 3. Encrypt & Decrypt
-async function encryptMessage(text) {
+async function encryptData(text) {
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
-    const ciphertextBuffer = await window.crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: iv }, sharedAesKey, new TextEncoder().encode(text)
-    );
-    return { ciphertext: bufferToBase64(ciphertextBuffer), iv: bufferToBase64(iv) };
+    const cipher = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, masterAesKey, new TextEncoder().encode(text));
+    return { ciphertext: bufferToBase64(cipher), iv: bufferToBase64(iv) };
 }
 
-async function decryptMessage(ciphertextBase64, ivBase64) {
+async function decryptData(ciphertextB64, ivB64) {
     try {
-        const decryptedBuffer = await window.crypto.subtle.decrypt(
-            { name: "AES-GCM", iv: base64ToBuffer(ivBase64) }, sharedAesKey, base64ToBuffer(ciphertextBase64)
-        );
-        return new TextDecoder().decode(decryptedBuffer);
-    } catch (e) { return "⚠️ [Decryption Failed - Keys do not match]"; }
+        const plain = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(ivB64) }, masterAesKey, base64ToBuffer(ciphertextB64));
+        return new TextDecoder().decode(plain);
+    } catch (e) { return "⚠️ [Decryption Failed]"; }
 }
 
-// --- NETWORK INITIALIZATION ---
+// --- INITIALIZATION ---
+async function initApp() {
+    const config = await (await fetch('/api/getConfig')).json();
+    supabase = window.supabase.createClient(config.url, config.anonKey);
 
-async function initChat() {
-    try {
-        const configResponse = await fetch('/api/getConfig');
-        const config = await configResponse.json();
-        const supabase = window.supabase.createClient(config.url, config.anonKey);
+    // Check Auth
+    const { data: { session } } = await supabase.auth.getSession();
+    currentUser = session?.user || null;
+    document.getElementById('authStatus').innerText = currentUser ? `Logged in as ${currentUser.email}` : 'Guest Mode';
 
-        roomChannel = supabase.channel(`room:${roomId}`, { config: { broadcast: { self: false } } });
+    // Route based on URL
+    const hash = window.location.hash.substring(1);
+    lobbyView.classList.remove('hidden');
 
-        roomChannel.on('broadcast', { event: 'key-exchange' }, async (payload) => {
-            if (payload.payload.senderId === myClientId) return;
-            if (!myKeyPair) await generateIdentityKeys();
-            await deriveSharedSecret(payload.payload.publicKey);
-        });
+    if (hash) {
+        // Joining a room
+        const parts = hash.split('|');
+        currentRoomId = parts[0];
+        const isUrlKey = parts.length > 1; // If key is in URL, it's an open room
 
-        roomChannel.on('broadcast', { event: 'secure-message' }, async (payload) => {
-            if (payload.payload.senderId === myClientId) return;
-            typingIndicator.classList.add('hidden');
-            if (!sharedAesKey) return renderMessage("⚠️ [Encrypted message received, but AES channel is not secure]", false);
-            
-            const decryptedText = await decryptMessage(payload.payload.ciphertext, payload.payload.iv);
-            renderMessage(decryptedText, false);
-        });
+        const { data: roomData } = await supabase.from('chat_rooms').select('room_name, is_protected').eq('id', currentRoomId).single();
+        if (!roomData) return alert("Room not found or expired.");
 
-        roomChannel.on('broadcast', { event: 'typing' }, (payload) => {
-            if (payload.payload.senderId === myClientId) return;
-            if (payload.payload.isTyping) {
-                typingIndicator.classList.remove('hidden');
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            } else {
-                typingIndicator.classList.add('hidden');
-            }
-        });
-
-        roomChannel.subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-                statusText.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i> Room Created. Waiting for peer...`;
-                generateKeysBtn.classList.remove('hidden');
-                generateKeysBtn.addEventListener('click', generateIdentityKeys);
-                
-                // Show invite link panel
-                inviteLinkInput.value = window.location.href;
-                invitePanel.classList.remove('hidden');
-                invitePanel.classList.add('flex');
-            }
-        });
-    } catch (error) { statusText.innerHTML = `<i class="ph-fill ph-warning text-red-400 text-lg"></i> Failed to load config.`; }
-}
-
-// --- UI & TYPING INTERACTIONS ---
-
-// Copy Invite Link Button
-copyInviteBtn.addEventListener('click', async () => {
-    try {
-        await navigator.clipboard.writeText(inviteLinkInput.value);
-        copyInviteBtn.innerHTML = `<i class="ph-fill ph-check text-emerald-400 text-lg"></i> Copied!`;
-        setTimeout(() => {
-            copyInviteBtn.innerHTML = `<i class="ph ph-copy text-lg"></i> Copy Link`;
-        }, 2000);
-    } catch (err) {
-        console.error("Failed to copy text: ", err);
+        document.getElementById('joinRoomName').innerText = `Room: ${roomData.room_name}`;
+        if (roomData.is_protected && !isUrlKey) document.getElementById('joinPasswordInput').classList.remove('hidden');
+        
+        authSection.classList.add('hidden');
+        createRoomSection.classList.add('hidden');
+        joinRoomSection.classList.remove('hidden');
+    } else {
+        // Creating a room
+        if (currentUser) {
+            authSection.classList.add('hidden');
+            createRoomSection.classList.remove('hidden');
+        } else {
+            authSection.classList.remove('hidden');
+            createRoomSection.classList.add('hidden');
+        }
     }
-});
+}
 
-messageInput.addEventListener('input', async () => {
-    if (!sharedAesKey) return; 
+// --- AUTH LOGIC ---
+document.getElementById('signupBtn').onclick = async () => {
+    const { error } = await supabase.auth.signUp({ email: emailInput.value, password: passwordInput.value });
+    if (error) alert(error.message); else { alert("Account created! Logging in..."); location.reload(); }
+};
+document.getElementById('loginBtn').onclick = async () => {
+    const { error } = await supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
+    if (error) alert(error.message); else location.reload();
+};
 
-    if (!amITyping) {
-        amITyping = true;
-        await roomChannel.send({ type: 'broadcast', event: 'typing', payload: { senderId: myClientId, isTyping: true } });
+// --- CREATE ROOM ---
+document.getElementById('createRoomBtn').onclick = async () => {
+    const name = document.getElementById('newRoomName').value || "Secure Vault";
+    const pwd = document.getElementById('newRoomPassword').value;
+    const hours = parseInt(document.getElementById('retentionSelect').value);
+    
+    document.getElementById('createRoomBtn').innerHTML = `<i class="ph ph-spinner animate-spin"></i> Deploying...`;
+
+    // 1. Insert to DB
+    const { data, error } = await supabase.from('chat_rooms').insert([{
+        room_name: name,
+        is_protected: !!pwd,
+        retention_hours: hours,
+        expires_at: new Date(Date.now() + hours * 3600000).toISOString(),
+        creator_id: currentUser.id
+    }]).select().single();
+
+    if (error) return alert("Error creating room.");
+
+    // 2. Generate Cryptography
+    let urlHash = `#${data.id}`;
+    if (pwd) {
+        masterAesKey = await deriveKeyFromPassword(pwd, data.id);
+    } else {
+        masterAesKey = await generateRandomKey();
+        const exported = await window.crypto.subtle.exportKey("raw", masterAesKey);
+        urlHash += `|${bufferToBase64(exported)}`;
     }
 
-    clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(async () => {
-        amITyping = false;
-        await roomChannel.send({ type: 'broadcast', event: 'typing', payload: { senderId: myClientId, isTyping: false } });
-    }, 1500);
-});
+    window.history.replaceState(null, null, urlHash);
+    myDisplayName = "Creator";
+    currentRoomId = data.id;
+    enterChat(name, pwd);
+};
 
-chatForm.addEventListener('submit', async (e) => {
+// --- JOIN ROOM ---
+document.getElementById('joinRoomBtn').onclick = async () => {
+    myDisplayName = document.getElementById('guestNameInput').value || "Guest_" + Math.floor(Math.random()*1000);
+    const pwd = document.getElementById('joinPasswordInput').value;
+    const parts = window.location.hash.substring(1).split('|');
+
+    document.getElementById('joinRoomBtn').innerHTML = `<i class="ph ph-spinner animate-spin"></i> Decrypting...`;
+
+    try {
+        if (parts.length > 1) {
+            // Open room: Key is in URL
+            masterAesKey = await window.crypto.subtle.importKey("raw", base64ToBuffer(parts[1]), { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
+        } else {
+            // Protected room: Derive from password
+            if (!pwd) throw new Error("Password required");
+            masterAesKey = await deriveKeyFromPassword(pwd, currentRoomId);
+        }
+        
+        const { data: roomData } = await supabase.from('chat_rooms').select('room_name').eq('id', currentRoomId).single();
+        enterChat(roomData.room_name);
+    } catch (e) {
+        alert("Invalid Password or corrupted link.");
+        document.getElementById('joinRoomBtn').innerText = "Enter Vault";
+    }
+};
+
+// --- ENTER CHAT & LOAD HISTORY ---
+async function enterChat(roomName, rawPwd = null) {
+    lobbyView.classList.add('hidden');
+    chatView.classList.remove('hidden');
+    document.getElementById('chatRoomTitle').innerText = roomName;
+
+    // Setup Invite Modal
+    document.getElementById('shareUrl').value = window.location.href;
+    if (rawPwd) {
+        document.getElementById('sharePwdDisplay').classList.remove('hidden');
+        document.getElementById('sharePwdDisplay').querySelector('span').innerText = rawPwd;
+    }
+
+    // 1. Fetch History
+    const { data: history } = await supabase.from('chat_messages').select('*').eq('room_id', currentRoomId).order('created_at', { ascending: true });
+    if (history) {
+        for (const msg of history) {
+            const plain = await decryptData(msg.ciphertext, msg.iv);
+            renderMessage(plain, msg.sender_name, msg.sender_name === myDisplayName);
+        }
+    }
+
+    // 2. Subscribe to new DB messages
+    supabase.channel('public:chat_messages')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${currentRoomId}` }, async (payload) => {
+            if (payload.new.sender_name === myDisplayName) return; // We render our own locally
+            document.getElementById('typingIndicator').classList.add('hidden');
+            const plain = await decryptData(payload.new.ciphertext, payload.new.iv);
+            renderMessage(plain, payload.new.sender_name, false);
+        }).subscribe();
+
+    // 3. Subscribe to Realtime Typing Broadcasts
+    roomChannel = supabase.channel(`typing:${currentRoomId}`);
+    roomChannel.on('broadcast', { event: 'typing' }, (p) => {
+        if (p.payload.sender === myDisplayName) return;
+        document.getElementById('typingIndicator').classList.toggle('hidden', !p.payload.isTyping);
+    }).subscribe();
+}
+
+// --- CHAT UI LOGIC ---
+document.getElementById('chatForm').onsubmit = async (e) => {
     e.preventDefault();
-    const rawText = messageInput.value.trim();
-    if (!rawText || !sharedAesKey) return;
+    const text = document.getElementById('messageInput').value.trim();
+    if (!text || !masterAesKey) return;
 
+    document.getElementById('messageInput').value = '';
+    renderMessage(text, myDisplayName, true);
+    roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: myDisplayName, isTyping: false } });
+
+    const { ciphertext, iv } = await encryptData(text);
+    await supabase.from('chat_messages').insert([{ room_id: currentRoomId, sender_name: myDisplayName, ciphertext, iv }]);
+};
+
+document.getElementById('messageInput').oninput = () => {
+    if (!amITyping) { amITyping = true; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: myDisplayName, isTyping: true } }); }
     clearTimeout(typingTimeout);
-    amITyping = false;
-    await roomChannel.send({ type: 'broadcast', event: 'typing', payload: { senderId: myClientId, isTyping: false } });
+    typingTimeout = setTimeout(() => { amITyping = false; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: myDisplayName, isTyping: false } }); }, 1500);
+};
 
-    renderMessage(rawText, true);
-    messageInput.value = '';
+document.getElementById('inviteBtn').onclick = () => document.getElementById('inviteModal').classList.toggle('hidden');
+document.getElementById('copyShareBtn').onclick = () => { navigator.clipboard.writeText(document.getElementById('shareUrl').value); document.getElementById('copyShareBtn').innerText = "Copied!"; };
 
-    const encryptedData = await encryptMessage(rawText);
-    await roomChannel.send({
-        type: 'broadcast',
-        event: 'secure-message',
-        payload: { senderId: myClientId, ciphertext: encryptedData.ciphertext, iv: encryptedData.iv }
-    });
-});
-
-function renderMessage(text, isMe) {
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
-    const bubble = document.createElement('div');
-    bubble.className = `max-w-[75%] p-3 rounded-2xl text-sm font-mono break-words ${
-        isMe ? 'bg-indigo-600 text-white rounded-tr-sm shadow-[0_0_15px_rgba(79,70,229,0.2)]' : 'bg-slate-800 text-emerald-300 border border-slate-700 rounded-tl-sm'
-    }`;
-    bubble.innerText = text;
-    msgDiv.appendChild(bubble);
-    messagesContainer.appendChild(msgDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+function renderMessage(text, sender, isMe) {
+    const c = document.getElementById('messagesContainer');
+    const div = document.createElement('div');
+    div.className = `flex flex-col w-full ${isMe ? 'items-end' : 'items-start'}`;
+    div.innerHTML = `
+        <span class="text-[10px] text-slate-500 mb-1 px-1">${sender}</span>
+        <div class="max-w-[75%] p-3 rounded-2xl text-sm font-mono break-words ${isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-slate-800 text-emerald-300 border border-slate-700 rounded-tl-sm'}">
+            ${text}
+        </div>`;
+    c.appendChild(div);
+    c.scrollTop = c.scrollHeight;
 }
 
-initChat();
+initApp();
