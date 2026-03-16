@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -57,17 +56,21 @@
             </button>
         </div>
 
-        <div id="messagesContainer" class="flex-grow overflow-y-auto space-y-4 mb-4 pr-2 custom-scrollbar">
+        <div id="messagesContainer" class="flex-grow overflow-y-auto space-y-4 mb-2 pr-2 custom-scrollbar">
             <div class="text-center text-slate-600 text-xs font-mono py-10">
                 <i class="ph ph-lock-key text-3xl mb-2"></i><br>
                 Messages are End-to-End Encrypted.<br>Nobody outside of this channel, not even ZeroKey, can read them.
             </div>
         </div>
 
-        <form id="chatForm" class="relative mt-auto">
+        <div id="typingIndicator" class="hidden text-xs text-indigo-400 font-mono mb-2 px-2 animate-pulse flex items-center gap-2">
+            <i class="ph ph-chat-teardrop-dots text-lg"></i> Peer is typing...
+        </div>
+
+        <form id="chatForm" class="relative mt-auto border-t border-slate-800 pt-4">
             <input type="text" id="messageInput" autocomplete="off" disabled placeholder="Waiting for secure connection..." 
                    class="w-full bg-slate-900/80 border border-slate-700 rounded-xl py-4 pl-4 pr-16 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            <button type="submit" id="sendBtn" disabled class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(79,70,229,0.4)]">
+            <button type="submit" id="sendBtn" disabled class="absolute right-2 top-1/2 -translate-y-1/2 mt-2 w-10 h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(79,70,229,0.4)]">
                 <i class="ph-fill ph-paper-plane-right text-lg"></i>
             </button>
         </form>
