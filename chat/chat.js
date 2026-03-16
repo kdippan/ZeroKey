@@ -5,9 +5,21 @@ const chatForm = document.getElementById('chatForm');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 const generateKeysBtn = document.getElementById('generateKeysBtn');
-const typingIndicator = document.getElementById('typingIndicator'); // New element
+const typingIndicator = document.getElementById('typingIndicator');
+const invitePanel = document.getElementById('invitePanel');
+const inviteLinkInput = document.getElementById('inviteLinkInput');
+const copyInviteBtn = document.getElementById('copyInviteBtn');
 
-const roomId = window.location.hash.substring(1) || 'secure-lobby';
+// --- ROOM GENERATION LOGIC ---
+// If the user visits /chat without a room hash, generate a secure random one!
+let roomId = window.location.hash.substring(1);
+if (!roomId) {
+    // Create a random 12-character string
+    roomId = 'room-' + Math.random().toString(36).substring(2, 14);
+    // Update the URL without reloading the page
+    window.history.replaceState(null, null, `#${roomId}`);
+}
+
 let myClientId = crypto.randomUUID(); 
 let roomChannel;
 
@@ -64,6 +76,7 @@ async function deriveSharedSecret(peerPublicKeyBase64) {
     messageInput.disabled = false;
     sendBtn.disabled = false;
     messageInput.placeholder = "Type a secure message...";
+    invitePanel.classList.add('hidden'); // Hide the invite link once secured
     messageInput.focus();
 }
 
@@ -95,30 +108,23 @@ async function initChat() {
 
         roomChannel = supabase.channel(`room:${roomId}`, { config: { broadcast: { self: false } } });
 
-        // Handle Handshakes
         roomChannel.on('broadcast', { event: 'key-exchange' }, async (payload) => {
             if (payload.payload.senderId === myClientId) return;
             if (!myKeyPair) await generateIdentityKeys();
             await deriveSharedSecret(payload.payload.publicKey);
         });
 
-        // Handle Incoming Messages
         roomChannel.on('broadcast', { event: 'secure-message' }, async (payload) => {
             if (payload.payload.senderId === myClientId) return;
-            
-            // Hide typing indicator immediately when message arrives
             typingIndicator.classList.add('hidden');
-
             if (!sharedAesKey) return renderMessage("⚠️ [Encrypted message received, but AES channel is not secure]", false);
             
             const decryptedText = await decryptMessage(payload.payload.ciphertext, payload.payload.iv);
             renderMessage(decryptedText, false);
         });
 
-        // NEW: Handle Typing Events
         roomChannel.on('broadcast', { event: 'typing' }, (payload) => {
             if (payload.payload.senderId === myClientId) return;
-            
             if (payload.payload.isTyping) {
                 typingIndicator.classList.remove('hidden');
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -129,9 +135,14 @@ async function initChat() {
 
         roomChannel.subscribe((status) => {
             if (status === 'SUBSCRIBED') {
-                statusText.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i> Room Connected. Handshake required.`;
+                statusText.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i> Room Created. Waiting for peer...`;
                 generateKeysBtn.classList.remove('hidden');
                 generateKeysBtn.addEventListener('click', generateIdentityKeys);
+                
+                // Show invite link panel
+                inviteLinkInput.value = window.location.href;
+                invitePanel.classList.remove('hidden');
+                invitePanel.classList.add('flex');
             }
         });
     } catch (error) { statusText.innerHTML = `<i class="ph-fill ph-warning text-red-400 text-lg"></i> Failed to load config.`; }
@@ -139,22 +150,32 @@ async function initChat() {
 
 // --- UI & TYPING INTERACTIONS ---
 
-// Listen to keystrokes for typing indicator
-messageInput.addEventListener('input', async () => {
-    if (!sharedAesKey) return; // Don't broadcast if not secure yet
+// Copy Invite Link Button
+copyInviteBtn.addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(inviteLinkInput.value);
+        copyInviteBtn.innerHTML = `<i class="ph-fill ph-check text-emerald-400 text-lg"></i> Copied!`;
+        setTimeout(() => {
+            copyInviteBtn.innerHTML = `<i class="ph ph-copy text-lg"></i> Copy Link`;
+        }, 2000);
+    } catch (err) {
+        console.error("Failed to copy text: ", err);
+    }
+});
 
-    // Send "Typing = true" only once when we start
+messageInput.addEventListener('input', async () => {
+    if (!sharedAesKey) return; 
+
     if (!amITyping) {
         amITyping = true;
         await roomChannel.send({ type: 'broadcast', event: 'typing', payload: { senderId: myClientId, isTyping: true } });
     }
 
-    // Reset the timer every time a key is pressed
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(async () => {
         amITyping = false;
         await roomChannel.send({ type: 'broadcast', event: 'typing', payload: { senderId: myClientId, isTyping: false } });
-    }, 1500); // Waits 1.5 seconds after last keystroke to hide indicator
+    }, 1500);
 });
 
 chatForm.addEventListener('submit', async (e) => {
@@ -162,7 +183,6 @@ chatForm.addEventListener('submit', async (e) => {
     const rawText = messageInput.value.trim();
     if (!rawText || !sharedAesKey) return;
 
-    // Immediately stop the typing indicator when we send
     clearTimeout(typingTimeout);
     amITyping = false;
     await roomChannel.send({ type: 'broadcast', event: 'typing', payload: { senderId: myClientId, isTyping: false } });
