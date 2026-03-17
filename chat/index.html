@@ -32,7 +32,7 @@
                     <i id="navAvatarIcon" class="ph-fill ph-user text-slate-400 text-lg w-full h-full flex items-center justify-center"></i>
                 </div>
             </div>
-            <div id="authStatus" class="text-xs sm:text-sm font-medium text-slate-400">Loading v3.0...</div>
+            <div id="authStatus" class="text-xs sm:text-sm font-medium text-slate-400">Loading Config...</div>
         </div>
     </nav>
 
@@ -159,532 +159,525 @@
     </main>
 
     <script>
-        // GLOBAL ERROR CATCHER - Prints crashes directly to the UI
-        window.onerror = function(message, source, lineno, colno, error) {
-            const status = document.getElementById('authStatus');
-            if(status) status.innerHTML = `<span class="text-red-500 font-bold">CRASH: ${message} (Line ${lineno})</span>`;
+        // 1. CATCH EVERY SINGLE TYPE OF CRASH
+        const statusEl = document.getElementById('authStatus');
+        
+        window.onerror = function(msg, url, line) {
+            if(statusEl) statusEl.innerHTML = `<span class="text-red-500 font-bold">Error: ${msg}</span>`;
             return true;
         };
+        
+        window.onunhandledrejection = function(e) {
+            if(statusEl) statusEl.innerHTML = `<span class="text-red-500 font-bold">Crash: ${e.reason}</span>`;
+        };
 
-        // Wait for HTML to load
-        document.addEventListener("DOMContentLoaded", function() {
-            const lobbyView = document.getElementById('lobbyView');
-            const dashboardView = document.getElementById('dashboardView');
-            const settingsView = document.getElementById('settingsView');
-            const chatView = document.getElementById('chatView');
+        // 2. RUN IMMEDIATELY (No waiting for DOM events)
+        (async function boot() {
+            try {
+                if(statusEl) statusEl.innerText = "Step 1: Fetching Config...";
 
-            const authSection = document.getElementById('authSection');
-            const createRoomSection = document.getElementById('createRoomSection');
-            const joinRoomSection = document.getElementById('joinRoomSection');
-            const authStatus = document.getElementById('authStatus');
-            const userNavMenu = document.getElementById('userNavMenu');
+                // Fetch Vercel Config
+                const configRes = await fetch('/api/getConfig');
+                if (!configRes.ok) throw new Error("Vercel /api/getConfig failed to load.");
+                const config = await configRes.json();
 
-            const chatForm = document.getElementById('chatForm');
-            const messageInput = document.getElementById('messageInput');
-            const chatFileInput = document.getElementById('chatFileInput');
-            const filePreviewContainer = document.getElementById('filePreviewContainer');
-            const filePreviewName = document.getElementById('filePreviewName');
-            const removeFileBtn = document.getElementById('removeFileBtn');
+                if(statusEl) statusEl.innerText = "Step 2: Connecting DB...";
+                const supabase = window.supabase.createClient(config.url, config.anonKey);
 
-            let supabase;
-            let currentUser = null;
-            let currentProfile = { display_name: "Guest", avatar_url: "" };
-            let currentRoomId = null;
-            let masterAesKey = null;
-            let roomChannel;
-            let amITyping = false;
-            let typingTimeout = null;
-            let pendingFile = null;
-
-            function bufferToBase64(buf) { return window.btoa(String.fromCharCode(...new Uint8Array(buf))); }
-            function base64ToBuffer(b64) { return new Uint8Array([...window.atob(b64)].map(c => c.charCodeAt(0))).buffer; }
-
-            async function deriveKeyFromPassword(password, salt) {
-                const enc = new TextEncoder();
-                const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
-                return await window.crypto.subtle.deriveKey(
-                    { name: "PBKDF2", salt: enc.encode(salt), iterations: 100000, hash: "SHA-256" },
-                    keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
-                );
-            }
-
-            async function generateRandomKey() {
-                return await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
-            }
-
-            async function encryptData(text, key = masterAesKey) {
-                const iv = window.crypto.getRandomValues(new Uint8Array(12));
-                const cipher = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(text));
-                return { ciphertext: bufferToBase64(cipher), iv: bufferToBase64(iv) };
-            }
-
-            async function decryptData(ciphertextB64, ivB64, key = masterAesKey) {
-                try {
-                    const plain = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(ivB64) }, key, base64ToBuffer(ciphertextB64));
-                    return new TextDecoder().decode(plain);
-                } catch (e) { return null; }
-            }
-
-            function fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = error => reject(error);
-                });
-            }
-
-            async function initApp() {
-                try {
-                    authStatus.innerText = "Fetching Config...";
-                    const configRes = await fetch('/api/getConfig');
-                    if (!configRes.ok) throw new Error("Config missing");
-                    const config = await configRes.json();
-
-                    supabase = window.supabase.createClient(config.url, config.anonKey);
-
-                    const { data: { session } } = await supabase.auth.getSession();
-                    currentUser = session?.user || null;
-
-                    if (currentUser) {
-                        userNavMenu.classList.remove('hidden');
-                        userNavMenu.classList.add('flex');
-                        await loadUserProfile();
-                    } else {
-                        authStatus.innerText = 'Guest Mode';
+                if(statusEl) statusEl.innerText = "Step 3: Checking Auth...";
+                const { data: { session }, error: authErr } = await supabase.auth.getSession();
+                if (authErr) throw new Error(authErr.message);
+                
+                let currentUser = session?.user || null;
+                let currentProfile = { display_name: "Guest", avatar_url: "" };
+                
+                if (currentUser) {
+                    if(statusEl) statusEl.innerText = `Logged in: ${currentUser.email}`;
+                    document.getElementById('userNavMenu').classList.remove('hidden');
+                    document.getElementById('userNavMenu').classList.add('flex');
+                    
+                    const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                    if (data) {
+                        currentProfile = data;
+                        document.getElementById('settingsNameInput').value = data.display_name;
+                        if (data.avatar_url) {
+                            document.getElementById('navAvatarIcon').classList.add('hidden');
+                            document.getElementById('navAvatarImg').src = data.avatar_url;
+                            document.getElementById('navAvatarImg').classList.remove('hidden');
+                            
+                            document.getElementById('settingsAvatarIcon').classList.add('hidden');
+                            document.getElementById('settingsAvatarImg').src = data.avatar_url;
+                            document.getElementById('settingsAvatarImg').classList.remove('hidden');
+                        }
                     }
-
-                    routeApp();
-                } catch (err) {
-                    authStatus.innerHTML = `<span class="text-red-400">Boot Error: ${err.message}</span>`;
+                } else {
+                    if(statusEl) statusEl.innerText = 'Guest Mode';
                 }
-            }
 
-            async function loadUserProfile() {
-                const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-                if (data) {
-                    currentProfile = data;
-                    authStatus.innerText = data.display_name;
-                    document.getElementById('settingsNameInput').value = data.display_name;
-                    if (data.avatar_url) {
-                        document.getElementById('navAvatarIcon').classList.add('hidden');
-                        const navImg = document.getElementById('navAvatarImg');
-                        navImg.src = data.avatar_url;
-                        navImg.classList.remove('hidden');
-                        
-                        document.getElementById('settingsAvatarIcon').classList.add('hidden');
-                        const setImg = document.getElementById('settingsAvatarImg');
-                        setImg.src = data.avatar_url;
-                        setImg.classList.remove('hidden');
-                    }
-                }
-            }
-
-            function routeApp() {
+                // 3. ROUTE THE APP
                 const hash = window.location.hash.substring(1);
+                
+                // --- DOM Setup Variables ---
+                let currentRoomId = null;
+                let masterAesKey = null;
+                let roomChannel;
+                let amITyping = false;
+                let typingTimeout = null;
+                let pendingFile = null;
+
+                function hideAllViews() {
+                    document.getElementById('lobbyView').classList.add('hidden');
+                    document.getElementById('dashboardView').classList.add('hidden');
+                    document.getElementById('dashboardView').classList.remove('flex');
+                    document.getElementById('settingsView').classList.add('hidden');
+                    document.getElementById('settingsView').classList.remove('flex');
+                    document.getElementById('chatView').classList.add('hidden');
+                    document.getElementById('chatView').classList.remove('flex');
+                }
+
                 hideAllViews();
 
                 if (hash) {
-                    handleRoomJoinFlow(hash);
-                } else {
-                    lobbyView.classList.remove('hidden');
-                    if (currentUser) {
-                        authSection.classList.add('hidden');
-                        createRoomSection.classList.remove('hidden');
+                    // --- JOIN ROOM LOGIC ---
+                    document.getElementById('lobbyView').classList.remove('hidden');
+                    const parts = hash.split('|');
+                    const requestedIdOrAlias = parts[0];
+
+                    let query = supabase.from('chat_rooms').select('*');
+                    if (requestedIdOrAlias.length === 36 && requestedIdOrAlias.includes('-')) {
+                        query = query.eq('id', requestedIdOrAlias);
                     } else {
-                        authSection.classList.remove('hidden');
-                        createRoomSection.classList.add('hidden');
+                        query = query.eq('custom_alias', requestedIdOrAlias);
+                    }
+
+                    const { data: roomData, error: dbErr } = await query.single();
+
+                    if (!roomData || dbErr) return alert("Room not found or has expired and been deleted.");
+
+                    currentRoomId = roomData.id;
+                    document.getElementById('joinRoomName').innerText = `Room: ${roomData.room_name}`;
+                    
+                    if (currentUser) document.getElementById('guestNameInput').value = currentProfile.display_name;
+
+                    const isUrlKey = parts.length > 1;
+                    if (roomData.is_protected && !isUrlKey) {
+                        document.getElementById('joinPasswordInput').classList.remove('hidden');
+                    }
+
+                    document.getElementById('authSection').classList.add('hidden');
+                    document.getElementById('createRoomSection').classList.add('hidden');
+                    document.getElementById('joinRoomSection').classList.remove('hidden');
+
+                    document.getElementById('joinRoomBtn').onclick = async () => {
+                        const pwd = document.getElementById('joinPasswordInput').value;
+                        const btn = document.getElementById('joinRoomBtn');
+                        btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Decrypting...`;
+
+                        try {
+                            if (parts.length > 1) {
+                                masterAesKey = await window.crypto.subtle.importKey("raw", base64ToBuffer(parts[1]), { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
+                            } else {
+                                if (!pwd) throw new Error("Password required");
+                                const testKey = await deriveKeyFromPassword(pwd, currentRoomId);
+                                const check = await decryptData(roomData.auth_check, roomData.auth_iv, testKey);
+                                
+                                if (check !== "ZkAuth-Valid") throw new Error("Incorrect Password!");
+                                masterAesKey = testKey; 
+                            }
+                            
+                            const enteredName = document.getElementById('guestNameInput').value;
+                            if(!currentUser && enteredName) currentProfile.display_name = enteredName;
+
+                            enterChat(roomData.room_name);
+                        } catch (e) {
+                            alert(e.message || "Decryption Failed.");
+                            btn.innerHTML = `<i class="ph ph-sign-in text-lg"></i> Enter Vault`;
+                        }
+                    };
+                } else {
+                    // --- LOBBY LOGIC ---
+                    document.getElementById('lobbyView').classList.remove('hidden');
+                    if (currentUser) {
+                        document.getElementById('authSection').classList.add('hidden');
+                        document.getElementById('createRoomSection').classList.remove('hidden');
+                    } else {
+                        document.getElementById('authSection').classList.remove('hidden');
+                        document.getElementById('createRoomSection').classList.add('hidden');
                     }
                 }
-            }
 
-            function hideAllViews() {
-                lobbyView.classList.add('hidden');
-                dashboardView.classList.add('hidden');
-                dashboardView.classList.remove('flex');
-                settingsView.classList.add('hidden');
-                settingsView.classList.remove('flex');
-                chatView.classList.add('hidden');
-                chatView.classList.remove('flex');
-            }
+                // --- HELPER FUNCTIONS ---
+                function bufferToBase64(buf) { return window.btoa(String.fromCharCode(...new Uint8Array(buf))); }
+                function base64ToBuffer(b64) { return new Uint8Array([...window.atob(b64)].map(c => c.charCodeAt(0))).buffer; }
 
-            document.getElementById('navDashboardBtn').onclick = () => {
-                window.history.replaceState(null, null, '/chat');
-                hideAllViews();
-                dashboardView.classList.remove('hidden');
-                dashboardView.classList.add('flex');
-                loadDashboardRooms();
-            };
-
-            document.getElementById('navProfileBtn').onclick = () => {
-                window.history.replaceState(null, null, '/chat');
-                hideAllViews();
-                settingsView.classList.remove('hidden');
-                settingsView.classList.add('flex');
-            };
-
-            document.getElementById('avatarUploadInput').onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                if (file.size > 2 * 1024 * 1024) return alert("Avatar must be under 2MB");
-
-                const btn = document.getElementById('saveProfileBtn');
-                btn.innerText = "Uploading...";
-                btn.disabled = true;
-
-                if (currentProfile.avatar_url) {
-                    const oldPath = currentProfile.avatar_url.split('/avatars/')[1];
-                    if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
+                async function deriveKeyFromPassword(password, salt) {
+                    const enc = new TextEncoder();
+                    const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
+                    return await window.crypto.subtle.deriveKey(
+                        { name: "PBKDF2", salt: enc.encode(salt), iterations: 100000, hash: "SHA-256" },
+                        keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
+                    );
                 }
 
-                const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
-                const { error } = await supabase.storage.from('avatars').upload(filePath, file);
-                if (error) { alert("Upload failed"); btn.innerText = "Save Changes"; btn.disabled = false; return; }
-
-                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
-                
-                await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-                await loadUserProfile();
-                btn.innerText = "Save Changes";
-                btn.disabled = false;
-            };
-
-            document.getElementById('saveProfileBtn').onclick = async () => {
-                const newName = document.getElementById('settingsNameInput').value;
-                if (!newName) return;
-                await supabase.from('profiles').update({ display_name: newName }).eq('id', currentUser.id);
-                await loadUserProfile();
-                alert("Profile Updated!");
-            };
-
-            document.getElementById('logoutBtn').onclick = async () => {
-                await supabase.auth.signOut();
-                location.reload();
-            };
-
-            async function loadDashboardRooms() {
-                const list = document.getElementById('dashboardRoomsList');
-                list.innerHTML = `<i class="ph ph-spinner animate-spin text-indigo-500"></i> Loading...`;
-                
-                const { data } = await supabase.from('chat_rooms').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
-                
-                if (!data || data.length === 0) {
-                    list.innerHTML = `<p class="text-slate-500 text-sm">No active rooms found.</p>`;
-                    return;
+                async function generateRandomKey() {
+                    return await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
                 }
 
-                list.innerHTML = '';
-                data.forEach(room => {
-                    const link = room.custom_alias ? room.custom_alias : room.id;
+                async function encryptData(text, key = masterAesKey) {
+                    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                    const cipher = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(text));
+                    return { ciphertext: bufferToBase64(cipher), iv: bufferToBase64(iv) };
+                }
+
+                async function decryptData(ciphertextB64, ivB64, key = masterAesKey) {
+                    try {
+                        const plain = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(ivB64) }, key, base64ToBuffer(ciphertextB64));
+                        return new TextDecoder().decode(plain);
+                    } catch (e) { return null; }
+                }
+
+                function fileToBase64(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = error => reject(error);
+                    });
+                }
+
+                // --- CHAT INITIALIZATION ---
+                async function enterChat(roomName, rawPwd = null) {
+                    hideAllViews();
+                    const chatView = document.getElementById('chatView');
+                    chatView.classList.remove('hidden');
+                    chatView.classList.add('flex');
+                    document.getElementById('chatRoomTitle').innerText = roomName;
+
+                    document.getElementById('shareUrl').value = window.location.href;
+                    if (rawPwd) {
+                        document.getElementById('sharePwdDisplay').classList.remove('hidden');
+                        document.getElementById('sharePwdDisplay').querySelector('span').innerText = rawPwd;
+                    }
+
+                    const { data: history } = await supabase.from('chat_messages').select('*').eq('room_id', currentRoomId).order('created_at', { ascending: true });
+                    if (history) {
+                        for (const msg of history) {
+                            const plainJsonStr = await decryptData(msg.ciphertext, msg.iv);
+                            if (plainJsonStr) {
+                                try {
+                                    const payload = JSON.parse(plainJsonStr);
+                                    renderMessage(payload, msg.sender_name === currentProfile.display_name);
+                                } catch(e) {}
+                            }
+                        }
+                    }
+
+                    supabase.channel('public:chat_messages')
+                        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${currentRoomId}` }, async (dbPayload) => {
+                            if (dbPayload.new.sender_name === currentProfile.display_name) return; 
+                            document.getElementById('typingIndicator').classList.add('hidden');
+                            const plainJsonStr = await decryptData(dbPayload.new.ciphertext, dbPayload.new.iv);
+                            if (plainJsonStr) {
+                                try {
+                                    const payload = JSON.parse(plainJsonStr);
+                                    renderMessage(payload, false);
+                                } catch(e) {}
+                            }
+                        }).subscribe();
+
+                    roomChannel = supabase.channel(`typing:${currentRoomId}`);
+                    roomChannel.on('broadcast', { event: 'typing' }, (p) => {
+                        if (p.payload.sender === currentProfile.display_name) return;
+                        document.getElementById('typingIndicator').classList.toggle('hidden', !p.payload.isTyping);
+                    }).subscribe();
+                }
+
+                function renderMessage(payload, isMe) {
+                    const c = document.getElementById('messagesContainer');
                     const div = document.createElement('div');
-                    div.className = "bg-slate-800 border border-slate-700 p-4 rounded-xl flex justify-between items-center";
+                    div.className = `flex w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`;
+                    
+                    let avatarHtml = '';
+                    if (!isMe) {
+                        if (payload.avatar) {
+                            avatarHtml = `<img src="${payload.avatar}" class="w-8 h-8 rounded-full object-cover mr-2 flex-shrink-0 mt-4 border border-slate-700">`;
+                        } else {
+                            avatarHtml = `<div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center mr-2 flex-shrink-0 mt-4 border border-slate-600"><i class="ph-fill ph-user text-slate-400"></i></div>`;
+                        }
+                    }
+
+                    let fileHtml = '';
+                    if (payload.file) {
+                        if (payload.file.type.startsWith('image/')) {
+                            fileHtml = `<img src="${payload.file.data}" class="max-w-full rounded-lg mb-2 border border-slate-700/50">`;
+                        } else {
+                            fileHtml = `
+                            <a href="${payload.file.data}" download="${payload.file.name}" class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-lg mb-2 hover:bg-slate-900 transition-colors border border-slate-700/50">
+                                <i class="ph ph-file-dashed text-indigo-400 text-2xl"></i>
+                                <span class="text-xs truncate max-w-[150px] text-slate-300">${payload.file.name}</span>
+                                <i class="ph ph-download-simple ml-auto text-slate-400"></i>
+                            </a>`;
+                        }
+                    }
+
+                    const bubbleColor = isMe ? 'bg-indigo-600 text-white rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl' : 'bg-slate-800 text-emerald-300 border border-slate-700 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl';
+                    
                     div.innerHTML = `
-                        <div>
-                            <h3 class="text-white font-bold">${room.room_name}</h3>
-                            <p class="text-xs text-slate-400 font-mono">zerokey.vercel.app/chat#${link}</p>
-                            <span class="text-[10px] mt-1 inline-block px-2 py-0.5 rounded-full ${room.is_protected ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">
-                                ${room.is_protected ? 'Password Protected' : 'Open Vault'}
-                            </span>
+                        ${avatarHtml}
+                        <div class="flex flex-col max-w-[75%]">
+                            ${!isMe ? `<span class="text-[10px] text-slate-500 mb-1 ml-1">${payload.senderName}</span>` : ''}
+                            <div class="p-3 shadow-lg ${bubbleColor}">
+                                ${fileHtml}
+                                <p class="text-sm font-mono break-words">${payload.text}</p>
+                            </div>
                         </div>
-                        <a href="#${link}" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-sm font-bold text-white transition-all" onclick="setTimeout(()=>location.reload(), 100)">Join</a>
                     `;
-                    list.appendChild(div);
-                });
-            }
-
-            document.getElementById('createRoomBtn').onclick = async () => {
-                const name = document.getElementById('newRoomName').value || "Secure Vault";
-                const pwd = document.getElementById('newRoomPassword').value;
-                let alias = document.getElementById('newRoomAlias').value.trim();
-                if(alias) alias = alias.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase(); 
-                const hours = parseInt(document.getElementById('retentionSelect').value);
-                
-                const btn = document.getElementById('createRoomBtn');
-                btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Deploying...`;
-
-                let authCheckHex = null;
-                let authIvHex = null;
-                let generatedKey = null;
-
-                if (pwd) {
-                    generatedKey = await deriveKeyFromPassword(pwd, name); 
-                    const enc = await encryptData("ZkAuth-Valid", generatedKey);
-                    authCheckHex = enc.ciphertext;
-                    authIvHex = enc.iv;
-                } else {
-                    generatedKey = await generateRandomKey();
+                    
+                    c.appendChild(div);
+                    c.scrollTop = c.scrollHeight;
                 }
 
-                const { data, error } = await supabase.from('chat_rooms').insert([{
-                    room_name: name,
-                    custom_alias: alias || null,
-                    is_protected: !!pwd,
-                    auth_check: authCheckHex,
-                    auth_iv: authIvHex,
-                    retention_hours: hours,
-                    expires_at: new Date(Date.now() + hours * 3600000).toISOString(),
-                    creator_id: currentUser.id
-                }]).select().single();
+                // --- EVENT LISTENERS BINDING ---
+                document.getElementById('navDashboardBtn').onclick = () => {
+                    window.history.replaceState(null, null, '/chat');
+                    hideAllViews();
+                    document.getElementById('dashboardView').classList.remove('hidden');
+                    document.getElementById('dashboardView').classList.add('flex');
+                    loadDashboardRooms();
+                };
 
-                if (error) {
-                    btn.innerHTML = `<i class="ph ph-plus-circle"></i> Deploy Room`;
-                    return alert(error.message.includes('unique constraint') ? "That custom alias is already taken." : "Error creating room.");
+                document.getElementById('navProfileBtn').onclick = () => {
+                    window.history.replaceState(null, null, '/chat');
+                    hideAllViews();
+                    document.getElementById('settingsView').classList.remove('hidden');
+                    document.getElementById('settingsView').classList.add('flex');
+                };
+
+                async function loadDashboardRooms() {
+                    const list = document.getElementById('dashboardRoomsList');
+                    list.innerHTML = `<i class="ph ph-spinner animate-spin text-indigo-500"></i> Loading...`;
+                    
+                    const { data } = await supabase.from('chat_rooms').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
+                    
+                    if (!data || data.length === 0) {
+                        list.innerHTML = `<p class="text-slate-500 text-sm">No active rooms found.</p>`;
+                        return;
+                    }
+
+                    list.innerHTML = '';
+                    data.forEach(room => {
+                        const link = room.custom_alias ? room.custom_alias : room.id;
+                        const div = document.createElement('div');
+                        div.className = "bg-slate-800 border border-slate-700 p-4 rounded-xl flex justify-between items-center";
+                        div.innerHTML = `
+                            <div>
+                                <h3 class="text-white font-bold">${room.room_name}</h3>
+                                <p class="text-xs text-slate-400 font-mono">zerokey.vercel.app/chat#${link}</p>
+                                <span class="text-[10px] mt-1 inline-block px-2 py-0.5 rounded-full ${room.is_protected ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">
+                                    ${room.is_protected ? 'Password Protected' : 'Open Vault'}
+                                </span>
+                            </div>
+                            <a href="#${link}" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-sm font-bold text-white transition-all" onclick="setTimeout(()=>location.reload(), 100)">Join</a>
+                        `;
+                        list.appendChild(div);
+                    });
                 }
 
-                let urlHash = `#${alias || data.id}`;
-                if (pwd) {
-                    masterAesKey = await deriveKeyFromPassword(pwd, data.id);
-                    const encFinal = await encryptData("ZkAuth-Valid", masterAesKey);
-                    await supabase.from('chat_rooms').update({ auth_check: encFinal.ciphertext, auth_iv: encFinal.iv }).eq('id', data.id);
-                } else {
-                    masterAesKey = generatedKey;
-                    const exported = await window.crypto.subtle.exportKey("raw", masterAesKey);
-                    urlHash += `|${bufferToBase64(exported)}`;
-                }
+                document.getElementById('createRoomBtn').onclick = async () => {
+                    const name = document.getElementById('newRoomName').value || "Secure Vault";
+                    const pwd = document.getElementById('newRoomPassword').value;
+                    let alias = document.getElementById('newRoomAlias').value.trim();
+                    if(alias) alias = alias.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase(); 
+                    const hours = parseInt(document.getElementById('retentionSelect').value);
+                    
+                    const btn = document.getElementById('createRoomBtn');
+                    btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Deploying...`;
 
-                window.history.replaceState(null, null, urlHash);
-                currentRoomId = data.id;
-                enterChat(name, pwd);
-            };
+                    let authCheckHex = null;
+                    let authIvHex = null;
+                    let generatedKey = null;
 
-            async function handleRoomJoinFlow(hash) {
-                lobbyView.classList.remove('hidden');
-                const parts = hash.split('|');
-                const requestedIdOrAlias = parts[0];
+                    if (pwd) {
+                        generatedKey = await deriveKeyFromPassword(pwd, name); 
+                        const enc = await encryptData("ZkAuth-Valid", generatedKey);
+                        authCheckHex = enc.ciphertext;
+                        authIvHex = enc.iv;
+                    } else {
+                        generatedKey = await generateRandomKey();
+                    }
 
-                let query = supabase.from('chat_rooms').select('*');
-                if (requestedIdOrAlias.length === 36 && requestedIdOrAlias.includes('-')) {
-                    query = query.eq('id', requestedIdOrAlias);
-                } else {
-                    query = query.eq('custom_alias', requestedIdOrAlias);
-                }
+                    const { data, error } = await supabase.from('chat_rooms').insert([{
+                        room_name: name, custom_alias: alias || null, is_protected: !!pwd,
+                        auth_check: authCheckHex, auth_iv: authIvHex, retention_hours: hours,
+                        expires_at: new Date(Date.now() + hours * 3600000).toISOString(), creator_id: currentUser.id
+                    }]).select().single();
 
-                const { data: roomData } = await query.single();
+                    if (error) {
+                        btn.innerHTML = `<i class="ph ph-plus-circle"></i> Deploy Room`;
+                        return alert(error.message.includes('unique constraint') ? "That custom alias is already taken." : "Error creating room.");
+                    }
 
-                if (!roomData) return alert("Room not found or has expired and been deleted.");
+                    let urlHash = `#${alias || data.id}`;
+                    if (pwd) {
+                        masterAesKey = await deriveKeyFromPassword(pwd, data.id);
+                        const encFinal = await encryptData("ZkAuth-Valid", masterAesKey);
+                        await supabase.from('chat_rooms').update({ auth_check: encFinal.ciphertext, auth_iv: encFinal.iv }).eq('id', data.id);
+                    } else {
+                        masterAesKey = generatedKey;
+                        const exported = await window.crypto.subtle.exportKey("raw", masterAesKey);
+                        urlHash += `|${bufferToBase64(exported)}`;
+                    }
 
-                currentRoomId = roomData.id;
-                document.getElementById('joinRoomName').innerText = `Room: ${roomData.room_name}`;
-                
-                if (currentUser) document.getElementById('guestNameInput').value = currentProfile.display_name;
+                    window.history.replaceState(null, null, urlHash);
+                    currentRoomId = data.id;
+                    enterChat(name, pwd);
+                };
 
-                const isUrlKey = parts.length > 1;
-                if (roomData.is_protected && !isUrlKey) {
-                    document.getElementById('joinPasswordInput').classList.remove('hidden');
-                }
+                document.getElementById('chatForm').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const messageInput = document.getElementById('messageInput');
+                    const text = messageInput.value.trim();
+                    if (!text && !pendingFile) return;
+                    if (!masterAesKey) return;
 
-                authSection.classList.add('hidden');
-                createRoomSection.classList.add('hidden');
-                joinRoomSection.classList.remove('hidden');
-
-                document.getElementById('joinRoomBtn').onclick = async () => {
-                    const pwd = document.getElementById('joinPasswordInput').value;
-                    const btn = document.getElementById('joinRoomBtn');
-                    btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Decrypting...`;
+                    const btn = document.getElementById('sendBtn');
+                    btn.innerHTML = `<i class="ph ph-spinner animate-spin text-xl"></i>`;
+                    btn.disabled = true;
 
                     try {
-                        if (parts.length > 1) {
-                            masterAesKey = await window.crypto.subtle.importKey("raw", base64ToBuffer(parts[1]), { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
-                        } else {
-                            if (!pwd) throw new Error("Password required");
-                            const testKey = await deriveKeyFromPassword(pwd, currentRoomId);
-                            const check = await decryptData(roomData.auth_check, roomData.auth_iv, testKey);
-                            
-                            if (check !== "ZkAuth-Valid") throw new Error("Incorrect Password!");
-                            masterAesKey = testKey; 
-                        }
-                        
-                        const enteredName = document.getElementById('guestNameInput').value;
-                        if(!currentUser && enteredName) currentProfile.display_name = enteredName;
-
-                        enterChat(roomData.room_name);
-                    } catch (e) {
-                        alert(e.message || "Decryption Failed.");
-                        btn.innerHTML = `<i class="ph ph-sign-in text-lg"></i> Enter Vault`;
-                    }
-                };
-            }
-
-            async function enterChat(roomName, rawPwd = null) {
-                hideAllViews();
-                chatView.classList.remove('hidden');
-                chatView.classList.add('flex');
-                document.getElementById('chatRoomTitle').innerText = roomName;
-
-                document.getElementById('shareUrl').value = window.location.href;
-                if (rawPwd) {
-                    document.getElementById('sharePwdDisplay').classList.remove('hidden');
-                    document.getElementById('sharePwdDisplay').querySelector('span').innerText = rawPwd;
-                }
-
-                const { data: history } = await supabase.from('chat_messages').select('*').eq('room_id', currentRoomId).order('created_at', { ascending: true });
-                if (history) {
-                    for (const msg of history) {
-                        const plainJsonStr = await decryptData(msg.ciphertext, msg.iv);
-                        if (plainJsonStr) {
-                            try {
-                                const payload = JSON.parse(plainJsonStr);
-                                renderMessage(payload, msg.sender_name === currentProfile.display_name);
-                            } catch(e) {}
-                        }
-                    }
-                }
-
-                supabase.channel('public:chat_messages')
-                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${currentRoomId}` }, async (dbPayload) => {
-                        if (dbPayload.new.sender_name === currentProfile.display_name) return; 
-                        document.getElementById('typingIndicator').classList.add('hidden');
-                        const plainJsonStr = await decryptData(dbPayload.new.ciphertext, dbPayload.new.iv);
-                        if (plainJsonStr) {
-                            try {
-                                const payload = JSON.parse(plainJsonStr);
-                                renderMessage(payload, false);
-                            } catch(e) {}
-                        }
-                    }).subscribe();
-
-                roomChannel = supabase.channel(`typing:${currentRoomId}`);
-                roomChannel.on('broadcast', { event: 'typing' }, (p) => {
-                    if (p.payload.sender === currentProfile.display_name) return;
-                    document.getElementById('typingIndicator').classList.toggle('hidden', !p.payload.isTyping);
-                }).subscribe();
-            }
-
-            chatFileInput.onchange = (e) => {
-                const file = e.target.files[0];
-                if(!file) return;
-                if (file.size > 2 * 1024 * 1024) return alert("Files must be under 2MB for browser encryption limits.");
-                
-                pendingFile = file;
-                filePreviewName.innerText = file.name;
-                filePreviewContainer.classList.remove('hidden');
-                filePreviewContainer.classList.add('flex');
-            };
-
-            removeFileBtn.onclick = () => {
-                pendingFile = null;
-                chatFileInput.value = '';
-                filePreviewContainer.classList.add('hidden');
-                filePreviewContainer.classList.remove('flex');
-            };
-
-            chatForm.onsubmit = async (e) => {
-                e.preventDefault();
-                const text = messageInput.value.trim();
-                if (!text && !pendingFile) return;
-                if (!masterAesKey) return;
-
-                const btn = document.getElementById('sendBtn');
-                btn.innerHTML = `<i class="ph ph-spinner animate-spin text-xl"></i>`;
-                btn.disabled = true;
-
-                try {
-                    const payload = {
-                        text: text,
-                        senderName: currentProfile.display_name,
-                        avatar: currentProfile.avatar_url || null,
-                        file: null
-                    };
-
-                    if (pendingFile) {
-                        const base64Data = await fileToBase64(pendingFile);
-                        payload.file = {
-                            name: pendingFile.name,
-                            type: pendingFile.type,
-                            data: base64Data
+                        const payload = {
+                            text: text,
+                            senderName: currentProfile.display_name,
+                            avatar: currentProfile.avatar_url || null,
+                            file: null
                         };
+
+                        if (pendingFile) {
+                            const base64Data = await fileToBase64(pendingFile);
+                            payload.file = { name: pendingFile.name, type: pendingFile.type, data: base64Data };
+                        }
+
+                        renderMessage(payload, true);
+                        
+                        messageInput.value = '';
+                        document.getElementById('removeFileBtn').click();
+                        roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: false } });
+
+                        const jsonStr = JSON.stringify(payload);
+                        const { ciphertext, iv } = await encryptData(jsonStr);
+                        await supabase.from('chat_messages').insert([{ 
+                            room_id: currentRoomId, sender_name: currentProfile.display_name, ciphertext, iv 
+                        }]);
+                    } catch (err) {
+                        alert("Encryption failed. File might be too large.");
                     }
 
-                    renderMessage(payload, true);
+                    btn.innerHTML = `<i class="ph-fill ph-paper-plane-right text-xl"></i>`;
+                    btn.disabled = false;
+                };
+
+                document.getElementById('messageInput').oninput = () => {
+                    if (!amITyping) { amITyping = true; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: true } }); }
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => { amITyping = false; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: false } }); }, 1500);
+                };
+
+                document.getElementById('chatFileInput').onchange = (e) => {
+                    const file = e.target.files[0];
+                    if(!file) return;
+                    if (file.size > 2 * 1024 * 1024) return alert("Files must be under 2MB for browser encryption limits.");
                     
-                    messageInput.value = '';
-                    removeFileBtn.click();
-                    roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: false } });
+                    pendingFile = file;
+                    document.getElementById('filePreviewName').innerText = file.name;
+                    document.getElementById('filePreviewContainer').classList.remove('hidden');
+                    document.getElementById('filePreviewContainer').classList.add('flex');
+                };
 
-                    const jsonStr = JSON.stringify(payload);
-                    const { ciphertext, iv } = await encryptData(jsonStr);
-                    await supabase.from('chat_messages').insert([{ 
-                        room_id: currentRoomId, 
-                        sender_name: currentProfile.display_name, 
-                        ciphertext, 
-                        iv 
-                    }]);
-                } catch (err) {
-                    alert("Encryption failed. File might be too large.");
-                }
+                document.getElementById('removeFileBtn').onclick = () => {
+                    pendingFile = null;
+                    document.getElementById('chatFileInput').value = '';
+                    document.getElementById('filePreviewContainer').classList.add('hidden');
+                    document.getElementById('filePreviewContainer').classList.remove('flex');
+                };
 
-                btn.innerHTML = `<i class="ph-fill ph-paper-plane-right text-xl"></i>`;
-                btn.disabled = false;
-            };
+                document.getElementById('avatarUploadInput').onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    if (file.size > 2 * 1024 * 1024) return alert("Avatar must be under 2MB");
 
-            function renderMessage(payload, isMe) {
-                const c = document.getElementById('messagesContainer');
-                const div = document.createElement('div');
-                div.className = `flex w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`;
-                
-                let avatarHtml = '';
-                if (!isMe) {
-                    if (payload.avatar) {
-                        avatarHtml = `<img src="${payload.avatar}" class="w-8 h-8 rounded-full object-cover mr-2 flex-shrink-0 mt-4 border border-slate-700">`;
-                    } else {
-                        avatarHtml = `<div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center mr-2 flex-shrink-0 mt-4 border border-slate-600"><i class="ph-fill ph-user text-slate-400"></i></div>`;
+                    const btn = document.getElementById('saveProfileBtn');
+                    btn.innerText = "Uploading...";
+                    btn.disabled = true;
+
+                    if (currentProfile.avatar_url) {
+                        const oldPath = currentProfile.avatar_url.split('/avatars/')[1];
+                        if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
                     }
-                }
 
-                let fileHtml = '';
-                if (payload.file) {
-                    if (payload.file.type.startsWith('image/')) {
-                        fileHtml = `<img src="${payload.file.data}" class="max-w-full rounded-lg mb-2 border border-slate-700/50">`;
-                    } else {
-                        fileHtml = `
-                        <a href="${payload.file.data}" download="${payload.file.name}" class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-lg mb-2 hover:bg-slate-900 transition-colors border border-slate-700/50">
-                            <i class="ph ph-file-dashed text-indigo-400 text-2xl"></i>
-                            <span class="text-xs truncate max-w-[150px] text-slate-300">${payload.file.name}</span>
-                            <i class="ph ph-download-simple ml-auto text-slate-400"></i>
-                        </a>`;
+                    const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
+                    const { error } = await supabase.storage.from('avatars').upload(filePath, file);
+                    if (error) { alert("Upload failed"); btn.innerText = "Save Changes"; btn.disabled = false; return; }
+
+                    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                    
+                    await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
+                    
+                    const { data: updatedData } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                    if (updatedData) {
+                        currentProfile = updatedData;
+                        document.getElementById('navAvatarIcon').classList.add('hidden');
+                        document.getElementById('navAvatarImg').src = updatedData.avatar_url;
+                        document.getElementById('navAvatarImg').classList.remove('hidden');
+                        document.getElementById('settingsAvatarIcon').classList.add('hidden');
+                        document.getElementById('settingsAvatarImg').src = updatedData.avatar_url;
+                        document.getElementById('settingsAvatarImg').classList.remove('hidden');
                     }
-                }
+                    
+                    btn.innerText = "Save Changes";
+                    btn.disabled = false;
+                };
 
-                const bubbleColor = isMe ? 'bg-indigo-600 text-white rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl' : 'bg-slate-800 text-emerald-300 border border-slate-700 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl';
+                document.getElementById('saveProfileBtn').onclick = async () => {
+                    const newName = document.getElementById('settingsNameInput').value;
+                    if (!newName) return;
+                    await supabase.from('profiles').update({ display_name: newName }).eq('id', currentUser.id);
+                    currentProfile.display_name = newName;
+                    if(statusEl) statusEl.innerText = newName;
+                    alert("Profile Updated!");
+                };
+
+                document.getElementById('logoutBtn').onclick = async () => {
+                    await supabase.auth.signOut();
+                    location.reload();
+                };
+
+                document.getElementById('inviteBtn').onclick = () => document.getElementById('inviteModal').classList.toggle('hidden');
+                document.getElementById('copyShareBtn').onclick = () => { navigator.clipboard.writeText(document.getElementById('shareUrl').value); document.getElementById('copyShareBtn').innerText = "Copied!"; };
+
+                document.getElementById('signupBtn').onclick = async () => {
+                    const eInput = document.getElementById('emailInput').value;
+                    const pInput = document.getElementById('passwordInput').value;
+                    if(!eInput || !pInput) return alert("Enter email and password");
+                    document.getElementById('signupBtn').innerText = "Working...";
+                    const { error } = await supabase.auth.signUp({ email: eInput, password: pInput });
+                    if (error) { alert(error.message); document.getElementById('signupBtn').innerText = "Sign Up"; } 
+                    else { alert("Success! Check your email to confirm your account."); location.reload(); }
+                };
                 
-                div.innerHTML = `
-                    ${avatarHtml}
-                    <div class="flex flex-col max-w-[75%]">
-                        ${!isMe ? `<span class="text-[10px] text-slate-500 mb-1 ml-1">${payload.senderName}</span>` : ''}
-                        <div class="p-3 shadow-lg ${bubbleColor}">
-                            ${fileHtml}
-                            <p class="text-sm font-mono break-words">${payload.text}</p>
-                        </div>
-                    </div>
-                `;
-                
-                c.appendChild(div);
-                c.scrollTop = c.scrollHeight;
+                document.getElementById('loginBtn').onclick = async () => {
+                    const eInput = document.getElementById('emailInput').value;
+                    const pInput = document.getElementById('passwordInput').value;
+                    if(!eInput || !pInput) return alert("Enter email and password");
+                    document.getElementById('loginBtn').innerText = "Working...";
+                    const { error } = await supabase.auth.signInWithPassword({ email: eInput, password: pInput });
+                    if (error) { alert(error.message); document.getElementById('loginBtn').innerText = "Log In"; } 
+                    else location.reload();
+                };
+
+            } catch (err) {
+                if(statusEl) statusEl.innerHTML = `<span class="text-red-500 font-bold">Boot Failed: ${err.message}</span>`;
             }
-
-            messageInput.oninput = () => {
-                if (!amITyping) { amITyping = true; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: true } }); }
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => { amITyping = false; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: false } }); }, 1500);
-            };
-
-            document.getElementById('inviteBtn').onclick = () => document.getElementById('inviteModal').classList.toggle('hidden');
-            document.getElementById('copyShareBtn').onclick = () => { navigator.clipboard.writeText(document.getElementById('shareUrl').value); document.getElementById('copyShareBtn').innerText = "Copied!"; };
-
-            document.getElementById('signupBtn').onclick = async () => {
-                const eInput = document.getElementById('emailInput').value;
-                const pInput = document.getElementById('passwordInput').value;
-                if(!eInput || !pInput) return alert("Enter email and password");
-                document.getElementById('signupBtn').innerText = "Working...";
-                const { error } = await supabase.auth.signUp({ email: eInput, password: pInput });
-                if (error) { alert(error.message); document.getElementById('signupBtn').innerText = "Sign Up"; } 
-                else { alert("Success! You can now log in."); location.reload(); }
-            };
-            
-            document.getElementById('loginBtn').onclick = async () => {
-                const eInput = document.getElementById('emailInput').value;
-                const pInput = document.getElementById('passwordInput').value;
-                if(!eInput || !pInput) return alert("Enter email and password");
-                document.getElementById('loginBtn').innerText = "Working...";
-                const { error } = await supabase.auth.signInWithPassword({ email: eInput, password: pInput });
-                if (error
+        })();
+    </script>
+</body>
+</html>
