@@ -159,6 +159,595 @@
         </div>
     </main>
 
-    <script src="/chat/app.js"></script>
+    <script src="/chat/app.js">
+        // ==========================================
+// ZEROCHAT v3.0 | CORE APPLICATION LOGIC
+// ==========================================
+
+// --- DOM ELEMENTS ---
+// Views
+const lobbyView = document.getElementById('lobbyView');
+const dashboardView = document.getElementById('dashboardView');
+const settingsView = document.getElementById('settingsView');
+const chatView = document.getElementById('chatView');
+
+// Sections & Nav
+const authSection = document.getElementById('authSection');
+const createRoomSection = document.getElementById('createRoomSection');
+const joinRoomSection = document.getElementById('joinRoomSection');
+const authStatus = document.getElementById('authStatus');
+const userNavMenu = document.getElementById('userNavMenu');
+
+// Forms & Inputs
+const chatForm = document.getElementById('chatForm');
+const messageInput = document.getElementById('messageInput');
+const chatFileInput = document.getElementById('chatFileInput');
+const filePreviewContainer = document.getElementById('filePreviewContainer');
+const filePreviewName = document.getElementById('filePreviewName');
+const removeFileBtn = document.getElementById('removeFileBtn');
+
+// --- APP STATE ---
+let supabase;
+let currentUser = null;
+let currentProfile = { display_name: "Guest", avatar_url: "" };
+let currentRoomId = null;
+let masterAesKey = null;
+let roomChannel;
+let amITyping = false;
+let typingTimeout = null;
+let pendingFile = null; // Stores file before sending
+
+// ==========================================
+// 1. CRYPTOGRAPHY ENGINE
+// ==========================================
+
+function bufferToBase64(buf) { return window.btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function base64ToBuffer(b64) { return new Uint8Array([...window.atob(b64)].map(c => c.charCodeAt(0))).buffer; }
+
+async function deriveKeyFromPassword(password, salt) {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
+    return await window.crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: enc.encode(salt), iterations: 100000, hash: "SHA-256" },
+        keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
+    );
+}
+
+async function generateRandomKey() {
+    return await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+}
+
+async function encryptData(text, key = masterAesKey) {
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const cipher = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(text));
+    return { ciphertext: bufferToBase64(cipher), iv: bufferToBase64(iv) };
+}
+
+async function decryptData(ciphertextB64, ivB64, key = masterAesKey) {
+    try {
+        const plain = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: base64ToBuffer(ivB64) }, key, base64ToBuffer(ciphertextB64));
+        return new TextDecoder().decode(plain);
+    } catch (e) { return null; } // Return null on failure for strict checking
+}
+
+// Convert File to Base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+// ==========================================
+// 2. BOOT SEQUENCE & ROUTING
+// ==========================================
+
+async function initApp() {
+    try {
+        authStatus.innerText = "Fetching Config...";
+        const configRes = await fetch('/api/getConfig');
+        if (!configRes.ok) throw new Error("Config missing");
+        const config = await configRes.json();
+
+        supabase = window.supabase.createClient(config.url, config.anonKey);
+
+        const { data: { session } } = await supabase.auth.getSession();
+        currentUser = session?.user || null;
+
+        if (currentUser) {
+            userNavMenu.classList.remove('hidden');
+            userNavMenu.classList.add('flex');
+            await loadUserProfile();
+        } else {
+            authStatus.innerText = 'Guest Mode';
+        }
+
+        routeApp();
+    } catch (err) {
+        authStatus.innerHTML = `<span class="text-red-400">Boot Error: ${err.message}</span>`;
+    }
+}
+
+async function loadUserProfile() {
+    const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+    if (data) {
+        currentProfile = data;
+        authStatus.innerText = data.display_name;
+        document.getElementById('settingsNameInput').value = data.display_name;
+        if (data.avatar_url) {
+            document.getElementById('navAvatarIcon').classList.add('hidden');
+            const navImg = document.getElementById('navAvatarImg');
+            navImg.src = data.avatar_url;
+            navImg.classList.remove('hidden');
+            
+            document.getElementById('settingsAvatarIcon').classList.add('hidden');
+            const setImg = document.getElementById('settingsAvatarImg');
+            setImg.src = data.avatar_url;
+            setImg.classList.remove('hidden');
+        }
+    }
+}
+
+function routeApp() {
+    const hash = window.location.hash.substring(1);
+    hideAllViews();
+
+    if (hash) {
+        handleRoomJoinFlow(hash);
+    } else {
+        lobbyView.classList.remove('hidden');
+        if (currentUser) {
+            authSection.classList.add('hidden');
+            createRoomSection.classList.remove('hidden');
+        } else {
+            authSection.classList.remove('hidden');
+            createRoomSection.classList.add('hidden');
+        }
+    }
+}
+
+function hideAllViews() {
+    lobbyView.classList.add('hidden');
+    dashboardView.classList.add('hidden');
+    dashboardView.classList.remove('flex');
+    settingsView.classList.add('hidden');
+    settingsView.classList.remove('flex');
+    chatView.classList.add('hidden');
+}
+
+// --- NAV CLICKS ---
+document.getElementById('navDashboardBtn').onclick = () => {
+    window.history.replaceState(null, null, '/chat');
+    hideAllViews();
+    dashboardView.classList.remove('hidden');
+    dashboardView.classList.add('flex');
+    loadDashboardRooms();
+};
+
+document.getElementById('navProfileBtn').onclick = () => {
+    window.history.replaceState(null, null, '/chat');
+    hideAllViews();
+    settingsView.classList.remove('hidden');
+    settingsView.classList.add('flex');
+};
+
+// ==========================================
+// 3. PROFILE & AVATAR UPLOADS
+// ==========================================
+
+document.getElementById('avatarUploadInput').onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) return alert("Avatar must be under 2MB");
+
+    const btn = document.getElementById('saveProfileBtn');
+    btn.innerText = "Uploading...";
+    btn.disabled = true;
+
+    // 1. Delete old avatar if it exists to save space
+    if (currentProfile.avatar_url) {
+        const oldPath = currentProfile.avatar_url.split('/avatars/')[1];
+        if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
+    }
+
+    // 2. Upload new
+    const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
+    const { error } = await supabase.storage.from('avatars').upload(filePath, file);
+    if (error) { alert("Upload failed"); btn.innerText = "Save Changes"; btn.disabled = false; return; }
+
+    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+    
+    // Update DB
+    await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
+    await loadUserProfile();
+    btn.innerText = "Save Changes";
+    btn.disabled = false;
+};
+
+document.getElementById('saveProfileBtn').onclick = async () => {
+    const newName = document.getElementById('settingsNameInput').value;
+    if (!newName) return;
+    await supabase.from('profiles').update({ display_name: newName }).eq('id', currentUser.id);
+    await loadUserProfile();
+    alert("Profile Updated!");
+};
+
+document.getElementById('logoutBtn').onclick = async () => {
+    await supabase.auth.signOut();
+    location.reload();
+};
+
+// ==========================================
+// 4. ROOM CREATION & DASHBOARD
+// ==========================================
+
+async function loadDashboardRooms() {
+    const list = document.getElementById('dashboardRoomsList');
+    list.innerHTML = `<i class="ph ph-spinner animate-spin text-indigo-500"></i> Loading...`;
+    
+    const { data } = await supabase.from('chat_rooms').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
+    
+    if (!data || data.length === 0) {
+        list.innerHTML = `<p class="text-slate-500 text-sm">No active rooms found.</p>`;
+        return;
+    }
+
+    list.innerHTML = '';
+    data.forEach(room => {
+        const link = room.custom_alias ? room.custom_alias : room.id;
+        const div = document.createElement('div');
+        div.className = "bg-slate-800 border border-slate-700 p-4 rounded-xl flex justify-between items-center";
+        div.innerHTML = `
+            <div>
+                <h3 class="text-white font-bold">${room.room_name}</h3>
+                <p class="text-xs text-slate-400 font-mono">zerokey.vercel.app/chat#${link}</p>
+                <span class="text-[10px] mt-1 inline-block px-2 py-0.5 rounded-full ${room.is_protected ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">
+                    ${room.is_protected ? 'Password Protected' : 'Open Vault'}
+                </span>
+            </div>
+            <a href="#${link}" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-sm font-bold text-white transition-all">Join</a>
+        `;
+        list.appendChild(div);
+    });
+}
+
+document.getElementById('createRoomBtn').onclick = async () => {
+    const name = document.getElementById('newRoomName').value || "Secure Vault";
+    const pwd = document.getElementById('newRoomPassword').value;
+    let alias = document.getElementById('newRoomAlias').value.trim();
+    if(alias) alias = alias.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase(); // Clean alias
+    const hours = parseInt(document.getElementById('retentionSelect').value);
+    
+    const btn = document.getElementById('createRoomBtn');
+    btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Deploying...`;
+
+    // 1. Setup Zero-Knowledge Auth Check
+    let authCheckHex = null;
+    let authIvHex = null;
+    let generatedKey = null;
+
+    if (pwd) {
+        // We will use the room name as a temporary salt until we get the DB ID
+        generatedKey = await deriveKeyFromPassword(pwd, name); 
+        const enc = await encryptData("ZkAuth-Valid", generatedKey);
+        authCheckHex = enc.ciphertext;
+        authIvHex = enc.iv;
+    } else {
+        generatedKey = await generateRandomKey();
+    }
+
+    // 2. Insert DB
+    const { data, error } = await supabase.from('chat_rooms').insert([{
+        room_name: name,
+        custom_alias: alias || null,
+        is_protected: !!pwd,
+        auth_check: authCheckHex,
+        auth_iv: authIvHex,
+        retention_hours: hours,
+        expires_at: new Date(Date.now() + hours * 3600000).toISOString(),
+        creator_id: currentUser.id
+    }]).select().single();
+
+    if (error) {
+        btn.innerHTML = `<i class="ph ph-plus-circle"></i> Deploy Room`;
+        return alert(error.message.includes('unique constraint') ? "That custom alias is already taken." : "Error creating room.");
+    }
+
+    // 3. Finalize Key (re-derive with actual room ID for ultimate security)
+    let urlHash = `#${alias || data.id}`;
+    if (pwd) {
+        masterAesKey = await deriveKeyFromPassword(pwd, data.id);
+        // Re-encrypt the auth check with the true key
+        const encFinal = await encryptData("ZkAuth-Valid", masterAesKey);
+        await supabase.from('chat_rooms').update({ auth_check: encFinal.ciphertext, auth_iv: encFinal.iv }).eq('id', data.id);
+    } else {
+        masterAesKey = generatedKey;
+        const exported = await window.crypto.subtle.exportKey("raw", masterAesKey);
+        urlHash += `|${bufferToBase64(exported)}`;
+    }
+
+    window.history.replaceState(null, null, urlHash);
+    currentRoomId = data.id;
+    enterChat(name, pwd);
+};
+
+// ==========================================
+// 5. ROOM JOINING & STRICT AUTH
+// ==========================================
+
+async function handleRoomJoinFlow(hash) {
+    lobbyView.classList.remove('hidden');
+    const parts = hash.split('|');
+    const requestedIdOrAlias = parts[0];
+
+    // Fetch room. Search by ID first, if invalid UUID, search by custom_alias
+    let query = supabase.from('chat_rooms').select('*');
+    if (requestedIdOrAlias.length === 36 && requestedIdOrAlias.includes('-')) {
+        query = query.eq('id', requestedIdOrAlias);
+    } else {
+        query = query.eq('custom_alias', requestedIdOrAlias);
+    }
+
+    const { data: roomData } = await query.single();
+
+    if (!roomData) return alert("Room not found or has expired and been deleted.");
+
+    currentRoomId = roomData.id;
+    document.getElementById('joinRoomName').innerText = `Room: ${roomData.room_name}`;
+    
+    if (currentUser) document.getElementById('guestNameInput').value = currentProfile.display_name;
+
+    const isUrlKey = parts.length > 1;
+    if (roomData.is_protected && !isUrlKey) {
+        document.getElementById('joinPasswordInput').classList.remove('hidden');
+    }
+
+    authSection.classList.add('hidden');
+    createRoomSection.classList.add('hidden');
+    joinRoomSection.classList.remove('hidden');
+
+    // Attach Join Logic
+    document.getElementById('joinRoomBtn').onclick = async () => {
+        const pwd = document.getElementById('joinPasswordInput').value;
+        const btn = document.getElementById('joinRoomBtn');
+        btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Decrypting...`;
+
+        try {
+            if (parts.length > 1) {
+                // Open Room
+                masterAesKey = await window.crypto.subtle.importKey("raw", base64ToBuffer(parts[1]), { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
+            } else {
+                // Strict Zero-Knowledge Password Verification
+                if (!pwd) throw new Error("Password required");
+                const testKey = await deriveKeyFromPassword(pwd, currentRoomId);
+                const check = await decryptData(roomData.auth_check, roomData.auth_iv, testKey);
+                
+                if (check !== "ZkAuth-Valid") throw new Error("Incorrect Password!");
+                masterAesKey = testKey; // It worked! Keep the key.
+            }
+            
+            // Set final display name
+            const enteredName = document.getElementById('guestNameInput').value;
+            if(!currentUser && enteredName) currentProfile.display_name = enteredName;
+
+            enterChat(roomData.room_name);
+        } catch (e) {
+            alert(e.message || "Decryption Failed.");
+            btn.innerHTML = `<i class="ph ph-sign-in text-lg"></i> Enter Vault`;
+        }
+    };
+}
+
+// ==========================================
+// 6. CHAT & FILE ENCRYPTION
+// ==========================================
+
+async function enterChat(roomName, rawPwd = null) {
+    hideAllViews();
+    chatView.classList.remove('hidden');
+    chatView.classList.add('flex');
+    document.getElementById('chatRoomTitle').innerText = roomName;
+
+    document.getElementById('shareUrl').value = window.location.href;
+    if (rawPwd) {
+        document.getElementById('sharePwdDisplay').classList.remove('hidden');
+        document.getElementById('sharePwdDisplay').querySelector('span').innerText = rawPwd;
+    }
+
+    // 1. Fetch History
+    const { data: history } = await supabase.from('chat_messages').select('*').eq('room_id', currentRoomId).order('created_at', { ascending: true });
+    if (history) {
+        for (const msg of history) {
+            const plainJsonStr = await decryptData(msg.ciphertext, msg.iv);
+            if (plainJsonStr) {
+                try {
+                    const payload = JSON.parse(plainJsonStr);
+                    renderMessage(payload, msg.sender_name === currentProfile.display_name);
+                } catch(e) {}
+            }
+        }
+    }
+
+    // 2. Listeners
+    supabase.channel('public:chat_messages')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${currentRoomId}` }, async (dbPayload) => {
+            if (dbPayload.new.sender_name === currentProfile.display_name) return; 
+            document.getElementById('typingIndicator').classList.add('hidden');
+            const plainJsonStr = await decryptData(dbPayload.new.ciphertext, dbPayload.new.iv);
+            if (plainJsonStr) {
+                try {
+                    const payload = JSON.parse(plainJsonStr);
+                    renderMessage(payload, false);
+                } catch(e) {}
+            }
+        }).subscribe();
+
+    roomChannel = supabase.channel(`typing:${currentRoomId}`);
+    roomChannel.on('broadcast', { event: 'typing' }, (p) => {
+        if (p.payload.sender === currentProfile.display_name) return;
+        document.getElementById('typingIndicator').classList.toggle('hidden', !p.payload.isTyping);
+    }).subscribe();
+}
+
+// Handle File Selection
+chatFileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    if (file.size > 2 * 1024 * 1024) return alert("Files must be under 2MB for browser encryption limits.");
+    
+    pendingFile = file;
+    filePreviewName.innerText = file.name;
+    filePreviewContainer.classList.remove('hidden');
+    filePreviewContainer.classList.add('flex');
+};
+
+removeFileBtn.onclick = () => {
+    pendingFile = null;
+    chatFileInput.value = '';
+    filePreviewContainer.classList.add('hidden');
+    filePreviewContainer.classList.remove('flex');
+};
+
+chatForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const text = messageInput.value.trim();
+    if (!text && !pendingFile) return;
+    if (!masterAesKey) return;
+
+    const btn = document.getElementById('sendBtn');
+    btn.innerHTML = `<i class="ph ph-spinner animate-spin text-xl"></i>`;
+    btn.disabled = true;
+
+    try {
+        // Construct standard payload
+        const payload = {
+            text: text,
+            senderName: currentProfile.display_name,
+            avatar: currentProfile.avatar_url || null,
+            file: null
+        };
+
+        if (pendingFile) {
+            const base64Data = await fileToBase64(pendingFile);
+            payload.file = {
+                name: pendingFile.name,
+                type: pendingFile.type,
+                data: base64Data
+            };
+        }
+
+        // Optimistic UI Render
+        renderMessage(payload, true);
+        
+        // Reset Inputs
+        messageInput.value = '';
+        removeFileBtn.click();
+        roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: false } });
+
+        // Encrypt and Send
+        const jsonStr = JSON.stringify(payload);
+        const { ciphertext, iv } = await encryptData(jsonStr);
+        await supabase.from('chat_messages').insert([{ 
+            room_id: currentRoomId, 
+            sender_name: currentProfile.display_name, 
+            ciphertext, 
+            iv 
+        }]);
+    } catch (err) {
+        alert("Encryption failed. File might be too large.");
+    }
+
+    btn.innerHTML = `<i class="ph-fill ph-paper-plane-right text-xl"></i>`;
+    btn.disabled = false;
+};
+
+// UI Rendering for Messages
+function renderMessage(payload, isMe) {
+    const c = document.getElementById('messagesContainer');
+    const div = document.createElement('div');
+    div.className = `flex w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`;
+    
+    // Setup Avatar HTML
+    let avatarHtml = '';
+    if (!isMe) {
+        if (payload.avatar) {
+            avatarHtml = `<img src="${payload.avatar}" class="w-8 h-8 rounded-full object-cover mr-2 flex-shrink-0 mt-4 border border-slate-700">`;
+        } else {
+            avatarHtml = `<div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center mr-2 flex-shrink-0 mt-4 border border-slate-600"><i class="ph-fill ph-user text-slate-400"></i></div>`;
+        }
+    }
+
+    // Setup File HTML
+    let fileHtml = '';
+    if (payload.file) {
+        if (payload.file.type.startsWith('image/')) {
+            fileHtml = `<img src="${payload.file.data}" class="max-w-full rounded-lg mb-2 border border-slate-700/50">`;
+        } else {
+            fileHtml = `
+            <a href="${payload.file.data}" download="${payload.file.name}" class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-lg mb-2 hover:bg-slate-900 transition-colors border border-slate-700/50">
+                <i class="ph ph-file-dashed text-indigo-400 text-2xl"></i>
+                <span class="text-xs truncate max-w-[150px] text-slate-300">${payload.file.name}</span>
+                <i class="ph ph-download-simple ml-auto text-slate-400"></i>
+            </a>`;
+        }
+    }
+
+    // Bubble HTML
+    const bubbleColor = isMe ? 'bg-indigo-600 text-white rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl' : 'bg-slate-800 text-emerald-300 border border-slate-700 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl';
+    
+    div.innerHTML = `
+        ${avatarHtml}
+        <div class="flex flex-col max-w-[75%]">
+            ${!isMe ? `<span class="text-[10px] text-slate-500 mb-1 ml-1">${payload.senderName}</span>` : ''}
+            <div class="p-3 shadow-lg ${bubbleColor}">
+                ${fileHtml}
+                <p class="text-sm font-mono break-words">${payload.text}</p>
+            </div>
+        </div>
+    `;
+    
+    c.appendChild(div);
+    c.scrollTop = c.scrollHeight;
+}
+
+// Typing events
+messageInput.oninput = () => {
+    if (!amITyping) { amITyping = true; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: true } }); }
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => { amITyping = false; roomChannel.send({ type: 'broadcast', event: 'typing', payload: { sender: currentProfile.display_name, isTyping: false } }); }, 1500);
+};
+
+// Modals & Links
+document.getElementById('inviteBtn').onclick = () => document.getElementById('inviteModal').classList.toggle('hidden');
+document.getElementById('copyShareBtn').onclick = () => { 
+    navigator.clipboard.writeText(document.getElementById('shareUrl').value); 
+    document.getElementById('copyShareBtn').innerText = "Copied!"; 
+};
+
+// Auth forms
+document.getElementById('signupBtn').onclick = async () => {
+    const eInput = document.getElementById('emailInput').value;
+    const pInput = document.getElementById('passwordInput').value;
+    if(!eInput || !pInput) return alert("Enter email and password");
+    document.getElementById('signupBtn').innerText = "Working...";
+    const { error } = await supabase.auth.signUp({ email: eInput, password: pInput });
+    if (error) { alert(error.message); document.getElementById('signupBtn').innerText = "Sign Up"; } 
+    else { alert("Success! You can now log in."); location.reload(); }
+};
+document.getElementById('loginBtn').onclick = async () => {
+    const eInput = document.getElementById('emailInput').value;
+    const pInput = document.getElementById('passwordInput').value;
+    if(!eInput || !pInput) return alert("Enter email and password");
+    document.getElementById('loginBtn').innerText = "Working...";
+    const { error } = await supabase.auth.signInWithPassword({ email: eInput, password: pInput });
+    if (error) { alert(error.message); document.getElementById('loginBtn').innerText = "Log In"; } 
+    else location.reload();
+};
+
+// RUN!
+document.addEventListener("DOMContentLoaded", initApp);
+    </script>
 </body>
 </html>
