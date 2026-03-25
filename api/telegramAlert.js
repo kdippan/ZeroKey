@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         const isRoom = newRecord.room_name !== undefined;
         const title = isRoom ? "👥 New Chat Room Created" : "📦 New Secret Payload Created";
         const linkId = newRecord.custom_alias || newRecord.id;
-        const linkBase = isRoom ? "https://zerokey.vercel.app/chat#" : "https://zerokey.vercel.app/#";
+        const linkBase = isRoom ? "https://zerokey.vercel.app/chat#" : "https://zerokey.vercel.app/view?id=";
 
         // Format a beautiful Markdown message for Telegram
         const message = `
