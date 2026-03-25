@@ -1,59 +1,65 @@
 export default async function handler(req, res) {
-    // Only accept POST requests from Supabase
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
     try {
-        // Supabase sends the newly inserted row inside req.body.record
-        const newRecord = req.body.record;
-        if (!newRecord) return res.status(400).json({ error: 'No record data found' });
+        const { type, table, schema, record, old_record } = req.body;
+        const data = record || old_record;
+        
+        if (!data) return res.status(400).json({ error: 'No data found' });
 
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
         const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
 
-        if (!botToken || !chatId) {
-            console.error("Missing Telegram environment variables.");
-            return res.status(500).json({ error: 'Server configuration error' });
+        if (!botToken || !chatId) return res.status(500).json({ error: 'Server config error' });
+
+        let message = '';
+
+        if (table === 'secrets') {
+            if (type === 'INSERT') {
+                message = `🚨 📦 *New Secret Payload Created*\n\n*ID:* \`${data.id}\`\n*Protected:* ${data.has_pin ? 'Yes 🔒' : 'No 🔓'}\n\n🔗 *Direct Link:*\nhttps://zerokey.vercel.app/view?id=${data.id}`;
+            } else if (type === 'DELETE') {
+                message = `💥 📦 *Secret Payload Destroyed*\n(Burned after reading)\n*ID:* \`${data.id}\``;
+            }
+        } else if (table === 'chat_rooms') {
+            const linkId = data.custom_alias || data.id;
+            if (type === 'INSERT') {
+                message = `🚨 🏠 *New Chat Room Created*\n\n*Name:* \`${data.room_name}\`\n*Protected:* ${data.is_protected ? 'Yes 🔒' : 'No 🔓'}\n\n🔗 *Direct Link:*\nhttps://zerokey.vercel.app/chat#${linkId}`;
+            } else if (type === 'DELETE') {
+                message = `💥 🏠 *Chat Room Destroyed*\n(Timer expired)\n*Name:* \`${data.room_name}\``;
+            }
+        } else if (schema === 'auth' && table === 'users') {
+            if (type === 'INSERT') {
+                message = `👤 *New User Signup*\n*Email:* \`${data.email}\``;
+            } else {
+                return res.status(200).json({ ignored: true });
+            }
+        } else if (schema === 'storage' && table === 'objects') {
+            if (data.name.endsWith('/.emptyFolderPlaceholder')) return res.status(200).json({ ignored: true });
+            
+            if (type === 'INSERT') {
+                const sizeMB = (data.metadata?.size / (1024 * 1024)).toFixed(2);
+                message = `📁 *New File Uploaded*\n*Bucket:* \`${data.bucket_id}\`\n*File:* \`${data.name}\`\n*Size:* ${sizeMB} MB`;
+            } else if (type === 'DELETE') {
+                message = `🗑️ *File Deleted*\n*Bucket:* \`${data.bucket_id}\`\n*File:* \`${data.name}\``;
+            }
+        } else {
+            return res.status(200).json({ ignored: true });
         }
 
-        // Check if this is a Chat Room or a standard Payload (handles both tables!)
-        const isRoom = newRecord.room_name !== undefined;
-        const title = isRoom ? "👥 New Chat Room Created" : "📦 New Secret Payload Created";
-        const linkId = newRecord.custom_alias || newRecord.id;
-        const linkBase = isRoom ? "https://zerokey.vercel.app/chat#" : "https://zerokey.vercel.app/view?id=";
+        message += `\n\n*Time:* ${new Date().toUTCString()}`;
 
-        // Format a beautiful Markdown message for Telegram
-        const message = `
-🚨 *${title}* 🚨
-
-*ID:* \`${newRecord.id}\`
-*Protected:* ${newRecord.is_protected ? 'Yes 🔒' : 'No 🔓'}
-*Created At:* ${new Date(newRecord.created_at).toUTCString()}
-
-🔗 *Direct Link:*
-${linkBase}${linkId}
-`;
-
-        // Blast it to the Telegram API
         const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'Markdown'
-            })
+            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
         });
 
-        if (!response.ok) {
-            throw new Error(`Telegram API responded with ${response.status}`);
-        }
+        if (!response.ok) throw new Error("Telegram API Error");
 
-        return res.status(200).json({ success: true, message: "Alert sent to admin." });
+        return res.status(200).json({ success: true });
 
     } catch (error) {
-        console.error("Telegram Alert Error:", error);
+        console.error("Alert Error:", error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
