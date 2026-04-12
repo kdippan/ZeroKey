@@ -43,6 +43,18 @@ async function decryptBuffer(encryptedBase64, key, ivBase64) {
 
 async function verifyBiometrics() {
     try {
+        // [FIX 1] Check if OS actually has a system password/PIN set up.
+        // If not, bypass the lock completely to prevent the Windows "Admin Required" error.
+        if (window.PublicKeyCredential) {
+            const isAvailable = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+            if (!isAvailable) {
+                console.warn("No system password/biometrics found. Bypassing check.");
+                return true; 
+            }
+        } else {
+            return true; // Bypass if WebAuthn is entirely unsupported
+        }
+
         const challenge = new Uint8Array(32);
         window.crypto.getRandomValues(challenge);
         
@@ -156,16 +168,32 @@ document.getElementById('decryptBtn').addEventListener('click', async () => {
                 await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(
                     pos => {
                         const d = getDistance(payload.geo.lat, payload.geo.lng, pos.coords.latitude, pos.coords.longitude);
-                        d > 50 ? rej(`Out of bounds by ${Math.round(d)}m.`) : res();
-                    }, err => rej("Location denied.")
+                        // [FIX 2] Split the error logic. Only reject as 'bounds' if they are physically too far away.
+                        if (d > 50) {
+                            rej({ type: 'bounds', msg: `Out of bounds by ${Math.round(d)}m.` });
+                        } else {
+                            res();
+                        }
+                    }, 
+                    err => rej({ type: 'denied', msg: "Location access denied or timed out. Please allow GPS to decrypt." }),
+                    { enableHighAccuracy: true, timeout: 15000 }
                 ));
             } catch (geoErr) {
-                await fetch('/api/destroySecret', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: payloadId }) 
-                });
-                return triggerGlitchLockout(geoErr);
+                if (geoErr.type === 'bounds') {
+                    // True security breach. Burn the payload.
+                    await fetch('/api/destroySecret', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: payloadId }) 
+                    });
+                    return triggerGlitchLockout(geoErr.msg);
+                } else {
+                    // Just a denied permission or timeout. Don't delete data, just reset the button.
+                    alert(geoErr.msg);
+                    btn.innerHTML = '<i class="ph ph-fire text-xl"></i> Decrypt & Read';
+                    btn.disabled = false;
+                    return; // Halt execution safely
+                }
             }
         }
 
