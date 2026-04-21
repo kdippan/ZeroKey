@@ -108,6 +108,42 @@
 
     <script>
         const blogs = [
+            // NEWLY ADDED BLOGS
+            {
+                title: "The E2EE Search Paradox: Implementing Blind Indexing",
+                desc: "Stop downloading your entire database to search. Learn how to query encrypted data using Web Crypto API HMACs.",
+                url: "/blog/blind-indexing-e2ee-search",
+                tags: ["Cryptography", "E2EE"],
+                icon: "ph-magnifying-glass"
+            },
+            {
+                title: "Prevent Key Theft with Non-Extractable Keys",
+                desc: "Perfect math means nothing if an extension reads your variables. Save your E2EE app from XSS with extractable: false.",
+                url: "/blog/non-extractable-keys-xss",
+                tags: ["Security", "XSS"],
+                icon: "ph-shield-warning"
+            },
+            {
+                title: "Multi-Device E2EE: Secure Key Exchange",
+                desc: "Stop sending passwords to your server. Learn how to implement ECDH Key Exchange to sync encrypted vaults securely.",
+                url: "/blog/multi-device-e2ee-ecdh",
+                tags: ["Networking", "Cryptography"],
+                icon: "ph-devices"
+            },
+            {
+                title: "Streaming E2EE: Encrypting Massive Files",
+                desc: "Stop crashing mobile browsers. Learn how to bypass RAM limits and encrypt massive files using the Web Streams API.",
+                url: "/blog/streaming-e2ee-large-files",
+                tags: ["Performance", "E2EE"],
+                icon: "ph-file-zip"
+            },
+            {
+                title: "RFC 3986: The URL Fragment & Zero-Knowledge",
+                desc: "Learn how to exploit RFC 3986 URL fragments to build zero-knowledge, client-side encryption tools. The server never sees your keys.",
+                url: "/blog/blog-rfc-3986-zero-knowledge",
+                tags: ["Cybersecurity", "RFC3986"],
+                icon: "ph-link-break"
+            },
             {
                 title: "How to Securely Clear Memory in JavaScript",
                 desc: "Don't leave your AES keys sitting in RAM. Learn how to manually wipe memory buffers using TypedArray.fill(0).",
@@ -115,6 +151,7 @@
                 tags: ["Memory", "Security"],
                 icon: "ph-memory"
             },
+            // PREVIOUS BLOGS
             {
                 title: "How to Encrypt Large Files Without Crashing",
                 desc: "Stop loading 2GB files into RAM. Learn how to encrypt and upload massive files in chunks using the Streams API.",
