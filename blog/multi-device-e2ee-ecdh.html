@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>The Multi-Device E2EE Nightmare: Secure Key Exchange with ECDH</title>
+    <meta name="description" content="Learn how to sync end-to-end encrypted data across multiple devices without exposing passwords using Elliptic Curve Diffie-Hellman (ECDH) and the Web Crypto API.">
+    <meta name="keywords" content="ECDH key exchange, multi-device end to end encryption, Web Crypto API RSA ECDSA, sync encrypted data, wrapKey unwrapKey javascript, Signal protocol architecture">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/multi-device-e2ee-ecdh">
+    <meta property="og:title" content="How to Sync E2EE Data Across Devices Without Leaking Keys">
+    <meta property="og:description" content="Stop sending passwords to your server. Learn how to implement ECDH Key Exchange to securely sync encrypted vaults across a user's phone and laptop.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "The Multi-Device E2EE Nightmare: Secure Key Exchange with ECDH",
+      "author": { "@type": "Person", "name": "Dippan Bhusal" },
+      "keywords": "ECDH, Key Exchange, Web Crypto API, E2EE sync, asymmetric encryption",
+      "publisher": { "@type": "Organization", "name": "ZeroKey", "url": "https://zerokey.vercel.app" }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom VS Code Dark Theme Overrides for Code Blocks */
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+        .token.comment, .token.prolog { color: #64748b !important; font-style: italic; }
+        .token.punctuation { color: #94a3b8 !important; }
+        .token.namespace { opacity: .7 !important; }
+        .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #f472b6 !important; }
+        .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #a7f3d0 !important; }
+        .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #e2e8f0 !important; }
+        .token.atrule, .token.attr-value, .token.keyword { color: #818cf8 !important; }
+        .token.function, .token.class-name { color: #60a5fa !important; }
+        .token.regex, .token.important, .token.variable { color: #fbbf24 !important; }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-fuchsia-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-fuchsia-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-fuchsia-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-devices"></i> Network Cryptography
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    The Multi-Device E2EE Nightmare: Secure Key Exchange with ECDH
+                </h1>
+                
+                <div class="flex items-center justify-center gap-4 text-sm text-slate-500 font-medium flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> May 28, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-blue-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 12 Min Read
+                    </div>
+                    <button id="copyMdBtn" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-full transition-colors border border-slate-700">
+                        <i class="ph ph-copy"></i> Copy Markdown
+                    </button>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-fuchsia-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-fuchsia-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    You've built a secure vault. Your user's data is encrypted locally using AES-GCM. But what happens when that user logs in on a new laptop? How does their phone securely send the AES master key to their laptop without your server intercepting it?
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The "Symmetric" Trap</h2>
+                <p>
+                    Standard AES encryption is <em>symmetric</em>. The exact same password used to lock the vault is required to unlock it. If you want to sync data across devices, you might be tempted to just encrypt the Master AES key with the user's login password and store it on the server.
+                </p>
+                <p>
+                    <strong>This is a massive vulnerability.</strong> If the user uses a weak password, a server breach allows attackers to brute-force that password, unwrap the Master Key, and decrypt the entire vault.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The Solution: ECDH Key Exchange</h2>
+                <p>
+                    To securely transmit the Master AES key from Device A (Phone) to Device B (Laptop), we must use <em>Asymmetric Cryptography</em>. Specifically, we use <strong>Elliptic Curve Diffie-Hellman (ECDH)</strong>. This is the exact same architectural foundation that powers WhatsApp, Signal, and iMessage.
+                </p>
+
+                <div class="bg-fuchsia-950/30 border-l-4 border-fuchsia-500 p-4 rounded-r-lg my-6">
+                    <p class="m-0 text-sm text-fuchsia-200"><strong>The Magic of ECDH:</strong> If Device A combines its <em>Private Key</em> with Device B's <em>Public Key</em>, it generates a unique "Shared Secret". If Device B combines its <em>Private Key</em> with Device A's <em>Public Key</em>, it generates the <strong>exact same Shared Secret</strong>. The server only sees the Public keys.</p>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-8">Step 1: Generating the Keypair (Device B)</h2>
+                <p>
+                    When the user logs in on their new Laptop, the browser generates an ECDH keypair. It keeps the Private Key hidden in IndexedDB and uploads the Public Key to your server.
+                </p>
+
+<pre><code class="language-javascript">// Device B (Laptop) generates an Asymmetric Key Pair
+async function generateDeviceKeyPair() {
+    const keyPair = await window.crypto.subtle.generateKey(
+        {
+            name: "ECDH",
+            namedCurve: "P-384"
+        },
+        true,
+        ["deriveKey"]
+    );
+    
+    // Export the Public Key to save to your database (e.g., Supabase)
+    const publicKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
+    await uploadPublicKeyToServer(publicKeyJwk); 
+    
+    return keyPair.privateKey; // Save this locally! NEVER upload it.
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 2: Deriving the Shared Secret (Device A)</h2>
+                <p>
+                    The Phone (Device A), which already holds the Master AES Key, fetches the Laptop's Public Key from the server. It then uses its own Private Key to derive the <strong>Shared Secret AES Key</strong>.
+                </p>
+
+<pre><code class="language-javascript">// Device A (Phone) derives the Shared Secret
+async function deriveSharedKey(deviceAPrivateKey, deviceBPublicKeyJwk) {
+    // Import Device B's public key
+    const deviceBPublicKey = await window.crypto.subtle.importKey(
+        "jwk",
+        deviceBPublicKeyJwk,
+        { name: "ECDH", namedCurve: "P-384" },
+        true,
+        []
+    );
+
+    // Derive a symmetric AES-GCM key using the ECDH math magic
+    return await window.crypto.subtle.deriveKey(
+        {
+            name: "ECDH",
+            public: deviceBPublicKey // Combine with B's public key
+        },
+        deviceAPrivateKey, // Combine with A's private key
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["wrapKey", "unwrapKey"]
+    );
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Step 3: Wrapping and Syncing</h2>
+                <p>
+                    Now that Device A has a Shared Key that only Device B can calculate, it uses <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-fuchsia-300">wrapKey</code> to encrypt the Master AES Vault Key and sends it to the server. Device B downloads the wrapped key, derives the exact same Shared Secret, and uses <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-fuchsia-300">unwrapKey</code> to extract the Master Vault Key.
+                </p>
+                <p>
+                    <strong>The Server is completely blind.</strong> It only routed a wrapped key and public keys. It mathematically cannot decrypt the vault.
+                </p>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-fuchsia-600/50 bg-fuchsia-950/20 my-12 relative overflow-hidden group hover:border-fuchsia-500/80 transition-all shadow-xl">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-infinity text-[160px] text-fuchsia-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Don't Want to Build This Yourself?</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            Key management, wrapping, and public key exchanges are incredibly easy to mess up. Let us handle the cryptography for you.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(192,38,211,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-shield-check"></i> Launch ZeroKey
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View Source Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-fuchsia-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-fuchsia-400 hover:text-fuchsia-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <script>
+        document.getElementById('copyMdBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalHtml = btn.innerHTML;
+            
+            const markdownContent = `
+# The Multi-Device E2EE Nightmare: Secure Key Exchange with ECDH
+
+By: Dippan Bhusal | Tags: #Cybersecurity #WebCrypto #JavaScript #ECDH #SignalProtocol
+
+You've built a secure vault. Your user's data is encrypted locally using AES-GCM. But what happens when that user logs in on a new laptop? How does their phone securely send the AES master key to their laptop without your server intercepting it?
+
+## The "Symmetric" Trap
+Standard AES encryption is *symmetric*. The exact same password used to lock the vault is required to unlock it. If you want to sync data across devices, you might be tempted to just encrypt the Master AES key with the user's login password and store it on the server.
+
+**This is a massive vulnerability.** If the user uses a weak password, a server breach allows attackers to brute-force that password, unwrap the Master Key, and decrypt the entire vault.
+
+## The Solution: ECDH Key Exchange
+To securely transmit the Master AES key from Device A (Phone) to Device B (Laptop), we must use *Asymmetric Cryptography*. Specifically, we use **Elliptic Curve Diffie-Hellman (ECDH)**. This is the exact same architectural foundation that powers WhatsApp, Signal, and iMessage.
+
+🚨 **The Magic of ECDH:** If Device A combines its *Private Key* with Device B's *Public Key*, it generates a unique "Shared Secret". If Device B combines its *Private Key* with Device A's *Public Key*, it generates the **exact same Shared Secret**. The server only sees the Public keys.
+
+## Implementation in JavaScript (Web Crypto API)
+
+### Step 1: Generating the Keypair (Device B)
+When the user logs in on their new Laptop, the browser generates an ECDH keypair. It keeps the Private Key hidden in IndexedDB and uploads the Public Key to your server.
+
+\`\`\`javascript
+// Device B (Laptop) generates an Asymmetric Key Pair
+async function generateDeviceKeyPair() {
+    const keyPair = await window.crypto.subtle.generateKey(
+        {
+            name: "ECDH",
+            namedCurve: "P-384"
+        },
+        true,
+        ["deriveKey"]
+    );
+    
+    // Export the Public Key to save to your database (e.g., Supabase)
+    const publicKeyJwk = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
+    await uploadPublicKeyToServer(publicKeyJwk); 
+    
+    return keyPair.privateKey; // Save this locally! NEVER upload it.
+}
+\`\`\`
+
+### Step 2: Deriving the Shared Secret (Device A)
+The Phone (Device A), which already holds the Master AES Key, fetches the Laptop's Public Key from the server. It then uses its own Private Key to derive the **Shared Secret AES Key**.
+
+\`\`\`javascript
+// Device A (Phone) derives the Shared Secret
+async function deriveSharedKey(deviceAPrivateKey, deviceBPublicKeyJwk) {
+    // Import Device B's public key
+    const deviceBPublicKey = await window.crypto.subtle.importKey(
+        "jwk",
+        deviceBPublicKeyJwk,
+        { name: "ECDH", namedCurve: "P-384" },
+        true,
+        []
+    );
+
+    // Derive a symmetric AES-GCM key using the ECDH math magic
+    return await window.crypto.subtle.deriveKey(
+        {
+            name: "ECDH",
+            public: deviceBPublicKey // Combine with B's public key
+        },
+        deviceAPrivateKey, // Combine with A's private key
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["wrapKey", "unwrapKey"]
+    );
+}
+\`\`\`
+
+## Step 3: Wrapping and Syncing
+Now that Device A has a Shared Key that only Device B can calculate, it uses \`wrapKey\` to encrypt the Master AES Vault Key and sends it to the server. Device B downloads the wrapped key, derives the exact same Shared Secret, and uses \`unwrapKey\` to extract the Master Vault Key.
+
+**The Server is completely blind.** It only routed a wrapped key and public keys. It mathematically cannot decrypt the vault.
+
+---
+**Don't Want to Build This Yourself?** Let us handle the cryptography for you. Try [ZeroKey](https://zerokey.vercel.app).
+            `.trim();
+
+            navigator.clipboard.writeText(markdownContent).then(() => {
+                btn.innerHTML = '<i class="ph ph-check"></i> Copied!';
+                btn.classList.replace('bg-slate-800', 'bg-fuchsia-600');
+                btn.classList.replace('hover:bg-slate-700', 'hover:bg-fuchsia-500');
+                btn.classList.replace('border-slate-700', 'border-fuchsia-500');
+                btn.classList.replace('text-slate-300', 'text-white');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.classList.replace('bg-fuchsia-600', 'bg-slate-800');
+                    btn.classList.replace('hover:bg-fuchsia-500', 'hover:bg-slate-700');
+                    btn.classList.replace('border-fuchsia-500', 'border-slate-700');
+                    btn.classList.replace('text-white', 'text-slate-300');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
