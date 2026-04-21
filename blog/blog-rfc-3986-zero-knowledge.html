@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFC 3986: Why the URL Fragment (#) is the Key to Zero-Knowledge Web Apps</title>
+    <meta name="description" content="Learn how to exploit RFC 3986 URL fragments to build zero-knowledge, client-side encryption tools. The server never sees your encryption keys.">
+    <meta name="keywords" content="rfc 3986 fragment not sent to server, url fragment identifier exploitation, zero-knowledge architecture, client side encryption AES-GCM, secure secure link sharing">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "RFC 3986: Why the URL Fragment (#) is the Key to Zero-Knowledge Web Apps",
+      "author": { "@type": "Organization", "name": "ZeroKey" },
+      "keywords": "rfc 3986, url fragment, zero-knowledge, client-side encryption",
+      "publisher": { "@type": "Organization", "name": "ZeroKey", "url": "https://zerokey.vercel.app" }
+    }
+    </script>
+</head>
+<body class="bg-[#0f172a] text-slate-300 font-sans antialiased selection:bg-blue-500/30">
+
+    <main class="max-w-3xl mx-auto px-6 py-12">
+        
+        <div class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
+            <a href="/" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition">
+                <i class="ph ph-arrow-left text-xl"></i> Back to ZeroKey
+            </a>
+            <button id="copyMdBtn" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg transition text-sm font-medium border border-slate-700">
+                <i class="ph ph-copy text-lg"></i> Copy as Markdown
+            </button>
+        </div>
+
+        <article id="blogContent" class="prose prose-invert prose-blue max-w-none">
+            <div class="flex gap-2 mb-4">
+                <span class="bg-blue-500/10 text-blue-400 text-xs px-3 py-1 rounded-full border border-blue-500/20"><i class="ph ph-tag"></i> Cybersecurity</span>
+                <span class="bg-purple-500/10 text-purple-400 text-xs px-3 py-1 rounded-full border border-purple-500/20"><i class="ph ph-tag"></i> Cryptography</span>
+                <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/20"><i class="ph ph-tag"></i> RFC 3986</span>
+            </div>
+
+            <h1 class="text-4xl font-bold text-white mb-6 leading-tight">Understanding RFC 3986: The URL Fragment Identifier & Zero-Knowledge Architecture</h1>
+            
+            <p class="text-lg text-slate-400 mb-8">If you want to build a truly secure application where the server cannot read the user's data, you must understand how browsers handle the URL fragment identifier (`#`). This is the foundation of client-side, zero-knowledge encryption.</p>
+
+            <h2 class="text-2xl font-semibold text-white mt-10 mb-4 flex items-center gap-2">
+                <i class="ph ph-file-code text-blue-400"></i> The RFC 3986 Fragment Rule
+            </h2>
+            <p>According to the official internet standard <strong>RFC 3986 (Uniform Resource Identifier: Generic Syntax)</strong>, the fragment identifier component of a URI allows indirect identification of a secondary resource. But here is the critical security feature:</p>
+            <blockquote class="border-l-4 border-blue-500 pl-4 py-1 my-6 bg-slate-800/50 italic text-slate-300">
+                "The fragment identifier is separated from the rest of the URI prior to a dereference, and thus the identifying information within the fragment itself is dereferenced solely by the user agent."
+            </blockquote>
+            <p>In plain English: <strong>The URL fragment is never sent to the server in an HTTP request.</strong> If a user navigates to <code>https://example.com/payload#secretKey123</code>, the backend server (Nginx, Vercel, AWS) only ever sees a request for <code>/payload</code>. The <code>#secretKey123</code> stays entirely within the local browser.</p>
+
+            <h2 class="text-2xl font-semibold text-white mt-10 mb-4 flex items-center gap-2">
+                <i class="ph ph-shield-check text-emerald-400"></i> Exploiting the Fragment for Secure Link Sharing
+            </h2>
+            <p>Traditional password managers and secure note tools often encrypt data, but if the decryption key touches the server, a database breach exposes everything. By utilizing the RFC 3986 specification, we can create a flawless <strong>zero-knowledge architecture</strong>.</p>
+            
+            <ul class="list-disc pl-6 space-y-3 my-6">
+                <li><strong>Encryption:</strong> The user types a message. The browser generates a random AES-GCM 256-bit key and encrypts the message locally.</li>
+                <li><strong>Storage:</strong> Only the scrambled, encrypted blob is sent to the database.</li>
+                <li><strong>Transmission:</strong> The raw decryption key is appended to the URL as a fragment (e.g., <code>#key</code>).</li>
+                <li><strong>Decryption:</strong> When the recipient opens the link, the browser pulls the key from the URL fragment and decrypts the downloaded blob. The server never knows what the key was.</li>
+            </ul>
+
+            <h2 class="text-2xl font-semibold text-white mt-10 mb-4 flex items-center gap-2">
+                <i class="ph ph-warning-circle text-orange-400"></i> Preventing URL Fragment Identifier Exploitation
+            </h2>
+            <p>While the fragment is a powerful tool for zero-knowledge systems, it must be handled carefully. Malicious actors can attempt <em>fragment identifier exploitation</em> if your JavaScript improperly parses the hash and injects it directly into the DOM (leading to DOM-based XSS).</p>
+            <p>To secure your application, never use <code>innerHTML</code> when handling data extracted from <code>window.location.hash</code>. Always treat the fragment strictly as a cryptographic key and pass it directly to the <code>window.crypto.subtle</code> API for key derivation.</p>
+
+            <div class="mt-12 p-8 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl text-center shadow-xl">
+                <div class="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="ph ph-lock-key text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-3">Try Zero-Knowledge Encryption Yourself</h3>
+                <p class="text-slate-400 mb-6">See the RFC 3986 fragment rule in action. Encrypt text and files directly in your browser. Our servers cannot read your data.</p>
+                <a href="/" class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3 rounded-lg transition shadow-[0_0_15px_rgba(37,99,235,0.4)]">
+                    Launch ZeroKey Encryptor
+                </a>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        // Markdown Extraction Logic
+        document.getElementById('copyMdBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalHtml = btn.innerHTML;
+            
+            // Hardcoded pristine markdown version for the perfect LLM/Copy output
+            const markdownContent = `
+# Understanding RFC 3986: The URL Fragment Identifier & Zero-Knowledge Architecture
+
+Tags: #Cybersecurity #Cryptography #RFC3986
+
+If you want to build a truly secure application where the server cannot read the user's data, you must understand how browsers handle the URL fragment identifier (\`#\`). This is the foundation of client-side, zero-knowledge encryption.
+
+## The RFC 3986 Fragment Rule
+According to the official internet standard **RFC 3986 (Uniform Resource Identifier: Generic Syntax)**, the fragment identifier component of a URI allows indirect identification of a secondary resource. But here is the critical security feature:
+
+> "The fragment identifier is separated from the rest of the URI prior to a dereference, and thus the identifying information within the fragment itself is dereferenced solely by the user agent."
+
+In plain English: **The URL fragment is never sent to the server in an HTTP request.** If a user navigates to \`https://example.com/payload#secretKey123\`, the backend server (Nginx, Vercel, AWS) only ever sees a request for \`/payload\`. The \`#secretKey123\` stays entirely within the local browser.
+
+## Exploiting the Fragment for Secure Link Sharing
+Traditional password managers and secure note tools often encrypt data, but if the decryption key touches the server, a database breach exposes everything. By utilizing the RFC 3986 specification, we can create a flawless **zero-knowledge architecture**.
+
+* **Encryption:** The user types a message. The browser generates a random AES-GCM 256-bit key and encrypts the message locally.
+* **Storage:** Only the scrambled, encrypted blob is sent to the database.
+* **Transmission:** The raw decryption key is appended to the URL as a fragment (e.g., \`#key\`).
+* **Decryption:** When the recipient opens the link, the browser pulls the key from the URL fragment and decrypts the downloaded blob. The server never knows what the key was.
+
+## Preventing URL Fragment Identifier Exploitation
+While the fragment is a powerful tool for zero-knowledge systems, it must be handled carefully. Malicious actors can attempt *fragment identifier exploitation* if your JavaScript improperly parses the hash and injects it directly into the DOM (leading to DOM-based XSS).
+
+To secure your application, never use \`innerHTML\` when handling data extracted from \`window.location.hash\`. Always treat the fragment strictly as a cryptographic key and pass it directly to the \`window.crypto.subtle\` API.
+
+---
+**Try Zero-Knowledge Encryption Yourself:** Protect your sensitive data with [ZeroKey](https://zerokey.vercel.app).
+            `.trim();
+
+            navigator.clipboard.writeText(markdownContent).then(() => {
+                btn.innerHTML = '<i class="ph ph-check text-lg"></i> Copied Markdown!';
+                btn.classList.replace('bg-slate-800', 'bg-emerald-600');
+                btn.classList.replace('hover:bg-slate-700', 'hover:bg-emerald-500');
+                btn.classList.replace('border-slate-700', 'border-emerald-500');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.classList.replace('bg-emerald-600', 'bg-slate-800');
+                    btn.classList.replace('hover:bg-emerald-500', 'hover:bg-slate-700');
+                    btn.classList.replace('border-emerald-500', 'border-slate-700');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
