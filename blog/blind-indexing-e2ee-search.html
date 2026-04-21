@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>The E2EE Search Paradox: Blind Indexing & Client-Side Encryption</title>
+    <meta name="description" content="Learn how to search client-side encrypted data without exposing it to the server using Blind Indexing and HMAC-SHA256 hashes.">
+    <meta name="keywords" content="end to end encryption search, blind indexing, searchable symmetric encryption, Web Crypto API HMAC, zero knowledge search, E2EE database queries">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://zerokey.vercel.app/blog/blind-indexing-e2ee-search">
+    <meta property="og:title" content="The E2EE Search Paradox: How to Query Encrypted Data">
+    <meta property="og:description" content="Stop downloading your entire database to search. Learn how to implement Blind Indexing for End-to-End Encrypted applications.">
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "The E2EE Search Paradox: Blind Indexing & Client-Side Encryption",
+      "author": { "@type": "Person", "name": "Dippan Bhusal" },
+      "keywords": "blind indexing, searchable encryption, E2EE, Web Crypto API, zero-knowledge",
+      "publisher": { "@type": "Organization", "name": "ZeroKey", "url": "https://zerokey.vercel.app" }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom VS Code Dark Theme Overrides for Code Blocks */
+        pre[class*="language-"] {
+            background: #020617 !important; /* Tailwind slate-950 */
+            border: 1px solid #1e293b !important; /* Tailwind slate-800 */
+            border-radius: 0.75rem !important;
+            padding: 1.5rem !important;
+            margin: 2em 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        code[class*="language-"], pre[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+        }
+        .token.comment, .token.prolog { color: #64748b !important; font-style: italic; }
+        .token.punctuation { color: #94a3b8 !important; }
+        .token.namespace { opacity: .7 !important; }
+        .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #f472b6 !important; }
+        .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #a7f3d0 !important; }
+        .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #e2e8f0 !important; }
+        .token.atrule, .token.attr-value, .token.keyword { color: #818cf8 !important; }
+        .token.function, .token.class-name { color: #60a5fa !important; }
+        .token.regex, .token.important, .token.variable { color: #fbbf24 !important; }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-indigo-500/30">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors text-slate-100">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <article class="max-w-3xl mx-auto">
+            
+            <header class="mb-12 border-b border-slate-800 pb-10 text-center">
+                <div class="flex items-center justify-center gap-2 text-indigo-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-magnifying-glass"></i> Cryptography Architecture
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    The E2EE Search Paradox: Implementing Blind Indexing
+                </h1>
+                
+                <div class="flex items-center justify-center gap-4 text-sm text-slate-500 font-medium flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-calendar-blank"></i> May 02, 2026
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-github-logo"></i> <a href="https://github.com/kdippan" target="_blank" class="hover:text-blue-400 transition-colors">Dippan Bhusal</a>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-slate-300">
+                        <i class="ph ph-timer"></i> 8 Min Read
+                    </div>
+                    <button id="copyMdBtn" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-full transition-colors border border-slate-700">
+                        <i class="ph ph-copy"></i> Copy Markdown
+                    </button>
+                </div>
+            </header>
+
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-indigo-300 prose-li:text-slate-300 text-slate-300 text-lg leading-relaxed space-y-8">
+                
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    You have successfully built an End-to-End Encrypted (E2EE) application. Your user's data is scrambled on their device using AES-GCM before it ever touches your server. You have achieved Zero-Knowledge. 
+                </p>
+                <p class="text-xl text-slate-200 leading-relaxed font-medium">
+                    And then, the inevitable feature request arrives: <strong class="text-white">"I need a search bar."</strong>
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">The E2EE Paradox</h2>
+                <p>
+                    How do you run a SQL <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-indigo-300">SELECT * WHERE text LIKE '%query%'</code> when the server only sees random, cryptographically secure blobs of text? You can't.
+                </p>
+                <p>
+                    Historically, developers fell back to two terrible solutions:
+                </p>
+                <ul class="space-y-3 pl-2 marker:text-indigo-500">
+                    <li><strong>The Performance Killer:</strong> Download the <em>entire</em> encrypted database to the client, decrypt it all in memory, and search it locally. This ruins bandwidth and crashes mobile browsers.</li>
+                    <li><strong>The Security Compromise:</strong> Send the search query to the server, decrypt the data temporarily in RAM to search it, and send the results back. This completely violates the Zero-Knowledge promise.</li>
+                </ul>
+
+                <h2 class="text-2xl font-bold pt-8">The Solution: Blind Indexing</h2>
+                <p>
+                    <strong>Blind Indexing</strong> (or Searchable Symmetric Encryption) allows the server to look up records without knowing what those records contain. 
+                </p>
+                <p>
+                    Instead of just encrypting the payload, the client extracts keywords, creates cryptographic hashes (HMACs) of those keywords using a separate, secret <code>Index_Key</code>, and sends those hashes to the server alongside the encrypted payload.
+                </p>
+
+                <h2 class="text-2xl font-bold pt-8">Implementation in JavaScript (Web Crypto API)</h2>
+                <p>
+                    To do this securely, we cannot use a simple SHA-256 hash. If we did, the server could easily run a rainbow table attack to reverse-engineer common words. We must use an <strong>HMAC</strong> (Hash-based Message Authentication Code) that requires a key the server does not have.
+                </p>
+
+<pre><code class="language-javascript">// Step 1: Derive a secondary key just for indexing. 
+// Do NOT use your AES encryption key for this!
+async function deriveIndexKey(masterPassword) {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+        "raw", 
+        enc.encode(masterPassword), 
+        { name: "PBKDF2" }, 
+        false, 
+        ["deriveKey"]
+    );
+    
+    // We derive an HMAC key, not an AES key
+    return await window.crypto.subtle.deriveKey(
+        { 
+            name: "PBKDF2", 
+            salt: enc.encode("static_blind_index_salt"), 
+            iterations: 100000, 
+            hash: "SHA-256" 
+        },
+        keyMaterial, 
+        { name: "HMAC", hash: "SHA-256", length: 256 }, 
+        false, 
+        ["sign"]
+    );
+}
+
+// Step 2: Generate the Blind Index token for a keyword
+async function generateBlindIndex(keyword, hmacKey) {
+    // Normalize data: lowercase, strip whitespace, remove punctuation
+    const normalizedWord = keyword.toLowerCase().trim().replace(/[^\w\s]/gi, '');
+    
+    const signatureBuffer = await window.crypto.subtle.sign(
+        "HMAC",
+        hmacKey,
+        new TextEncoder().encode(normalizedWord)
+    );
+    
+    // Convert the buffer to a hex string for database storage
+    const hashArray = Array.from(new Uint8Array(signatureBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">How the Database Schema Looks</h2>
+                <p>
+                    Your server database now stores two things: the encrypted payload (AES-256), and an array of Blind Index hashes.
+                </p>
+
+<pre><code class="language-sql">-- Supabase / PostgreSQL Schema
+CREATE TABLE encrypted_notes (
+    id UUID PRIMARY KEY,
+    aes_encrypted_blob TEXT NOT NULL,
+    -- Store the blind indices in a JSONB array or secondary table
+    blind_indices JSONB NOT NULL 
+);
+
+-- Creating a GIN index on JSONB makes querying hashes lightning fast
+CREATE INDEX idx_blind_indices ON encrypted_notes USING GIN (blind_indices);
+</code></pre>
+
+                <h2 class="text-2xl font-bold pt-8">Executing the Search</h2>
+                <p>
+                    When the user types "finance" into the search bar, the client-side JavaScript normalizes the word and hashes it using the secret <code>hmacKey</code>. 
+                </p>
+                <p>
+                    The browser then sends a request to the server: <br>
+                    <code class="bg-slate-800 px-2 py-1 rounded font-mono text-sm text-slate-300">GET /api/search?q=a8f5f167f44f4964e6c998dee827110c</code>
+                </p>
+                <p>
+                    The server simply looks for that exact hex string in the <code>blind_indices</code> column and returns the matching encrypted blobs. The server never knew the user searched for "finance". It only knows they searched for a specific hash.
+                </p>
+
+                <div class="glass-panel p-8 rounded-2xl border-2 border-indigo-600/50 bg-indigo-950/20 my-12 relative overflow-hidden group hover:border-indigo-500/80 transition-all shadow-xl">
+                    <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-shield-check text-[160px] text-indigo-500"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold text-white mb-3">Secure Your Payloads with ZeroKey</h3>
+                        <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                            Building E2EE architecture is incredibly complex. If you just need to share sensitive data securely without the headache, use our zero-knowledge encryptor.
+                        </p>
+                        <div class="flex gap-4 flex-wrap">
+                            <a href="/encrypt" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-lock-key"></i> Launch ZeroKey
+                            </a>
+                            <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                                <i class="ph ph-github-logo"></i> View Source Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer class="mt-16 border-t border-slate-800 pt-10">
+                <div class="flex items-center justify-between gap-6 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-slate-800 rounded-full border border-slate-700 text-indigo-400 text-2xl">
+                            <i class="ph-fill ph-terminal-window"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">About the Author</p>
+                            <p class="text-sm text-slate-400">Dippan Bhusal is a developer focused on secure full-stack architecture and zero-knowledge systems.</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/kdippan" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
+                        <i class="ph ph-github-logo text-lg"></i> View GitHub
+                    </a>
+                </div>
+            </footer>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-indigo-400 hover:text-indigo-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        document.getElementById('copyMdBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalHtml = btn.innerHTML;
+            
+            const markdownContent = `
+# The E2EE Search Paradox: Implementing Blind Indexing
+
+By: Dippan Bhusal | Tags: #Cybersecurity #Cryptography #E2EE #JavaScript
+
+You have successfully built an End-to-End Encrypted (E2EE) application. Your user's data is scrambled on their device using AES-GCM before it ever touches your server. You have achieved Zero-Knowledge. 
+
+And then, the inevitable feature request arrives: **"I need a search bar."**
+
+## The E2EE Paradox
+How do you run a SQL \`SELECT * WHERE text LIKE '%query%'\` when the server only sees random, cryptographically secure blobs of text? You can't.
+
+Historically, developers fell back to two terrible solutions:
+1. **The Performance Killer:** Download the *entire* encrypted database to the client, decrypt it all in memory, and search it locally. This ruins bandwidth and crashes mobile browsers.
+2. **The Security Compromise:** Send the search query to the server, decrypt the data temporarily in RAM to search it, and send the results back. This completely violates the Zero-Knowledge promise.
+
+## The Solution: Blind Indexing
+**Blind Indexing** (or Searchable Symmetric Encryption) allows the server to look up records without knowing what those records contain. 
+
+Instead of just encrypting the payload, the client extracts keywords, creates cryptographic hashes (HMACs) of those keywords using a separate, secret \`Index_Key\`, and sends those hashes to the server alongside the encrypted payload.
+
+## Implementation in JavaScript (Web Crypto API)
+To do this securely, we cannot use a simple SHA-256 hash. If we did, the server could easily run a rainbow table attack to reverse-engineer common words. We must use an **HMAC** (Hash-based Message Authentication Code) that requires a key the server does not have.
+
+\`\`\`javascript
+// Step 1: Derive a secondary key just for indexing. 
+// Do NOT use your AES encryption key for this!
+async function deriveIndexKey(masterPassword) {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+        "raw", 
+        enc.encode(masterPassword), 
+        { name: "PBKDF2" }, 
+        false, 
+        ["deriveKey"]
+    );
+    
+    // We derive an HMAC key, not an AES key
+    return await window.crypto.subtle.deriveKey(
+        { 
+            name: "PBKDF2", 
+            salt: enc.encode("static_blind_index_salt"), 
+            iterations: 100000, 
+            hash: "SHA-256" 
+        },
+        keyMaterial, 
+        { name: "HMAC", hash: "SHA-256", length: 256 }, 
+        false, 
+        ["sign"]
+    );
+}
+
+// Step 2: Generate the Blind Index token for a keyword
+async function generateBlindIndex(keyword, hmacKey) {
+    // Normalize data: lowercase, strip whitespace, remove punctuation
+    const normalizedWord = keyword.toLowerCase().trim().replace(/[^\\w\\s]/gi, '');
+    
+    const signatureBuffer = await window.crypto.subtle.sign(
+        "HMAC",
+        hmacKey,
+        new TextEncoder().encode(normalizedWord)
+    );
+    
+    // Convert the buffer to a hex string for database storage
+    const hashArray = Array.from(new Uint8Array(signatureBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+\`\`\`
+
+## Executing the Search
+When the user types "finance" into the search bar, the client-side JavaScript normalizes the word and hashes it using the secret \`hmacKey\`. The browser then sends a request to the server: 
+\`GET /api/search?q=a8f5f167f44f4964e6c998dee827110c\`
+
+The server simply looks for that exact hex string in the database and returns the matching encrypted blobs. The server never knew the user searched for "finance". It only knows they searched for a specific hash.
+
+---
+**Secure Your Payloads:** Building E2EE architecture is incredibly complex. If you just need to share sensitive data securely, use [ZeroKey](https://zerokey.vercel.app).
+            `.trim();
+
+            navigator.clipboard.writeText(markdownContent).then(() => {
+                btn.innerHTML = '<i class="ph ph-check"></i> Copied!';
+                btn.classList.replace('bg-slate-800', 'bg-teal-600');
+                btn.classList.replace('hover:bg-slate-700', 'hover:bg-teal-500');
+                btn.classList.replace('border-slate-700', 'border-teal-500');
+                btn.classList.replace('text-slate-300', 'text-white');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.classList.replace('bg-teal-600', 'bg-slate-800');
+                    btn.classList.replace('hover:bg-teal-500', 'hover:bg-slate-700');
+                    btn.classList.replace('border-teal-500', 'border-slate-700');
+                    btn.classList.replace('text-white', 'text-slate-300');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
