@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    
     <url>
         <loc>https://zerokey.vercel.app/</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-04-23</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
         <loc>https://zerokey.vercel.app/encrypt</loc>
-        <lastmod>2026-03-10</lastmod>
+        <lastmod>2026-04-23</lastmod>
         <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/tools</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/blog</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
@@ -30,6 +43,7 @@
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
+    
     <url>
         <loc>https://zerokey.vercel.app/privacy</loc>
         <lastmod>2026-03-10</lastmod>
@@ -56,10 +70,89 @@
     </url>
 
     <url>
-        <loc>https://zerokey.vercel.app/blog</loc>
-        <lastmod>2026-04-21</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>0.9</priority>
+        <loc>https://zerokey.vercel.app/aes-encryption-tool</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/jwt-decoder</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/rsa-key-generator</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/pbkdf2-calculator</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/hmac-generator</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/sha-hash-generator</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/base64-converter</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/web-crypto-checker</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.85</priority>
+    </url>
+
+    <url>
+        <loc>https://zerokey.vercel.app/blog/blind-indexing-e2ee-search</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/blog/how-to-securely-clear-memory-javascript</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/blog/blog-rfc-3986-zero-knowledge</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/blog/streaming-e2ee-large-files</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/blog/multi-device-e2ee-ecdh</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://zerokey.vercel.app/blog/non-extractable-keys-xss</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
     </url>
 
     <url>
@@ -167,43 +260,6 @@
     <url>
         <loc>https://zerokey.vercel.app/blog/how-to-share-api-keys-securely</loc>
         <lastmod>2026-03-14</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <url>
-        <loc>https://zerokey.vercel.app/blog/how-to-securely-clear-memory-javascript</loc>
-        <lastmod>2026-04-21</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://zerokey.vercel.app/blog/blind-indexing-e2ee-search</loc>
-        <lastmod>2026-04-21</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://zerokey.vercel.app/blog/blog-rfc-3986-zero-knowledge</loc>
-        <lastmod>2026-04-21</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://zerokey.vercel.app/blog/streaming-e2ee-large-files</loc>
-        <lastmod>2026-04-21</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://zerokey.vercel.app/blog/multi-device-e2ee-ecdh</loc>
-        <lastmod>2026-04-21</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://zerokey.vercel.app/blog/non-extractable-keys-xss</loc>
-        <lastmod>2026-04-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
