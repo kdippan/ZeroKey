@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Free Cryptography & Security Tools for Developers | ZeroKey</title>
+    <meta name="description" content="A suite of free, client-side cryptography tools for developers. Test AES-GCM encryption, decode JWTs locally, calculate PBKDF2 hashes, and generate RSA keys securely in your browser.">
+    <meta name="keywords" content="cryptography tools, developer security utilities, Web Crypto API tools, AES-GCM online encryptor, local JWT decoder, PBKDF2 calculator, secure hash generator, Base64 converter">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <link rel="canonical" href="https://zerokey.vercel.app/tools">
+
+    <meta property="og:title" content="Free Cryptography & Security Tools | ZeroKey">
+    <meta property="og:description" content="100% client-side security tools. Decode JWTs, generate RSA keys, and encrypt data locally without exposing secrets to a server.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zerokey.vercel.app/tools">
+
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/tools/style.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "ZeroKey Cryptography Developer Tools",
+      "description": "A collection of free, client-side cryptographic utilities for developers.",
+      "url": "https://zerokey.vercel.app/tools",
+      "itemListElement": [
+        { "@type": "SiteNavigationElement", "position": 1, "name": "PBKDF2 Calculator", "url": "https://zerokey.vercel.app/pbkdf2-calculator" },
+        { "@type": "SiteNavigationElement", "position": 2, "name": "Web Crypto Checker", "url": "https://zerokey.vercel.app/web-crypto-checker" },
+        { "@type": "SiteNavigationElement", "position": 3, "name": "Base64 Converter", "url": "https://zerokey.vercel.app/base64-converter" },
+        { "@type": "SiteNavigationElement", "position": 4, "name": "SHA Hash Generator", "url": "https://zerokey.vercel.app/sha-hash-generator" },
+        { "@type": "SiteNavigationElement", "position": 5, "name": "JWT Decoder", "url": "https://zerokey.vercel.app/jwt-decoder" },
+        { "@type": "SiteNavigationElement", "position": 6, "name": "RSA Key Generator", "url": "https://zerokey.vercel.app/rsa-key-generator" },
+        { "@type": "SiteNavigationElement", "position": 7, "name": "AES-GCM Encryptor", "url": "https://zerokey.vercel.app/aes-encryption-tool" },
+        { "@type": "SiteNavigationElement", "position": 8, "name": "HMAC Generator", "url": "https://zerokey.vercel.app/hmac-generator" }
+      ]
+    }
+    </script>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
+    
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    
+    <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight" onclick="gtag('event', 'click', { 'event_category': 'Navigation', 'event_label': 'Logo Home' });">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Navigation', 'event_label': 'Home' });">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Navigation', 'event_label': 'Blog' });">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Navigation', 'event_label': 'Status' });">Status</a>
+                <a href="/about" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Navigation', 'event_label': 'About' });">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Launch Vault' });">
+                <i class="ph ph-shield-check"></i> Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            
+            <header class="text-center mb-16 max-w-3xl mx-auto">
+                <div class="inline-flex items-center gap-2 bg-slate-800/50 border border-slate-700 text-slate-300 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+                    <i class="ph-fill ph-code text-blue-400"></i> 100% Client-Side Processing
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    Developer Security Tools
+                </h1>
+                <p class="text-slate-400 text-lg leading-relaxed mb-10">
+                    A suite of zero-knowledge cryptographic utilities built for developers. Generate keys, decode tokens, and test encryption logic entirely within your browser—no data ever leaves your device.
+                </p>
+                
+                <div class="relative max-w-2xl mx-auto group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="ph ph-magnifying-glass text-slate-500 text-xl group-focus-within:text-blue-500 transition-colors"></i>
+                    </div>
+                    <input type="text" id="toolSearch" class="w-full bg-[#020617] border border-slate-700 rounded-2xl py-4 pl-12 pr-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all shadow-inner text-lg placeholder-slate-600" placeholder="Search for tools (e.g., 'JWT', 'Base64', 'RSA')...">
+                </div>
+            </header>
+            
+            <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-24">
+                
+                <a href="/jwt-decoder" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all flex flex-col h-full" data-name="Secure JWT Decoder JSON Web Token Parser" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'JWT Decoder' });">
+                    <div class="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                        <i class="ph ph-brackets-curly text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">Secure JWT Decoder</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Inspect and decode JSON Web Tokens locally without exposing session data to third-party servers.</p>
+                </a>
+
+                <a href="/aes-encryption-tool" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-blue-500/50 hover:bg-blue-950/20 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all flex flex-col h-full" data-name="AES-256-GCM Encryptor Decryptor text encryption" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'AES Encryptor' });">
+                    <div class="bg-blue-500/10 text-blue-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <i class="ph ph-lock-key text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">AES-256-GCM Encryptor</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Encrypt and decrypt sensitive text messages using military-grade AES-GCM cryptography.</p>
+                </a>
+
+                <a href="/rsa-key-generator" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-purple-500/50 hover:bg-purple-950/20 hover:shadow-[0_0_30px_rgba(168,85,247,0.1)] transition-all flex flex-col h-full" data-name="RSA Key Pair Generator Public Private PEM" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'RSA Generator' });">
+                    <div class="bg-purple-500/10 text-purple-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                        <i class="ph ph-key text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">RSA Key Generator</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Generate 2048-bit and 4096-bit RSA public/private key pairs in PEM format instantly in your browser.</p>
+                </a>
+
+                <a href="/pbkdf2-calculator" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all flex flex-col h-full" data-name="PBKDF2 Password Calculator Stretching Hash" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'PBKDF2 Calculator' });">
+                    <div class="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                        <i class="ph ph-password text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">PBKDF2 Calculator</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Generate derived keys using Password-Based Key Derivation Function 2 (PBKDF2) to test password stretching.</p>
+                </a>
+
+                <a href="/hmac-generator" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-blue-500/50 hover:bg-blue-950/20 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all flex flex-col h-full" data-name="HMAC Signature Generator Webhook SHA256 API" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'HMAC Generator' });">
+                    <div class="bg-blue-500/10 text-blue-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <i class="ph ph-stamp text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">HMAC Generator</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Calculate Hash-based Message Authentication Codes to securely verify webhooks and API payloads.</p>
+                </a>
+
+                <a href="/sha-hash-generator" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-purple-500/50 hover:bg-purple-950/20 hover:shadow-[0_0_30px_rgba(168,85,247,0.1)] transition-all flex flex-col h-full" data-name="SHA Hash Generator SHA256 SHA512 Digest Checksum" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'SHA Generator' });">
+                    <div class="bg-purple-500/10 text-purple-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                        <i class="ph ph-hash text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">SHA Hash Generator</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Compute secure cryptographic hashes including SHA-256 and SHA-512 instantly on your device.</p>
+                </a>
+
+                <a href="/base64-converter" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all flex flex-col h-full" data-name="Base64 to ArrayBuffer Converter Uint8Array Hex" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'Base64 Converter' });">
+                    <div class="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                        <i class="ph ph-arrows-left-right text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">Base64 Converter</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Translate Base64 strings to raw ArrayBuffer and Hex formats for Web Crypto API compatibility.</p>
+                </a>
+
+                <a href="/web-crypto-checker" class="tool-card group block p-6 bg-slate-900/60 border border-slate-800 rounded-2xl hover:border-blue-500/50 hover:bg-blue-950/20 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all flex flex-col h-full" data-name="Web Crypto API Checker Browser Support SubtleCrypto" onclick="gtag('event', 'click', { 'event_category': 'Tool Directory', 'event_label': 'Web Crypto Checker' });">
+                    <div class="bg-blue-500/10 text-blue-400 p-3 rounded-xl w-fit mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <i class="ph ph-shield-check text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Web Crypto API Checker</h3>
+                    <p class="text-sm text-slate-400 flex-grow">Run diagnostics to verify if your browser supports native, zero-knowledge cryptographic primitives.</p>
+                </a>
+
+            </div>
+
+            <div id="noResults" class="hidden text-center py-12">
+                <i class="ph ph-magnifying-glass text-4xl text-slate-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-white mb-2">No tools found</h3>
+                <p class="text-slate-400">Try adjusting your search terms.</p>
+            </div>
+
+            <section class="mt-20 border-t border-slate-800 pt-20">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">The Architecture of Zero-Knowledge</h2>
+                    <p class="text-slate-400 max-w-2xl mx-auto text-lg">
+                        These individual tools represent the core cryptographic primitives that power the <strong class="text-emerald-400">ZeroKey Vault</strong>. Here is how they combine to create a trustless, burn-after-reading delivery system.
+                    </p>
+                </div>
+
+                <div class="relative bg-[#020617] border border-slate-800 rounded-2xl p-8 md:p-12 shadow-2xl overflow-hidden">
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
+                        
+                        <div class="flex-1 text-center group">
+                            <div class="w-20 h-20 mx-auto bg-slate-900 border-2 border-slate-700 rounded-full flex items-center justify-center text-3xl text-slate-400 group-hover:border-emerald-500 group-hover:text-emerald-400 group-hover:scale-110 transition-all shadow-lg mb-4">
+                                <i class="ph ph-keyboard"></i>
+                            </div>
+                            <h4 class="text-white font-bold mb-1">1. Local Input</h4>
+                            <p class="text-xs text-slate-500">User types secret plaintext.</p>
+                        </div>
+
+                        <i class="ph ph-arrow-right text-3xl text-slate-700 hidden lg:block"></i>
+                        <i class="ph ph-arrow-down text-3xl text-slate-700 block lg:hidden my-2"></i>
+
+                        <div class="flex-1 text-center group">
+                            <div class="w-20 h-20 mx-auto bg-slate-900 border-2 border-slate-700 rounded-full flex items-center justify-center text-3xl text-slate-400 group-hover:border-blue-500 group-hover:text-blue-400 group-hover:scale-110 transition-all shadow-lg mb-4">
+                                <i class="ph ph-cpu"></i>
+                            </div>
+                            <h4 class="text-white font-bold mb-1">2. Web Crypto API</h4>
+                            <p class="text-xs text-slate-500">AES-GCM encryption & PBKDF2 stretching.</p>
+                        </div>
+
+                        <i class="ph ph-arrow-right text-3xl text-slate-700 hidden lg:block"></i>
+                        <i class="ph ph-arrow-down text-3xl text-slate-700 block lg:hidden my-2"></i>
+
+                        <div class="flex-1 text-center group">
+                            <div class="w-20 h-20 mx-auto bg-slate-900 border-2 border-slate-700 rounded-full flex items-center justify-center text-3xl text-slate-400 group-hover:border-purple-500 group-hover:text-purple-400 group-hover:scale-110 transition-all shadow-lg mb-4">
+                                <i class="ph ph-link"></i>
+                            </div>
+                            <h4 class="text-white font-bold mb-1">3. Base64 Transit</h4>
+                            <p class="text-xs text-slate-500">Key hidden in URL Fragment (#).</p>
+                        </div>
+
+                        <i class="ph ph-arrow-right text-3xl text-slate-700 hidden lg:block"></i>
+                        <i class="ph ph-arrow-down text-3xl text-slate-700 block lg:hidden my-2"></i>
+
+                        <div class="flex-1 text-center group">
+                            <div class="w-20 h-20 mx-auto bg-slate-900 border-2 border-slate-700 rounded-full flex items-center justify-center text-3xl text-slate-400 group-hover:border-red-500 group-hover:text-red-400 group-hover:scale-110 transition-all shadow-lg mb-4">
+                                <i class="ph ph-fire"></i>
+                            </div>
+                            <h4 class="text-white font-bold mb-1">4. Supabase Wipe</h4>
+                            <p class="text-xs text-slate-500">Irreversible hard DELETE on read.</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="text-center mt-12">
+                    <a href="/encrypt" class="inline-flex items-center gap-3 bg-white text-slate-900 font-bold px-8 py-4 rounded-full hover:bg-slate-200 hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Bottom Launch Vault' });">
+                        See the Vault in Action <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div id="cookieConsent" class="fixed bottom-0 left-0 w-full z-50 transform translate-y-full transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border-t border-slate-800 p-4 md:p-6 shadow-2xl">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="text-slate-300 text-sm">
+                    <strong class="text-white">Privacy First.</strong> We use minimal cookies and Google Analytics exclusively to improve our free developer tools. We never track PII or sensitive cryptographic data.
+                </div>
+                <div class="flex gap-3 shrink-0">
+                    <a href="/privacy" class="text-slate-400 hover:text-white text-sm py-2 px-4 transition-colors">Privacy Policy</a>
+                    <button id="acceptCookiesBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors text-sm" onclick="gtag('event', 'click', { 'event_category': 'Cookies', 'event_label': 'Accepted' });">
+                        Got it, thanks!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300" onclick="gtag('event', 'click', { 'event_category': 'Outbound', 'event_label': 'GitHub Author' });">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="/tools/main.js"></script>
+</body>
+</html>
