@@ -10,28 +10,32 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure JWT Decoder | Offline JSON Web Token Parser | ZeroKey Tools</title>
-    <meta name="description" content="Free, secure online JWT decoder. Parse and inspect JSON Web Tokens locally in your browser. Tokens never leave your device. Zero-knowledge JWT debugger.">
-    <meta name="keywords" content="JWT decoder online, JSON Web Token parser, decode JWT locally, secure JWT viewer, JWT debugger, inspect JWT payload, client-side JWT decode">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>Secure JWT Decoder | Offline JSON Web Token Parser | ZeroKey</title>
+    <meta name="description" content="Free, 100% offline JWT decoder. Parse and inspect JSON Web Tokens locally in your browser. Tokens never leave your device. Zero-knowledge JWT debugger.">
+    <meta name="keywords" content="JWT decoder online, JSON Web Token parser, decode JWT locally, secure JWT viewer, JWT debugger, inspect JWT payload, client-side JWT decode, offline JWT tool">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <link rel="canonical" href="https://zerokey.vercel.app/jwt-decoder">
     
     <meta property="og:title" content="Secure JWT Decoder | ZeroKey Tools">
     <meta property="og:description" content="Safely decode JSON Web Tokens entirely in your browser without sending sensitive session data to a server.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zerokey.vercel.app/jwt-decoder/index.html">
+    <meta property="og:url" content="https://zerokey.vercel.app/jwt-decoder">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/tools.png">
 
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -49,51 +53,76 @@
     <link rel="stylesheet" href="/jwt-decoder/style.css">
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Secure JWT Decoder",
-      "url": "https://zerokey.vercel.app/jwt-decoder/index.html",
-      "description": "A privacy-first developer utility to decode, format, and inspect JSON Web Tokens (JWT) locally within the browser.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Secure JWT Decoder",
+        "url": "https://zerokey.vercel.app/jwt-decoder",
+        "description": "A privacy-first developer utility to decode, format, and inspect JSON Web Tokens (JWT) locally within the browser.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dippan Bhusal"
+        }
       },
-      "author": {
-        "@type": "Person",
-        "name": "Dippan Bhusal"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is pasting my JWT online dangerous?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Standard online decoders send your token to their servers. If you paste a production authentication token, you are exposing a live session key. Our decoder runs 100% offline in your browser memory to prevent this."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can a JWT be decrypted?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard JSON Web Tokens are just Base64 encoded, not encrypted. Anyone who has the token can decode and read the payload. They are signed for authenticity, but the data itself is public."
+            }
+          }
+        ]
       }
-    }
+    ]
     </script>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
     
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="/" class="hover:text-white transition-colors">Home</a>
-                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Home' });">Home</a>
+                <a href="/tools" class="hover:text-white transition-colors text-slate-100">Tools</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Blog' });">Blog</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
-                <i class="ph ph-shield-check"></i> Launch Vault
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-0.5" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Vault' });">
+                Launch Vault
             </a>
         </div>
     </nav>
 
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
-            <header class="mb-12 text-center">
+            
+            <header class="mb-12 text-center reveal">
                 <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
-                    <i class="ph ph-code"></i> Developer Utilities
+                    <i class="ph-fill ph-brackets-curly"></i> Developer Utilities
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     Secure JWT Decoder
@@ -102,11 +131,29 @@
                     Paste your JSON Web Token below to inspect its claims. Decoding happens entirely in your browser—your tokens are never sent to a server.
                 </p>
             </header>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-emerald-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all"><i class="ph-fill ph-shield-check"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">100% Offline Parsing</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Pasting production authentication tokens into web tools is risky. Our tool parses the Base64 payload strictly in local memory.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-blue-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all"><i class="ph-fill ph-code"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">JSON Formatting</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Automatically decodes and pretty-prints the Header and Payload claims so you can easily debug user roles and expirations.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-purple-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all"><i class="ph-fill ph-eye-slash"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">No Logging</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">We respect your privacy. There are no backend databases or hidden API calls capturing the tokens you paste here.</p>
+                </div>
+            </section>
             
-            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                <div class="flex flex-col h-full bg-slate-900/60 border border-slate-800 p-6 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden">
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 reveal">
+                <div class="flex flex-col h-full bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden hover:border-slate-700 transition-colors duration-500">
                     <div class="flex justify-between items-center mb-4">
-                        <label class="block text-sm font-bold text-white uppercase tracking-wider">Encoded Token</label>
+                        <label class="block text-sm font-bold text-white uppercase tracking-wider"><i class="ph-fill ph-key text-emerald-400 mr-1"></i> Encoded Token</label>
                         <button id="clearTokenBtn" class="text-xs text-slate-500 hover:text-red-400 transition-colors"><i class="ph ph-trash"></i> Clear</button>
                     </div>
                     <textarea id="jwtInput" class="flex-grow w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner break-all h-64 lg:h-auto" placeholder="Paste a JWT here (ey...)."></textarea>
@@ -115,13 +162,13 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col h-full bg-slate-900/60 border border-slate-800 p-6 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden space-y-6">
+                <div class="flex flex-col h-full bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden space-y-6 hover:border-slate-700 transition-colors duration-500">
                     <div class="flex-grow flex flex-col">
                         <div class="flex items-center gap-2 mb-3">
                             <label class="block text-sm font-bold text-red-400 uppercase tracking-wider">Header</label>
                             <span class="text-xs text-slate-500 font-mono">Algorithm & Token Type</span>
                         </div>
-                        <pre id="jwtHeader" class="bg-[#020617] border border-slate-800 rounded-xl p-4 text-red-300 font-mono text-sm overflow-x-auto shadow-inner h-32"></pre>
+                        <pre id="jwtHeader" class="bg-[#020617] border border-slate-800 rounded-xl p-4 text-red-300 font-mono text-sm overflow-x-auto shadow-inner h-32 m-0"></pre>
                     </div>
 
                     <div class="flex-grow flex flex-col">
@@ -129,52 +176,131 @@
                             <label class="block text-sm font-bold text-purple-400 uppercase tracking-wider">Payload</label>
                             <span class="text-xs text-slate-500 font-mono">Data & Claims</span>
                         </div>
-                        <pre id="jwtPayload" class="flex-grow bg-[#020617] border border-slate-800 rounded-xl p-4 text-purple-300 font-mono text-sm overflow-x-auto shadow-inner min-h-[200px]"></pre>
+                        <pre id="jwtPayload" class="flex-grow bg-[#020617] border border-slate-800 rounded-xl p-4 text-purple-300 font-mono text-sm overflow-x-auto shadow-inner min-h-[200px] m-0"></pre>
                     </div>
                 </div>
             </section>
             
-            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
+            <section class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-3xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-16 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl reveal">
                 <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+                    <i class="ph-fill ph-lock-key-open text-[160px] text-emerald-500"></i>
                 </div>
                 <div class="relative z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">Tokens are easily decoded. Secrets shouldn't be.</h3>
-                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
-                        A JSON Web Token is simply Base64 encoded, meaning anyone who intercepts it can read your payload. If you need to securely deliver sensitive configuration files or API keys, use <strong class="text-emerald-400">ZeroKey</strong>. We encrypt data locally and destroy the database record upon opening.
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Tokens are easily decoded. Secrets shouldn't be.</h3>
+                    <p class="text-slate-300 mb-8 leading-relaxed max-w-xl mx-auto text-lg">
+                        As you can see, a JSON Web Token is simply Base64 encoded. <strong class="text-white border-b border-red-500">Anyone who intercepts it can read your payload.</strong> Do not put passwords or PII in a JWT.
                     </p>
-                    <div class="flex gap-4 flex-wrap justify-center">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Encrypt a Secret Payload
-                        </a>
-                    </div>
+                    <p class="text-slate-400 mb-8 text-sm max-w-lg mx-auto">
+                        If you need to securely deliver sensitive configuration files or API keys, use <strong class="text-emerald-400">ZeroKey</strong>. We use true AES-GCM encryption to lock data locally, and permanently destroy the database record upon opening.
+                    </p>
+                    <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] inline-flex items-center gap-2 text-lg hover:scale-105" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'JWT Psycho CTA' });">
+                        <i class="ph-bold ph-shield-check"></i> Encrypt a Secret Payload
+                    </a>
                 </div>
             </section>
             
-            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold">What is a JSON Web Token (JWT)?</h2>
-                <p>A JSON Web Token (JWT) is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. This information can be verified and trusted because it is digitally signed using a secret (with the HMAC algorithm) or a public/private key pair using RSA or ECDSA.</p>
-                
-                <h2 class="text-2xl font-bold pt-4">Why is pasting JWTs online dangerous?</h2>
-                <p>Many online JWT decoders send the token you paste to their backend servers to process the decoding. If you paste a production authentication token, you are effectively handing over a live session key to a third party. A compromised token can lead to session hijacking and severe data breaches.</p>
-                <p>This <strong class="text-white">ZeroKey JWT Decoder</strong> is designed with absolute privacy in mind. It uses vanilla JavaScript to parse and decode the Base64Url strings strictly within your local browser environment. No HTTP requests are made, and your token never touches a remote server.</p>
-
-                <h2 class="text-2xl font-bold pt-4">Understanding the JWT Structure</h2>
-                <p>A JWT consists of three parts separated by dots (<code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">.</code>), which typically look like this: <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-white">xxxxx.yyyyy.zzzzz</code></p>
+            <article class="max-w-4xl mx-auto prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 border-t border-slate-800 pt-16 reveal">
+                <h2 class="text-3xl font-bold">Understanding the JWT Structure</h2>
+                <p>A JSON Web Token (JWT) is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting information between parties. A standard JWT consists of three parts separated by dots (<code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">.</code>), looking like this: <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-white">xxxxx.yyyyy.zzzzz</code></p>
                 <ul>
-                    <li><strong>Header:</strong> Consists of two parts: the type of the token (JWT) and the signing algorithm being used, such as HMAC SHA256 or RSA.</li>
-                    <li><strong>Payload (Claims):</strong> Contains the claims. Claims are statements about an entity (typically, the user) and additional data. Do not put secret information in the payload, as it can be easily decoded by anyone who has the token.</li>
-                    <li><strong>Signature:</strong> To create the signature part, you have to take the encoded header, the encoded payload, a secret, the algorithm specified in the header, and sign that. The signature is used to verify the message wasn't changed along the way.</li>
+                    <li><strong>Header:</strong> The first part dictates the type of the token (JWT) and the signing algorithm being used, such as HMAC SHA256 or RSA.</li>
+                    <li><strong>Payload (Claims):</strong> The middle section contains the claims (statements about the user and additional metadata). <strong class="text-white">Do not put secret information in the payload</strong>, as it is only encoded, not encrypted.</li>
+                    <li><strong>Signature:</strong> The final part is used to verify the message wasn't changed along the way. It is generated by signing the encoded header and payload with a secure private key.</li>
                 </ul>
+                
+                <h3 class="text-2xl font-bold pt-6 border-t border-slate-800/50 mt-10">How to decode a JWT payload in JavaScript</h3>
+                <p>If you are building a frontend application and need to extract the user's ID or expiration date from a JWT stored in local storage, you don't need a heavy NPM library. You can decode it natively using the browser's built-in <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">atob()</code> function:</p>
+                
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center px-4 gap-2 z-10">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="ml-3 text-xs text-slate-400 font-mono">jwt-decoder.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-1">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-1" class="language-javascript text-emerald-300">function parseJwtPayload(token) {
+    // 1. Split the token and grab the payload (middle section)
+    const base64Url = token.split('.')[1];
+    
+    // 2. Fix the Base64 formatting
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    
+    // 3. Decode the Base64 string into a JSON payload
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    // 4. Return the parsed object
+    return JSON.parse(jsonPayload);
+}
+
+// Usage:
+// const claims = parseJwtPayload(myToken);
+// console.log(claims.exp);</code></pre>
+                </div>
             </article>
+
+            <section class="max-w-4xl mx-auto py-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center border-t border-slate-800/50 pt-16">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Is pasting my JWT online dangerous?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Yes. Standard online decoders send your token to their backend servers to be parsed. If you paste a production authentication token, you are effectively exposing a live session key to a third party. This <strong class="text-white">ZeroKey Decoder</strong> protects you by running 100% offline in your browser memory, making zero network requests.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Can a JWT be decrypted or read by anyone?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Yes. A standard JSON Web Token is merely Base64 encoded, <strong>not encrypted</strong>. Anyone who gains access to the token string can decode it and read the payload claims. The signature attached to the token only proves <em>authenticity</em> (that the server issued it), it does not provide privacy.
+                        </div>
+                    </details>
+                </div>
+            </section>
         </div>
     </main>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph-fill ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
     </footer>
+
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph-fill ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
 
     <script src="/jwt-decoder/main.js"></script>
 </body>
