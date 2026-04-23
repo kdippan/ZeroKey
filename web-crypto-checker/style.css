@@ -1,0 +1,20 @@
+html {
+    scroll-behavior: smooth;
+}
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.prose h2 {
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+}
+.prose p {
+    margin-bottom: 1.25rem;
+}
+.success-icon {
+    color: #10b981;
+}
+.fail-icon {
+    color: #ef4444;
+}
