@@ -27,3 +27,20 @@ textarea::-webkit-scrollbar-thumb:hover {
 .prose p {
     margin-bottom: 1.25rem;
 }
+/* Scroll Reveal Animation Classes */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* Ensure code blocks don't wrap terribly on mobile */
+pre code {
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+}
