@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="aes-encryption-tool/style.css" >
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -10,81 +11,89 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AES-256-GCM Encryption Tool | Secure Online Encryptor | ZeroKey Tools</title>
+    <title>AES-256-GCM Encryption Tool | Secure Online Encryptor | ZeroKey</title>
     <meta name="description" content="Free, secure online AES-256-GCM encryptor and decryptor. Encrypt text messages locally in your browser using the Web Crypto API. Zero-knowledge cryptography.">
-    <meta name="keywords" content="AES-256 encryption online, AES-GCM decryptor, encrypt text online, secure message encryption, Web Crypto API AES, client-side encryption tool, zero-knowledge encryptor">
+    <meta name="keywords" content="AES-256 encryption online, AES-GCM decryptor, encrypt text online, secure message encryption, Web Crypto API AES, client-side encryption tool">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <link rel="canonical" href="https://zerokey.vercel.app/aes-encryption-tool">
     
     <meta property="og:title" content="Secure AES-256-GCM Encryption Tool | ZeroKey">
     <meta property="og:description" content="Encrypt and decrypt sensitive text messages securely within your browser using native AES-GCM cryptography.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zerokey.vercel.app/aes-encryption-tool/index.html">
+    <meta property="og:url" content="https://zerokey.vercel.app/aes-encryption-tool">
 
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } } }
     </script>
     
     <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/aes-encryption-tool/style.css">
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "AES-256-GCM Encryption Tool",
-      "url": "https://zerokey.vercel.app/aes-encryption-tool/index.html",
-      "description": "A secure, client-side utility for encrypting and decrypting text using the Advanced Encryption Standard (AES) in Galois/Counter Mode (GCM).",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "AES-256-GCM Encryption Tool",
+        "url": "https://zerokey.vercel.app/aes-encryption-tool",
+        "description": "A secure, client-side utility for encrypting and decrypting text using AES in Galois/Counter Mode (GCM).",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "offers": { "@type": "Offer", "price": "0" }
       },
-      "author": {
-        "@type": "Person",
-        "name": "Dippan Bhusal"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+          "@type": "Question",
+          "name": "What is AES-256-GCM?",
+          "acceptedAnswer": { "@type": "Answer", "text": "AES-256-GCM provides Authenticated Encryption. It encrypts data and generates an authentication tag to guarantee data integrity." }
+        }]
       }
-    }
+    ]
     </script>
+
+    <style>
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        .animate-pulse-glow { animation: pulse-glow 3s infinite ease-in-out; }
+        @keyframes data-flow {
+            0% { transform: translateX(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateX(100px); opacity: 0; }
+        }
+        .animate-data-flow { animation: data-flow 2s infinite linear; }
+    </style>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
     
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
                 <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/tools" class="text-white transition-colors">Tools</a>
                 <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
-                <i class="ph ph-shield-check"></i> Launch Vault
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
             </a>
         </div>
     </nav>
@@ -92,111 +101,220 @@
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
         <div class="max-w-5xl mx-auto">
             <header class="mb-12 text-center">
-                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
+                <div class="flex items-center justify-center gap-2 text-purple-400 text-sm font-mono uppercase tracking-widest mb-3">
                     <i class="ph ph-lock-key"></i> Cryptography Utilities
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     AES-256-GCM Encryptor
                 </h1>
                 <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                    Securely encrypt and decrypt text messages using military-grade AES-GCM cryptography. All processing happens locally in your browser.
+                    Securely encrypt and decrypt text messages using military-grade AES-GCM cryptography. Processing happens 100% locally in your browser.
                 </p>
             </header>
             
-            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
+            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12 group hover:border-slate-700 transition-colors">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <div class="flex flex-col h-full space-y-4">
                         <div class="flex justify-between items-center">
-                            <label class="block text-sm font-bold text-white uppercase tracking-wider">Encryption</label>
+                            <label class="block text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2"><i class="ph-fill ph-lock-key text-blue-400"></i> Encryption</label>
                             <button id="clearEncryptBtn" class="text-xs text-slate-500 hover:text-red-400 transition-colors"><i class="ph ph-trash"></i> Clear</button>
                         </div>
-                        <textarea id="plainTextInput" rows="5" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Enter plaintext message to encrypt..."></textarea>
+                        <textarea id="plainTextInput" rows="5" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Enter plaintext message to encrypt..."></textarea>
                         
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Encryption Password</label>
-                            <input type="password" id="encryptPassword" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" placeholder="Strong password...">
+                            <input type="password" id="encryptPassword" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all font-mono text-sm placeholder-slate-600" placeholder="Set an Encryption Password...">
                         </div>
 
-                        <button id="encryptBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex justify-center items-center gap-2">
-                            <i class="ph ph-lock-key font-bold"></i> Encrypt Message
+                        <button id="encryptBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-4 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-1 flex justify-center items-center gap-2">
+                            <i class="ph-bold ph-lock-key"></i> Encrypt Message
                         </button>
 
-                        <div class="pt-4">
+                        <div class="pt-4 relative">
                             <label class="block text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wider text-xs">Ciphertext Output (Base64)</label>
-                            <textarea id="cipherTextOutput" rows="4" readonly class="w-full bg-[#020617] border border-emerald-900/50 rounded-xl p-4 text-emerald-400 font-mono text-sm focus:outline-none break-all shadow-inner" placeholder="Encrypted output will appear here..."></textarea>
+                            <textarea id="cipherTextOutput" rows="4" readonly class="w-full bg-[#020617] border border-emerald-900/50 rounded-xl p-4 text-emerald-400 font-mono text-sm outline-none break-all shadow-inner" placeholder="Encrypted output will appear here..."></textarea>
+                            <button id="copyCipherBtn" class="absolute top-10 right-2 bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs font-medium transition-all opacity-0 group-hover:opacity-100"><i class="ph ph-copy"></i></button>
                         </div>
                     </div>
 
                     <div class="flex flex-col h-full space-y-4">
                         <div class="flex justify-between items-center">
-                            <label class="block text-sm font-bold text-white uppercase tracking-wider">Decryption</label>
+                            <label class="block text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2"><i class="ph-fill ph-lock-key-open text-purple-400"></i> Decryption</label>
                             <button id="clearDecryptBtn" class="text-xs text-slate-500 hover:text-red-400 transition-colors"><i class="ph ph-trash"></i> Clear</button>
                         </div>
-                        <textarea id="cipherTextInput" rows="5" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Paste Base64 ciphertext here..."></textarea>
+                        <textarea id="cipherTextInput" rows="5" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-purple-500/50 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Paste Base64 ciphertext here..."></textarea>
                         
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Decryption Password</label>
-                            <input type="password" id="decryptPassword" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 outline-none transition-all font-mono text-sm placeholder-slate-600" placeholder="Enter password to decrypt...">
+                            <input type="password" id="decryptPassword" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-purple-500/50 outline-none transition-all font-mono text-sm placeholder-slate-600" placeholder="Enter Decryption Password...">
                         </div>
 
-                        <button id="decryptBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)] flex justify-center items-center gap-2">
-                            <i class="ph ph-lock-key-open font-bold"></i> Decrypt Message
+                        <button id="decryptBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-4 rounded-xl transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)] hover:-translate-y-1 flex justify-center items-center gap-2">
+                            <i class="ph-bold ph-lock-key-open"></i> Decrypt Message
                         </button>
 
                         <div class="pt-4">
                             <label class="block text-sm font-bold text-purple-400 mb-2 uppercase tracking-wider text-xs">Decrypted Plaintext</label>
-                            <textarea id="plainTextOutput" rows="4" readonly class="w-full bg-[#020617] border border-purple-900/50 rounded-xl p-4 text-purple-300 font-mono text-sm focus:outline-none shadow-inner" placeholder="Decrypted text will appear here..."></textarea>
+                            <textarea id="plainTextOutput" rows="4" readonly class="w-full bg-[#020617] border border-purple-900/50 rounded-xl p-4 text-purple-300 font-mono text-sm outline-none shadow-inner" placeholder="Decrypted text will appear here..."></textarea>
                         </div>
                     </div>
 
                 </div>
-                
                 <div class="mt-6 p-4 bg-[#020617] border border-slate-800 rounded-xl" id="errorContainer" style="display: none;">
                     <p class="text-red-400 text-sm flex items-center gap-2"><i class="ph-fill ph-warning-circle text-lg"></i> <span id="errorMessage">Error occurred.</span></p>
                 </div>
             </section>
             
-            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
+            <section class="mb-16">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">How Zero-Knowledge Works</h2>
+                    <p class="text-slate-400">ZeroKey uses this exact AES-GCM engine to lock data before transit.</p>
+                </div>
+                <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-2xl overflow-hidden hidden md:block">
+                    <div class="absolute top-[45%] left-[20%] w-20 h-0.5 bg-blue-500/50 animate-data-flow"></div>
+                    <div class="absolute top-[45%] left-[55%] w-20 h-0.5 bg-emerald-500/50 animate-data-flow"></div>
+
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-3xl mb-3 shadow-lg relative z-10 animate-pulse-glow">
+                                <i class="ph ph-laptop"></i>
+                            </div>
+                            <h4 class="text-white font-bold">1. Client Device</h4>
+                            <p class="text-xs text-slate-400 mt-1">Data encrypted locally using AES-GCM.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-emerald-500/20"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                Ciphertext Only
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph ph-database"></i>
+                            </div>
+                            <h4 class="text-white font-bold">2. ZeroKey DB</h4>
+                            <p class="text-xs text-slate-400 mt-1">We store scrambled blob. We cannot read it.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-emerald-500/50"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-emerald-400 whitespace-nowrap">
+                                Fetch & Burn
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-emerald-900/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-3xl mb-3 shadow-[0_0_30px_rgba(16,185,129,0.2)] relative z-10">
+                                <i class="ph ph-device-mobile"></i>
+                            </div>
+                            <h4 class="text-white font-bold">3. Recipient</h4>
+                            <p class="text-xs text-slate-400 mt-1">Decrypts locally. Server wipes record.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-panel p-8 rounded-3xl border-2 border-purple-600/50 bg-purple-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-purple-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl">
                 <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+                    <i class="ph-fill ph-magic-wand text-[160px] text-purple-500"></i>
                 </div>
                 <div class="relative z-10">
                     <h3 class="text-2xl font-bold text-white mb-3">Want to automate this?</h3>
                     <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
-                        Copying and pasting ciphertext is tedious. <strong class="text-emerald-400">ZeroKey</strong> automates this exact AES-GCM architecture. We encrypt your secrets locally, generate a self-destructing link, and permanently wipe the ciphertext from our database upon retrieval.
+                        Copying and pasting ciphertext is tedious. <strong class="text-purple-400">ZeroKey</strong> automates this exact AES-GCM architecture. We encrypt your secrets, generate a self-destructing link, and wipe the database upon retrieval.
                     </p>
-                    <div class="flex gap-4 flex-wrap justify-center">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Launch ZeroKey Vault
-                        </a>
-                    </div>
+                    <a href="/encrypt" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'AES Automate Vault' });" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(147,51,234,0.3)] inline-flex items-center gap-2">
+                        <i class="ph-bold ph-shield-check"></i> Launch ZeroKey Vault
+                    </a>
                 </div>
             </section>
             
-            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
+            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-6 mt-12 border-t border-slate-800 pt-12">
                 <h2 class="text-2xl font-bold">What is AES-256-GCM?</h2>
-                <p>The Advanced Encryption Standard (AES) is a symmetric block cipher established by the U.S. National Institute of Standards and Technology (NIST). The "256" refers to the 256-bit key size, which provides military-grade security that is currently considered computationally impenetrable against brute-force attacks.</p>
-                <p>GCM (Galois/Counter Mode) is a specific mode of operation for AES. Unlike older modes like CBC, GCM provides <strong class="text-white">Authenticated Encryption</strong>. This means it not only encrypts the data to ensure confidentiality, but it also generates an authentication tag to guarantee data integrity. If a malicious actor alters even a single bit of the ciphertext, the decryption process will fail entirely, preventing tampering attacks.</p>
+                <p>The Advanced Encryption Standard (AES) is a symmetric block cipher. The "256" refers to the 256-bit key size, providing military-grade security computationally impenetrable against brute-force attacks.</p>
+                <p>GCM (Galois/Counter Mode) provides <strong class="text-white">Authenticated Encryption</strong>. It not only encrypts data but generates an authentication tag. If a malicious actor alters a single bit, decryption fails entirely.</p>
                 
-                <h2 class="text-2xl font-bold pt-4">How this encryption tool works</h2>
-                <p>This tool utilizes the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle</code> interface to perform all cryptography directly inside your browser. No data is sent to an external server.</p>
-                <ol class="list-decimal pl-6 space-y-2">
-                    <li><strong>Key Derivation:</strong> Your text password is mathematically stretched using PBKDF2 (with a random salt and 100,000 iterations) to derive a cryptographically strong 256-bit AES key.</li>
-                    <li><strong>Initialization Vector:</strong> A random 12-byte Initialization Vector (IV) is generated. This ensures that encrypting the same message twice produces completely different ciphertexts.</li>
-                    <li><strong>Encryption:</strong> The plaintext is encrypted using AES-GCM, producing the ciphertext and the authentication tag.</li>
-                    <li><strong>Packaging:</strong> The Salt, IV, and Ciphertext are concatenated together and encoded into a single Base64 string so you can easily copy and paste it.</li>
-                </ol>
+                <h2 class="text-2xl font-bold pt-4">How this tool works locally</h2>
+                <p>This tool utilizes the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle</code> interface.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mt-4">
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 flex gap-4 items-start">
+                        <div class="bg-slate-800 text-blue-400 p-2 rounded-lg font-bold">1</div>
+                        <div>
+                            <h4 class="text-white font-semibold text-sm">Key Derivation (PBKDF2)</h4>
+                            <p class="text-xs text-slate-400 mt-1">Password stretched with 100,000 iterations to build 256-bit key.</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 flex gap-4 items-start">
+                        <div class="bg-slate-800 text-blue-400 p-2 rounded-lg font-bold">2</div>
+                        <div>
+                            <h4 class="text-white font-semibold text-sm">Initialization Vector (IV)</h4>
+                            <p class="text-xs text-slate-400 mt-1">Random 12-byte IV ensures unique ciphertexts per encryption.</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 flex gap-4 items-start">
+                        <div class="bg-slate-800 text-emerald-400 p-2 rounded-lg font-bold">3</div>
+                        <div>
+                            <h4 class="text-white font-semibold text-sm">AES-GCM Encryption</h4>
+                            <p class="text-xs text-slate-400 mt-1">Plaintext locked, producing ciphertext and auth tag.</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 flex gap-4 items-start">
+                        <div class="bg-slate-800 text-emerald-400 p-2 rounded-lg font-bold">4</div>
+                        <div>
+                            <h4 class="text-white font-semibold text-sm">Base64 Packaging</h4>
+                            <p class="text-xs text-slate-400 mt-1">Salt, IV, and Ciphertext concatenated and encoded.</p>
+                        </div>
+                    </div>
+                </div>
             </article>
         </div>
     </main>
 
     <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+            <div class="flex justify-center gap-4 mb-4 text-sm font-medium text-slate-500">
+                <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a>
+                <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy</a>
+            </div>
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by Dippan Bhusal.</p>
         </div>
     </footer>
 
-    <script src="/aes-encryption-tool/main.js"></script>
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
+<script src="aes-encryption-tool/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const cookieConsent = document.getElementById('cookieConsent');
+            if (!localStorage.getItem('zerokey_cookies_accepted')) {
+                setTimeout(() => cookieConsent.classList.remove('translate-y-[150%]'), 1000);
+            }
+            document.getElementById('acceptCookiesBtn').addEventListener('click', () => {
+                localStorage.setItem('zerokey_cookies_accepted', 'true');
+                cookieConsent.classList.add('translate-y-[150%]');
+                gtag('event', 'cookie_consent', { 'event_category': 'Engagement', 'event_label': 'Accepted' });
+            });
+
+            document.getElementById('copyCipherBtn').addEventListener('click', async (e) => {
+                const text = document.getElementById('cipherTextOutput').value;
+                if(!text) return;
+                await navigator.clipboard.writeText(text);
+                const btn = e.currentTarget;
+                btn.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i>';
+                setTimeout(() => btn.innerHTML = '<i class="ph ph-copy"></i>', 2000);
+                gtag('event', 'click', { 'event_category': 'Tool', 'event_label': 'Copied Cipher' });
+            });
+
+            </script>
 </body>
 </html>
