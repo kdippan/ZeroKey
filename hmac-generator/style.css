@@ -1,0 +1,29 @@
+html {
+    scroll-behavior: smooth;
+}
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+textarea::-webkit-scrollbar {
+    width: 8px;
+}
+textarea::-webkit-scrollbar-track {
+    background: #020617;
+    border-radius: 6px;
+}
+textarea::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 6px;
+    border: 2px solid #020617;
+}
+textarea::-webkit-scrollbar-thumb:hover {
+    background: #3b82f6;
+}
+.prose h2 {
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+}
+.prose p {
+    margin-bottom: 1.25rem;
+}
