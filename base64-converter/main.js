@@ -69,3 +69,55 @@ document.addEventListener('DOMContentLoaded', () => {
         hexInput.value = '';
     });
 });
+// --- Scroll Reveal Logic ---
+const reveals = document.querySelectorAll('.reveal');
+const revealOnScroll = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+reveals.forEach(reveal => revealOnScroll.observe(reveal));
+
+// --- Code Copy Button Logic ---
+document.querySelectorAll('.copy-code-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        const targetId = btn.getAttribute('data-target');
+        const codeElement = document.getElementById(targetId);
+        
+        if(codeElement) {
+            await navigator.clipboard.writeText(codeElement.innerText);
+            
+            // Analytics Tracking
+            if (typeof gtag === 'function') {
+                gtag('event', 'click', { 'event_category': 'Tool', 'event_label': 'Copied Snippet' });
+            }
+
+            // Visual Feedback
+            btn.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> Copied!';
+            btn.classList.add('text-emerald-400');
+            setTimeout(() => {
+                btn.innerHTML = '<i class="ph ph-copy"></i> Copy';
+                btn.classList.remove('text-emerald-400');
+            }, 2000);
+        }
+    });
+});
+
+// --- Cookie Consent Logic ---
+const cookieConsent = document.getElementById('cookieConsent');
+if (cookieConsent && !localStorage.getItem('zerokey_cookies_accepted')) {
+    setTimeout(() => cookieConsent.classList.remove('translate-y-[150%]'), 1000);
+}
+const acceptBtn = document.getElementById('acceptCookiesBtn');
+if(acceptBtn) {
+    acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('zerokey_cookies_accepted', 'true');
+        cookieConsent.classList.add('translate-y-[150%]');
+        if (typeof gtag === 'function') {
+            gtag('event', 'cookie_consent', { 'event_category': 'Engagement', 'event_label': 'Accepted' });
+        }
+    });
+}
