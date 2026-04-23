@@ -10,28 +10,32 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 to ArrayBuffer Converter | ZeroKey Tools</title>
-    <meta name="description" content="Free developer tool to convert Base64 strings to ArrayBuffer, Uint8Array, and Hex formats. Essential utility for Web Crypto API encoding and decoding.">
-    <meta name="keywords" content="Base64 to ArrayBuffer, ArrayBuffer to Base64, Uint8Array to Base64, Web Crypto API encoding, javascript buffer converter, Base64 to Hex, cryptography format converter">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>Base64 to ArrayBuffer Converter | Free Client-Side Tool | ZeroKey</title>
+    <meta name="description" content="Free, 100% client-side developer tool to convert Base64 strings to ArrayBuffer, Uint8Array, and Hex formats. Essential utility for Web Crypto API integrations.">
+    <meta name="keywords" content="Base64 to ArrayBuffer, ArrayBuffer to Base64, Uint8Array to Base64, Web Crypto API encoding, javascript buffer converter, Base64 to Hex, cryptography format converter, local developer tools">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     
-    <meta property="og:title" content="Base64 to ArrayBuffer Converter">
-    <meta property="og:description" content="Convert between Base64 strings and ArrayBuffers for Web Crypto API integrations.">
+    <link rel="canonical" href="https://zerokey.vercel.app/base64-converter">
+    
+    <meta property="og:title" content="Base64 to ArrayBuffer Converter | ZeroKey Tools">
+    <meta property="og:description" content="Convert between Base64 strings and ArrayBuffers instantly in your browser for Web Crypto API integrations.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zerokey.vercel.app/base64-converter/index.html">
+    <meta property="og:url" content="https://zerokey.vercel.app/base64-converter">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/tools.png">
 
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -49,51 +53,76 @@
     <link rel="stylesheet" href="/base64-converter/style.css">
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Base64 to ArrayBuffer Converter",
-      "url": "https://zerokey.vercel.app/base64-converter/index.html",
-      "description": "Convert Base64 encoded strings into Hexadecimal and ArrayBuffer representations for Web Crypto API compatibility.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Base64 to ArrayBuffer Converter",
+        "url": "https://zerokey.vercel.app/base64-converter",
+        "description": "Convert Base64 encoded strings into Hexadecimal and ArrayBuffer representations for Web Crypto API compatibility entirely within the browser.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dippan Bhusal"
+        }
       },
-      "author": {
-        "@type": "Person",
-        "name": "Dippan Bhusal"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why do I need to convert Base64 to ArrayBuffer?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cryptographic functions in the Web Crypto API strictly require data to be passed as a BufferSource (ArrayBuffer or Uint8Array). To transport this data across the internet, it must be encoded into a Base64 String."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is this Base64 conversion secure?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. This tool is 100% client-side. No data is sent to a server, ensuring your cryptographic keys or sensitive ciphertexts remain perfectly private."
+            }
+          }
+        ]
       }
-    }
+    ]
     </script>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
     
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="/" class="hover:text-white transition-colors">Home</a>
-                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Home' });">Home</a>
+                <a href="/tools" class="hover:text-white transition-colors text-slate-100">Tools</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Blog' });">Blog</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
-                <i class="ph ph-shield-check"></i> Launch Vault
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-0.5" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Vault' });">
+                Launch Vault
             </a>
         </div>
     </nav>
 
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-5xl mx-auto">
-            <header class="mb-12 text-center">
+        <div class="max-w-6xl mx-auto">
+            
+            <header class="mb-12 text-center reveal">
                 <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
-                    <i class="ph ph-brackets-curly"></i> Cryptography Utilities
+                    <i class="ph-fill ph-brackets-curly"></i> Cryptography Utilities
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     Base64 to ArrayBuffer Converter
@@ -102,64 +131,91 @@
                     Instantly translate between Base64 strings and raw ArrayBuffer (Hex) formats required for native Web Crypto API integrations.
                 </p>
             </header>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-emerald-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all"><i class="ph-fill ph-shield-check"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">100% Client-Side</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Your data never leaves the browser. We perform all binary conversions locally via JavaScript.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-blue-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all"><i class="ph-fill ph-cpu"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Web Crypto Ready</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Generate pure Hex strings that map directly into Uint8Arrays for <code class="text-xs bg-slate-800 px-1 rounded">crypto.subtle</code> operations.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-purple-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all"><i class="ph-fill ph-arrows-left-right"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Bidirectional Engine</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Instantly convert Base64 payloads to Hex, or encode your raw Hex buffers back into transportable Base64.</p>
+                </div>
+            </section>
             
-            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
+            <section class="max-w-5xl mx-auto bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-16 reveal hover:border-slate-700 transition-colors duration-500">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <div class="flex flex-col h-full">
                         <div class="flex justify-between items-center mb-3">
-                            <label class="block text-sm font-bold text-white uppercase tracking-wider">Base64 String</label>
+                            <label class="block text-sm font-bold text-white uppercase tracking-wider"><i class="ph-fill ph-file-text text-blue-400 mr-1"></i> Base64 String</label>
                             <button id="clearBase64Btn" class="text-xs text-slate-500 hover:text-red-400 transition-colors"><i class="ph ph-trash"></i> Clear</button>
                         </div>
                         <textarea id="base64Input" rows="8" class="flex-grow w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Enter Base64 string here (e.g., dGVzdA==)"></textarea>
-                        <button id="convertToHexBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] mt-4 flex justify-center items-center gap-2">
-                            Convert to Hex Buffer <i class="ph ph-arrow-right font-bold"></i>
+                        <button id="convertToHexBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-4 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] mt-4 flex justify-center items-center gap-2 hover:-translate-y-1">
+                            Convert to Hex Buffer <i class="ph-bold ph-arrow-right"></i>
                         </button>
                     </div>
 
                     <div class="flex flex-col h-full">
                         <div class="flex justify-between items-center mb-3">
-                            <label class="block text-sm font-bold text-emerald-400 uppercase tracking-wider">ArrayBuffer (Hex)</label>
+                            <label class="block text-sm font-bold text-emerald-400 uppercase tracking-wider"><i class="ph-fill ph-file-code text-emerald-400 mr-1"></i> ArrayBuffer (Hex)</label>
                             <button id="clearHexBtn" class="text-xs text-slate-500 hover:text-red-400 transition-colors"><i class="ph ph-trash"></i> Clear</button>
                         </div>
                         <textarea id="hexInput" rows="8" class="flex-grow w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-emerald-400 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Enter Hex string here (e.g., 74657374)"></textarea>
-                        <button id="convertToBase64Btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-4 flex justify-center items-center gap-2">
-                            <i class="ph ph-arrow-left font-bold"></i> Convert to Base64
+                        <button id="convertToBase64Btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-4 flex justify-center items-center gap-2 hover:-translate-y-1">
+                            <i class="ph-bold ph-arrow-left"></i> Convert to Base64
                         </button>
                     </div>
 
                 </div>
                 
-                <div class="mt-6 p-4 bg-[#020617] border border-slate-800 rounded-xl" id="errorContainer" style="display: none;">
+                <div class="mt-6 p-4 bg-[#020617] border border-red-500/30 rounded-xl hidden" id="errorContainer">
                     <p class="text-red-400 text-sm flex items-center gap-2"><i class="ph-fill ph-warning-circle text-lg"></i> <span id="errorMessage">Invalid input detected.</span></p>
                 </div>
             </section>
             
-            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
+            <section class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-3xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-16 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl reveal">
                 <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+                    <i class="ph-fill ph-warning-circle text-[160px] text-emerald-500"></i>
                 </div>
                 <div class="relative z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">Tired of managing encryption keys?</h3>
-                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
-                        Stop manually handling ArrayBuffers. <strong class="text-emerald-400">ZeroKey</strong> automatically handles client-side AES-GCM encryption, Base64 encoding, and database hard-deletes to deliver true zero-knowledge payloads.
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Manual Cryptography is Dangerous.</h3>
+                    <p class="text-slate-300 mb-8 leading-relaxed max-w-xl mx-auto text-lg">
+                        Mishandling ArrayBuffers or hard-coding transport logic is the #1 cause of data leaks. <strong class="text-emerald-400">ZeroKey</strong> automates client-side AES-GCM encryption, Base64 encoding, and database hard-deletes so you never have to worry about the plumbing.
                     </p>
-                    <div class="flex gap-4 flex-wrap justify-center">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Try ZeroKey Free
-                        </a>
-                    </div>
+                    <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] inline-flex items-center gap-2 text-lg hover:scale-105" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Base64 Psycho CTA' });">
+                        <i class="ph-bold ph-shield-check"></i> Automate Your Security
+                    </a>
                 </div>
             </section>
             
-            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold">Why Convert Base64 to ArrayBuffer?</h2>
-                <p>If you are building a secure application using the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">Web Crypto API</code>, you will immediately run into a data formatting problem. Cryptographic functions like <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">crypto.subtle.encrypt()</code> and <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">crypto.subtle.importKey()</code> strictly require data to be passed as a <strong class="text-white">BufferSource</strong> (typically an <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">ArrayBuffer</code> or <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">Uint8Array</code>).</p>
-                <p>However, you cannot easily store raw binary ArrayBuffers in a PostgreSQL database, transmit them inside JSON payloads, or append them to URL fragments. To transport ciphertext or keys across the internet, you must encode the raw binary into a <strong class="text-white">Base64 String</strong>. This tool helps developers test their encoding and decoding logic by providing a visual bridge between the transport layer (Base64) and the cryptographic execution layer (Hex/ArrayBuffer).</p>
+            <article class="max-w-4xl mx-auto prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 border-t border-slate-800 pt-16 reveal">
+                <h2 class="text-3xl font-bold">Why Convert Base64 to ArrayBuffer?</h2>
+                <p>If you are building a secure application using the <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">Web Crypto API</code>, you will immediately run into a data formatting problem. Native cryptographic functions like <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm">crypto.subtle.encrypt()</code> strictly require data to be passed as a <strong class="text-white">BufferSource</strong> (typically an <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm">ArrayBuffer</code> or <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm">Uint8Array</code>).</p>
+                <p>However, you cannot easily store raw binary ArrayBuffers in a PostgreSQL database, transmit them inside JSON payloads, or append them to URL fragments. To transport ciphertext across the internet, you must encode the raw binary into a <strong class="text-white">Base64 String</strong>. This tool helps developers test their encoding and decoding logic visually.</p>
                 
-                <h2 class="text-2xl font-bold pt-4">How to convert Base64 to Uint8Array in JavaScript</h2>
-                <p>If you need to implement this conversion in your own codebase, you cannot use the standard `TextEncoder`. You must decode the Base64 string into binary characters, and then map those characters into a typed array. Here is the standard, framework-free vanilla JavaScript approach:</p>
-                <pre class="bg-[#020617] border border-slate-800 rounded-xl p-6 text-sm overflow-x-auto"><code class="language-javascript text-emerald-300">function base64ToArrayBuffer(base64) {
+                <h3 class="text-2xl font-bold pt-6 border-t border-slate-800/50 mt-10">How to convert Base64 to Uint8Array in JavaScript</h3>
+                <p>You cannot use the standard `TextEncoder` for this. You must decode the Base64 string into binary characters, and then map those characters into a typed array. Here is the vanilla JavaScript approach:</p>
+                
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center px-4 gap-2 z-10">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="ml-3 text-xs text-slate-400 font-mono">base64-to-buffer.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-1">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-1" class="language-javascript text-emerald-300">function base64ToArrayBuffer(base64) {
     const binaryString = window.atob(base64);
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
@@ -168,10 +224,22 @@
     }
     return bytes.buffer;
 }</code></pre>
+                </div>
 
-                <h2 class="text-2xl font-bold pt-4">How to convert ArrayBuffer to Base64</h2>
-                <p>Conversely, once the Web Crypto API finishes encrypting your payload, it outputs an ArrayBuffer. Before you make a POST request to your database, you must convert that buffer back into a Base64 string:</p>
-                <pre class="bg-[#020617] border border-slate-800 rounded-xl p-6 text-sm overflow-x-auto"><code class="language-javascript text-emerald-300">function arrayBufferToBase64(buffer) {
+                <h3 class="text-2xl font-bold pt-6 border-t border-slate-800/50 mt-10">How to convert ArrayBuffer to Base64</h3>
+                <p>Conversely, once the Web Crypto API encrypts your payload, it outputs an ArrayBuffer. Convert that buffer back into a Base64 string before sending your POST request:</p>
+                
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center px-4 gap-2 z-10">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="ml-3 text-xs text-slate-400 font-mono">buffer-to-base64.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-2">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-2" class="language-javascript text-emerald-300">function arrayBufferToBase64(buffer) {
     let binary = '';
     const bytes = new Uint8Array(buffer);
     const len = bytes.byteLength;
@@ -180,15 +248,67 @@
     }
     return window.btoa(binary);
 }</code></pre>
+                </div>
             </article>
+
+            <section class="max-w-4xl mx-auto py-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center border-t border-slate-800/50 pt-16">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Why do I need to convert Base64 to ArrayBuffer?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Cryptographic functions in the Web Crypto API strictly require data to be passed as a BufferSource (ArrayBuffer or Uint8Array). To transport this data across the internet (via JSON or URLs), it must be encoded into a text-safe Base64 String.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Is this Base64 conversion secure and private?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Yes. This tool runs 100% client-side using JavaScript in your browser. No strings, hex codes, or payloads are ever transmitted to a server, ensuring your cryptographic data remains entirely private.
+                        </div>
+                    </details>
+                </div>
+            </section>
         </div>
     </main>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph-fill ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
     </footer>
+
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph-fill ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
 
     <script src="/base64-converter/main.js"></script>
 </body>
