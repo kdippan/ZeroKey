@@ -10,28 +10,32 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Crypto API Browser Support Checker | ZeroKey Tools</title>
-    <meta name="description" content="Free online tool to check if your browser supports the native Web Crypto API, SubtleCrypto, AES-GCM encryption, and secure random number generation for zero-knowledge applications.">
-    <meta name="keywords" content="Web Crypto API checker, check SubtleCrypto support, browser cryptography test, AES-GCM support test, window.crypto checker, zero-knowledge browser requirements, PBKDF2 compatibility, SHA-256 test">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>Web Crypto API Browser Support Checker | Free Online Tool | ZeroKey</title>
+    <meta name="description" content="Check if your browser supports SubtleCrypto, AES-GCM, and PBKDF2. Free online diagnostic tool for native Web Crypto API compatibility in modern browsers.">
+    <meta name="keywords" content="Web Crypto API checker, check SubtleCrypto support, browser cryptography test, AES-GCM support test, window.crypto checker, zero-knowledge browser requirements, PBKDF2 compatibility, SHA-256 test, developer tools">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     
-    <meta property="og:title" content="Web Crypto API Browser Support Checker">
-    <meta property="og:description" content="Test your browser's native cryptographic capabilities including AES-GCM, PBKDF2, and SubtleCrypto.">
+    <link rel="canonical" href="https://zerokey.vercel.app/web-crypto-checker">
+    
+    <meta property="og:title" content="Web Crypto API Browser Support Checker | ZeroKey Tools">
+    <meta property="og:description" content="Test your browser's native cryptographic capabilities including AES-GCM, PBKDF2, and SubtleCrypto instantly.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zerokey.vercel.app/web-crypto-checker/index.html">
+    <meta property="og:url" content="https://zerokey.vercel.app/web-crypto-checker">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/tools.png">
 
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -48,52 +52,116 @@
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/web-crypto-checker/style.css">
 
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        /* Ensure code blocks don't wrap terribly on mobile */
+        pre code {
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+        }
+
+        /* Editor macOS dots */
+        .editor-dots { position: absolute; top: 14px; left: 16px; display: flex; gap: 8px; z-index: 20; }
+        .editor-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; border: 1px solid #e0443e; }
+        .dot-yellow { background: #ffbd2e; border: 1px solid #dea123; }
+        .dot-green { background: #27c93f; border: 1px solid #1aab29; }
+
+        /* Scroll Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* Diagram Animations */
+        @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+        .animate-pulse-glow { animation: pulse-glow 3s infinite ease-in-out; }
+        @keyframes data-flow { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(100px); opacity: 0; } }
+        .animate-data-flow { animation: data-flow 2s infinite linear; }
+    </style>
+
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Web Crypto API Checker",
-      "url": "https://zerokey.vercel.app/web-crypto-checker/index.html",
-      "description": "An online developer utility to diagnose and verify browser support for the native Web Crypto API and SubtleCrypto interface.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Web Crypto API Support Checker",
+        "url": "https://zerokey.vercel.app/web-crypto-checker",
+        "description": "An online developer utility to diagnose and verify browser support for the native Web Crypto API and SubtleCrypto interface.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dippan Bhusal"
+        }
       },
-      "author": {
-        "@type": "Person",
-        "name": "Dippan Bhusal"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why does my browser fail the Web Crypto test?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The most common reason is an insecure context. Browsers block the Web Crypto API on websites loaded via HTTP. Ensure you are using HTTPS. Other reasons include outdated browser versions or disabled JavaScript."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is SubtleCrypto?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "SubtleCrypto is the core interface of the Web Crypto API. it provides low-level functions for hashing, encryption, decryption, and key management natively in the browser."
+            }
+          }
+        ]
       }
-    }
+    ]
     </script>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
     
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="/" class="hover:text-white transition-colors">Home</a>
-                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Home' });">Home</a>
+                <a href="/tools" class="hover:text-white transition-colors text-slate-100">Tools</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Blog' });">Blog</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
-                <i class="ph ph-shield-check"></i> Launch Vault
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-0.5" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Vault' });">
+                Launch Vault
             </a>
         </div>
     </nav>
 
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto">
-            <header class="mb-12 text-center">
+        <div class="max-w-6xl mx-auto">
+            
+            <header class="mb-12 text-center reveal">
                 <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
-                    <i class="ph ph-shield-check"></i> Environment Check
+                    <i class="ph-fill ph-shield-check"></i> Environment Check
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     Web Crypto API Checker
@@ -102,106 +170,328 @@
                     Automatically verify if your current browser supports the cryptographic primitives required for true zero-knowledge applications and secure end-to-end encryption.
                 </p>
             </header>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-emerald-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all"><i class="ph-fill ph-fingerprint"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Zero-Knowledge Diagnostic</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Verify if your browser can handle AES-GCM and PBKDF2 without relying on insecure third-party polyfills.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-blue-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all"><i class="ph-fill ph-lock"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Secure Context Check</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Automatically identifies if your connection is secure (HTTPS), which is a hard requirement for modern crypto APIs.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-purple-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all"><i class="ph-fill ph-code"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Primitive Validation</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Tests specific algorithms like SHA-256 and AES-GCM to ensure the hardware engine is performing correctly.</p>
+                </div>
+            </section>
             
-            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
-                <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
-                    <h2 class="text-xl font-bold text-white">Browser Diagnostic Report</h2>
-                    <button id="runTestBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2 text-sm">
-                        <i class="ph ph-arrows-clockwise"></i> Run Diagnostic
+            <section class="max-w-5xl mx-auto bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-16 reveal hover:border-slate-700 transition-colors duration-500">
+                <div class="flex justify-between items-center mb-8 border-b border-slate-800 pb-6">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="ph-fill ph-activity text-blue-400"></i> Browser Diagnostic Report</h2>
+                    <button id="runTestBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center gap-2 text-sm hover:-translate-y-1" onclick="gtag('event', 'use_tool', { 'event_category': 'Tool', 'event_label': 'Run Crypto Diagnostic' });">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Run Diagnostic
                     </button>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="resultsGrid">
-                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between" id="card-crypto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="resultsGrid">
+                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between transition-all duration-500" id="card-crypto">
                         <div>
-                            <p class="text-white font-semibold">window.crypto</p>
+                            <p class="text-white font-bold">window.crypto</p>
                             <p class="text-xs text-slate-500 mt-1">Base cryptography object</p>
                         </div>
                         <div class="icon-container"><i class="ph ph-spinner-gap animate-spin text-slate-500 text-2xl"></i></div>
                     </div>
                     
-                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between" id="card-subtle">
+                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between transition-all duration-500" id="card-subtle">
                         <div>
-                            <p class="text-white font-semibold">SubtleCrypto API</p>
-                            <p class="text-xs text-slate-500 mt-1">Advanced cryptographic functions</p>
+                            <p class="text-white font-bold">SubtleCrypto API</p>
+                            <p class="text-xs text-slate-500 mt-1">Low-level math functions</p>
                         </div>
                         <div class="icon-container"><i class="ph ph-spinner-gap animate-spin text-slate-500 text-2xl"></i></div>
                     </div>
 
-                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between" id="card-random">
+                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between transition-all duration-500" id="card-random">
                         <div>
-                            <p class="text-white font-semibold">Secure Random Values</p>
-                            <p class="text-xs text-slate-500 mt-1">getRandomValues() method</p>
+                            <p class="text-white font-bold">Secure Randomness</p>
+                            <p class="text-xs text-slate-500 mt-1">getRandomValues() check</p>
                         </div>
                         <div class="icon-container"><i class="ph ph-spinner-gap animate-spin text-slate-500 text-2xl"></i></div>
                     </div>
 
-                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between" id="card-aes">
+                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between transition-all duration-500" id="card-aes">
                         <div>
-                            <p class="text-white font-semibold">AES-GCM Support</p>
+                            <p class="text-white font-bold">AES-GCM Engine</p>
                             <p class="text-xs text-slate-500 mt-1">Authenticated encryption</p>
                         </div>
                         <div class="icon-container"><i class="ph ph-spinner-gap animate-spin text-slate-500 text-2xl"></i></div>
                     </div>
 
-                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between" id="card-pbkdf2">
+                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between transition-all duration-500" id="card-pbkdf2">
                         <div>
-                            <p class="text-white font-semibold">PBKDF2 Support</p>
-                            <p class="text-xs text-slate-500 mt-1">Key derivation function</p>
+                            <p class="text-white font-bold">PBKDF2 Engine</p>
+                            <p class="text-xs text-slate-500 mt-1">Key derivation support</p>
                         </div>
                         <div class="icon-container"><i class="ph ph-spinner-gap animate-spin text-slate-500 text-2xl"></i></div>
                     </div>
 
-                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between" id="card-sha">
+                    <div class="bg-[#020617] border border-slate-700 rounded-xl p-5 flex items-center justify-between transition-all duration-500" id="card-sha">
                         <div>
-                            <p class="text-white font-semibold">SHA-256 Support</p>
+                            <p class="text-white font-bold">SHA-256 Digest</p>
                             <p class="text-xs text-slate-500 mt-1">Secure hashing algorithm</p>
                         </div>
                         <div class="icon-container"><i class="ph ph-spinner-gap animate-spin text-slate-500 text-2xl"></i></div>
                     </div>
                 </div>
                 
-                <div class="mt-6 pt-6 border-t border-slate-800 text-center" id="finalVerdict">
-                    <p class="text-slate-400 text-sm">Click "Run Diagnostic" to verify your browser's capabilities.</p>
+                <div class="mt-10 pt-8 border-t border-slate-800 text-center" id="finalVerdict">
+                    <p class="text-slate-400 text-sm italic flex items-center justify-center gap-2"><i class="ph-fill ph-info"></i> Click "Run Diagnostic" to verify your browser's capabilities.</p>
                 </div>
             </section>
             
-            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
-                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+            <section class="mb-16 reveal">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Why Your Browser Matters</h2>
+                    <p class="text-slate-400">ZeroKey performs all security operations on your hardware, not our servers.</p>
                 </div>
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">Does your browser pass the test?</h3>
-                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
-                        If your browser supports these native APIs, you can securely use <strong class="text-emerald-400">ZeroKey</strong>. It is an open-source payload delivery system where sensitive data is encrypted entirely on your device before it ever touches the internet.
-                    </p>
-                    <div class="flex gap-4 flex-wrap justify-center">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Launch ZeroKey Vault
-                        </a>
+                <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-2xl overflow-hidden hidden md:block">
+                    <div class="absolute top-[45%] left-[20%] w-20 h-0.5 bg-blue-500/50 animate-data-flow"></div>
+                    <div class="absolute top-[45%] left-[55%] w-20 h-0.5 bg-emerald-500/50 animate-data-flow"></div>
+
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-3xl mb-3 shadow-lg relative z-10 animate-pulse-glow">
+                                <i class="ph ph-browsers"></i>
+                            </div>
+                            <h4 class="text-white font-bold">1. Modern Browser</h4>
+                            <p class="text-xs text-slate-400 mt-1">Requires a secure context (HTTPS) and SubtleCrypto engine.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                <i class="ph-bold ph-shield-check text-blue-400"></i> API Access
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-purple-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph-fill ph-cpu"></i>
+                            </div>
+                            <h4 class="text-white font-bold">2. Local Hardware</h4>
+                            <p class="text-xs text-slate-400 mt-1">CPU executes mathematics. Keys generated in local RAM.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/50"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-emerald-400 whitespace-nowrap">
+                                <i class="ph-fill ph-lock-key"></i> Privacy Loop
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-emerald-900/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-3xl mb-3 shadow-[0_0_30px_rgba(16,185,129,0.2)] relative z-10">
+                                <i class="ph ph-shield-check"></i>
+                            </div>
+                            <h4 class="text-white font-bold">3. Zero-Knowledge</h4>
+                            <p class="text-xs text-slate-400 mt-1">Encryption completes before data ever leaves the device.</p>
+                        </div>
                     </div>
                 </div>
             </section>
             
-            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold">What is the Web Crypto API?</h2>
-                <p>The <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">Web Crypto API</code> is a powerful native interface built directly into modern web browsers like Chrome, Firefox, Safari, and Edge. It provides developers with a set of low-level cryptographic primitives that allow JavaScript applications to perform complex security operations—such as hashing (SHA-256), signature generation, key derivation (PBKDF2), and authenticated encryption (AES-GCM)—without relying on heavy, potentially vulnerable third-party node modules or backend servers.</p>
+            <section class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-3xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-16 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl reveal">
+                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Does your browser pass the test?</h3>
+                    <p class="text-slate-300 mb-8 leading-relaxed max-w-xl mx-auto text-lg">
+                        If your browser supports these native APIs, you can securely use <strong class="text-emerald-400">ZeroKey</strong>. It is a trustless, open-source vault where sensitive data is encrypted entirely on your device before it ever touches the internet.
+                    </p>
+                    <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] inline-flex items-center gap-2 text-lg hover:scale-105" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Checker Psycho CTA' });">
+                        <i class="ph-bold ph-shield-check"></i> Launch ZeroKey Vault
+                    </a>
+                </div>
+            </section>
+            
+            <article class="max-w-4xl mx-auto prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 border-t border-slate-800 pt-16 reveal">
+                <h2 class="text-3xl font-bold">What is the Web Crypto API?</h2>
+                <p>The <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">Web Crypto API</code> is a powerful native interface built directly into modern web browsers like Chrome, Firefox, Safari, and Edge. It provides developers with a set of low-level cryptographic primitives that allow JavaScript applications to perform complex security operations without relying on heavy third-party node modules or backend servers.</p>
                 
-                <h2 class="text-2xl font-bold pt-4">Why is Client-Side Cryptography Important?</h2>
-                <p>Traditional web applications handle security by sending plaintext data over TLS to a server, where the backend encrypts it before storing it in a database. This architecture inherently means the server owner has access to your unencrypted data prior to encryption. By utilizing the SubtleCrypto interface, zero-knowledge platforms like ZeroKey can scramble your secrets <strong class="text-white">locally on your device</strong>. The server only receives a mathematically secure, unreadable blob of ciphertext, ensuring true privacy and end-to-end encryption.</p>
+                <h2 class="text-2xl font-bold pt-4 border-t border-slate-800/50 mt-10">How to detect Web Crypto support in JavaScript</h2>
+                <p>Before performing client-side encryption, you should always check if the browser is equipped to handle the operations. Here is a clean, dependency-free diagnostic snippet:</p>
                 
-                <h2 class="text-2xl font-bold pt-4">Why check for window.crypto.subtle?</h2>
-                <p>The <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle</code> object is where the actual mathematical heavy lifting occurs. For security reasons, modern browsers restrict access to this interface strictly to secure contexts. This means if a website is loaded over an insecure HTTP connection, the browser will intentionally block access to SubtleCrypto to prevent man-in-the-middle (MITM) attacks from intercepting or manipulating the cryptographic operations. Running this diagnostic tool helps verify that your current browser environment is safe, updated, and ready to handle zero-knowledge payloads.</p>
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center z-10">
+                        <div class="editor-dots">
+                            <div class="editor-dot dot-red"></div><div class="editor-dot dot-yellow"></div><div class="editor-dot dot-green"></div>
+                        </div>
+                        <span class="w-full text-center text-xs text-slate-400 font-mono absolute pointer-events-none">crypto-check.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-1">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-1" class="language-javascript text-emerald-300">function isWebCryptoSupported() {
+    // 1. Check for basic support
+    const hasCrypto = window.crypto !== undefined;
+    const hasSubtle = hasCrypto && window.crypto.subtle !== undefined;
+
+    // 2. Check for secure context (HTTPS)
+    const isSecure = window.isSecureContext === true;
+
+    if (!hasSubtle) {
+        console.error("Native Cryptography not supported in this browser.");
+        return false;
+    }
+
+    if (!isSecure) {
+        console.warn("SubtleCrypto may be blocked on non-secure (HTTP) origins.");
+    }
+
+    return true;
+}</code></pre>
+                </div>
+
+                <h2 class="text-2xl font-bold pt-4 border-t border-slate-800/50 mt-10">Why is Client-Side Cryptography Important?</h2>
+                <p>Traditional web applications handle security by sending plaintext data to a server, where the backend encrypts it. This architecture inherently means the server owner has access to your unencrypted data prior to encryption. By utilizing the <strong class="text-white">SubtleCrypto</strong> interface, zero-knowledge platforms like <strong class="text-emerald-400">ZeroKey</strong> scramble your secrets <strong class="text-white border-b border-blue-500">locally on your device</strong>. The server only receives a mathematically secure, unreadable blob of ciphertext, ensuring true privacy.</p>
             </article>
+
+            <section class="max-w-4xl mx-auto py-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center border-t border-slate-800/50 pt-16">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Why does my browser fail the Web Crypto test?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            The most common reason for failure is using an <strong class="text-white">insecure origin</strong>. Modern browsers strictly block access to the SubtleCrypto API unless the website is served over HTTPS or from localhost. This is a security measure to prevent Man-In-The-Middle attacks from tampering with your encryption logic.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Does this tool work on mobile browsers?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Yes. Modern mobile versions of Safari (iOS), Chrome (Android), and Firefox fully support the Web Crypto API. If your mobile browser fails the test, please ensure your OS and browser app are updated to the latest versions.
+                        </div>
+                    </details>
+                </div>
+            </section>
         </div>
     </main>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph-fill ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
     </footer>
 
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph-fill ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
+
     <script src="/web-crypto-checker/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Cookie Consent Logic ---
+            const cookieConsent = document.getElementById('cookieConsent');
+            if (cookieConsent && !localStorage.getItem('zerokey_cookies_accepted')) {
+                setTimeout(() => cookieConsent.classList.remove('translate-y-[150%]'), 1000);
+            }
+            const acceptBtn = document.getElementById('acceptCookiesBtn');
+            if(acceptBtn) {
+                acceptBtn.addEventListener('click', () => {
+                    localStorage.setItem('zerokey_cookies_accepted', 'true');
+                    cookieConsent.classList.add('translate-y-[150%]');
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'cookie_consent', { 'event_category': 'Engagement', 'event_label': 'Accepted' });
+                    }
+                });
+            }
+
+            // --- Scroll Reveal Logic ---
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOnScroll = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            reveals.forEach(reveal => revealOnScroll.observe(reveal));
+
+            // --- Code Copy Button Logic ---
+            document.querySelectorAll('.copy-code-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const targetId = btn.getAttribute('data-target');
+                    const codeElement = document.getElementById(targetId);
+                    
+                    if(codeElement) {
+                        await navigator.clipboard.writeText(codeElement.innerText);
+                        
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'click', { 'event_category': 'Tool', 'event_label': 'Copied Code Snippet' });
+                        }
+
+                        const originalHTML = btn.innerHTML;
+                        btn.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> Copied!';
+                        btn.classList.add('text-emerald-400');
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.classList.remove('text-emerald-400');
+                        }, 2000);
+                    }
+                });
+            });
+
+            // --- Parallax Logic ---
+            const parallaxElements = document.querySelectorAll('.parallax');
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        let scrollY = window.scrollY;
+                        parallaxElements.forEach(el => {
+                            let speed = parseFloat(el.getAttribute('data-speed')) || 0.1;
+                            el.style.transform = `translateY(${scrollY * speed}px)`;
+                        });
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        });
+    </script>
 </body>
 </html>
