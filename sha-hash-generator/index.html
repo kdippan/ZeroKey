@@ -10,28 +10,32 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure SHA Hash Generator | ZeroKey Tools</title>
-    <meta name="description" content="Free online tool to generate SHA-256, SHA-384, and SHA-512 hashes instantly using your browser's native Web Crypto API. Client-side, zero-knowledge hashing.">
-    <meta name="keywords" content="SHA-256 generator, SHA-512 hash calculator, Web Crypto API digest, online hash generator, client-side hashing, secure checksum calculator, cryptography utilities">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>Secure SHA Hash Generator Online | Free Client-Side Tool | ZeroKey</title>
+    <meta name="description" content="Free, 100% offline tool to generate SHA-256, SHA-384, and SHA-512 hashes instantly using your browser's native Web Crypto API. Client-side, zero-knowledge hashing.">
+    <meta name="keywords" content="SHA-256 generator, SHA-512 hash calculator, Web Crypto API digest, online hash generator, client-side hashing, secure checksum calculator, cryptography utilities, local hash tool">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     
-    <meta property="og:title" content="Secure SHA Hash Generator">
-    <meta property="og:description" content="Generate secure cryptographic hashes (SHA-256, SHA-512) entirely in your browser.">
+    <link rel="canonical" href="https://zerokey.vercel.app/sha-hash-generator">
+    
+    <meta property="og:title" content="Secure SHA Hash Generator | ZeroKey Tools">
+    <meta property="og:description" content="Generate secure cryptographic hashes (SHA-256, SHA-512) entirely in your browser without exposing your data.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zerokey.vercel.app/sha-hash-generator/index.html">
+    <meta property="og:url" content="https://zerokey.vercel.app/sha-hash-generator">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/tools.png">
 
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -48,52 +52,116 @@
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/sha-hash-generator/style.css">
 
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        /* Ensure code blocks don't wrap terribly on mobile */
+        pre code {
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+        }
+
+        /* Editor macOS dots */
+        .editor-dots { position: absolute; top: 14px; left: 16px; display: flex; gap: 8px; z-index: 20; }
+        .editor-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; border: 1px solid #e0443e; }
+        .dot-yellow { background: #ffbd2e; border: 1px solid #dea123; }
+        .dot-green { background: #27c93f; border: 1px solid #1aab29; }
+
+        /* Scroll Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* Diagram Animations */
+        @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+        .animate-pulse-glow { animation: pulse-glow 3s infinite ease-in-out; }
+        @keyframes data-flow { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(100px); opacity: 0; } }
+        .animate-data-flow { animation: data-flow 2s infinite linear; }
+    </style>
+
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "SHA Hash Generator",
-      "url": "https://zerokey.vercel.app/sha-hash-generator/index.html",
-      "description": "Calculate secure cryptographic hashes including SHA-256 and SHA-512 directly in the browser using the Web Crypto API.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Secure SHA Hash Generator",
+        "url": "https://zerokey.vercel.app/sha-hash-generator",
+        "description": "Compute secure cryptographic hashes (SHA-256, SHA-384, SHA-512) directly in the browser using the Web Crypto API.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dippan Bhusal"
+        }
       },
-      "author": {
-        "@type": "Person",
-        "name": "Dippan Bhusal"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the difference between hashing and encryption?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hashing is a one-way mathematical function. You cannot 'decrypt' a hash back into the original text. Encryption, on the other hand, is a two-way function where data can be decrypted if you have the correct key."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my text sent to a server to be hashed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. This tool runs entirely in your browser using the native Web Crypto API. The text you type is hashed locally in your device's memory, ensuring absolute privacy."
+            }
+          }
+        ]
       }
-    }
+    ]
     </script>
 </head>
-<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-purple-500/30 flex flex-col">
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
     
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="/" class="hover:text-white transition-colors">Home</a>
-                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Home' });">Home</a>
+                <a href="/tools" class="hover:text-white transition-colors text-slate-100">Tools</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Blog' });">Blog</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
-                <i class="ph ph-shield-check"></i> Launch Vault
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-0.5" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Vault' });">
+                Launch Vault
             </a>
         </div>
     </nav>
 
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl mx-auto">
-            <header class="mb-12 text-center">
-                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
-                    <i class="ph ph-hash"></i> Cryptography Utilities
+        <div class="max-w-5xl mx-auto">
+            
+            <header class="mb-12 text-center reveal">
+                <div class="flex items-center justify-center gap-2 text-purple-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph-fill ph-hash"></i> Cryptography Utilities
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     Secure SHA Hash Generator
@@ -102,84 +170,308 @@
                     Compute cryptographic hashes (SHA-256, SHA-384, SHA-512) instantly on your device. No data is ever transmitted to a server.
                 </p>
             </header>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-purple-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all"><i class="ph-fill ph-shield-check"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">100% Offline Integrity</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Pasting sensitive data into online hashers is a privacy risk. This tool executes entirely within your local browser memory.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-blue-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all"><i class="ph-fill ph-cpu"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Native Performance</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Instead of using slow NPM libraries, we use the blazing fast <code class="text-xs bg-slate-800 px-1 rounded">crypto.subtle.digest()</code> C++ browser engine.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-emerald-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all"><i class="ph-fill ph-check-circle"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Checksum Verification</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Perfect for generating signatures, verifying downloaded file integrity, or securely masking unique identifiers.</p>
+                </div>
+            </section>
             
-            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
-                <div class="space-y-6">
+            <section class="max-w-4xl mx-auto bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-16 reveal hover:border-slate-700 transition-colors duration-500">
+                <div class="space-y-6 relative z-10">
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <label for="inputText" class="block text-sm font-medium text-slate-300">Input Text</label>
-                            <span id="charCount" class="text-xs text-slate-500 font-mono">0 characters</span>
+                            <label for="inputText" class="block text-sm font-medium text-slate-300"><i class="ph-fill ph-text-t text-blue-400 mr-1"></i> Input Text</label>
+                            <span id="charCount" class="text-xs text-slate-500 font-mono bg-slate-800 px-2 py-1 rounded-md">0 characters</span>
                         </div>
-                        <textarea id="inputText" rows="5" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Type or paste the text you want to hash here..."></textarea>
+                        <textarea id="inputText" rows="6" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Type or paste the text you want to hash here..."></textarea>
                     </div>
 
                     <div>
-                        <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2">Algorithm</label>
-                        <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
-                            <option value="SHA-1">SHA-1 (Insecure, legacy only)</option>
-                            <option value="SHA-256" selected>SHA-256</option>
-                            <option value="SHA-384">SHA-384</option>
-                            <option value="SHA-512">SHA-512</option>
-                        </select>
+                        <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-gear text-purple-400 mr-1"></i> Digest Algorithm</label>
+                        <div class="relative">
+                            <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
+                                <option value="SHA-256" selected>SHA-256 (Standard)</option>
+                                <option value="SHA-384">SHA-384</option>
+                                <option value="SHA-512">SHA-512 (Highest Security)</option>
+                                <option value="SHA-1">SHA-1 (Insecure, legacy only)</option>
+                            </select>
+                            <i class="ph-bold ph-caret-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                        </div>
                     </div>
 
-                    <div class="pt-4 border-t border-slate-800">
+                    <div class="pt-6 border-t border-slate-800">
                         <label class="block text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wider text-xs">Generated Hash (Hex)</label>
                         <textarea id="outputHash" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-emerald-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
                     </div>
                 </div>
             </section>
-            
-            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
-                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+
+            <section class="mb-16 reveal">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">How ZeroKey Uses Hashing</h2>
+                    <p class="text-slate-400">We use hashes to identify your encrypted payloads without ever knowing what's inside them.</p>
                 </div>
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">Hashing isn't encryption.</h3>
-                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
-                        Hashes are one-way functions. If you need to securely send data that the recipient can actually read, you need AES-GCM encryption. <strong class="text-emerald-400">ZeroKey</strong> handles the entire encryption and secure delivery lifecycle for you.
-                    </p>
-                    <div class="flex gap-4 flex-wrap justify-center">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Launch ZeroKey Vault
-                        </a>
+                <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-2xl overflow-hidden hidden md:block">
+                    <div class="absolute top-[45%] left-[20%] w-20 h-0.5 bg-blue-500/50 animate-data-flow"></div>
+                    <div class="absolute top-[45%] left-[55%] w-20 h-0.5 bg-purple-500/50 animate-data-flow"></div>
+
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-3xl mb-3 shadow-lg relative z-10 animate-pulse-glow">
+                                <i class="ph-fill ph-file-text"></i>
+                            </div>
+                            <h4 class="text-white font-bold">1. Payload Created</h4>
+                            <p class="text-xs text-slate-400 mt-1">You generate an AES-GCM encrypted payload.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                <i class="ph-bold ph-hash text-blue-400"></i> SHA-256
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-purple-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph-fill ph-fingerprint"></i>
+                            </div>
+                            <h4 class="text-white font-bold">2. Hash ID Generated</h4>
+                            <p class="text-xs text-slate-400 mt-1">A one-way hash creates a unique identifier.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/50"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                <i class="ph-fill ph-database text-emerald-400"></i> Lookup
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-900 border border-slate-700 flex items-center justify-center text-emerald-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph-fill ph-magnifying-glass"></i>
+                            </div>
+                            <h4 class="text-white font-bold">3. Blind Retrieval</h4>
+                            <p class="text-xs text-slate-400 mt-1">Database fetches payload using the hash, without knowing the key.</p>
+                        </div>
                     </div>
                 </div>
             </section>
             
-            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold">What is a Cryptographic Hash?</h2>
-                <p>A cryptographic hash function is a mathematical algorithm that maps data of an arbitrary size (like a password or a massive file) to a bit string of a fixed size. The output is commonly called the hash value, hash code, or simply the digest.</p>
-                <p>Unlike encryption, hashing is a <strong class="text-white">one-way function</strong>. You cannot "decrypt" a SHA-256 hash to reveal the original input. This makes hashing perfect for verifying data integrity, storing passwords securely (often combined with a salt via PBKDF2 or bcrypt), and generating unique digital signatures.</p>
+            <section class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-3xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-16 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl reveal">
+                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="ph-fill ph-shield-warning text-[160px] text-emerald-500"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Hashing is a one-way street.</h3>
+                    <p class="text-slate-300 mb-8 leading-relaxed max-w-xl mx-auto text-lg">
+                        Hashes are designed to be irreversible. <strong class="text-white border-b border-emerald-500">Hashing is NOT encryption.</strong> You cannot "un-hash" a SHA-256 digest to read the original message.
+                    </p>
+                    <p class="text-slate-400 mb-8 text-sm max-w-lg mx-auto">
+                        If you need to securely send data that a recipient can actually read and decrypt, you need <strong class="text-white">AES-GCM encryption</strong>. ZeroKey handles the entire encryption, transport, and burn-after-reading lifecycle for you automatically.
+                    </p>
+                    <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] inline-flex items-center gap-2 text-lg hover:scale-105" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Hash Psycho CTA' });">
+                        <i class="ph-bold ph-lock-key"></i> Encrypt Reversible Data
+                    </a>
+                </div>
+            </section>
+            
+            <article class="max-w-4xl mx-auto prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 border-t border-slate-800 pt-16 reveal">
+                <h2 class="text-3xl font-bold">What is a Cryptographic Hash?</h2>
+                <p>A cryptographic hash function is a mathematical algorithm that maps data of an arbitrary size (like a password or a massive 10GB file) to a bit string of a fixed size. The output is commonly called the hash value, hash code, or simply the digest.</p>
+                <p>Unlike encryption, hashing is a <strong class="text-white">one-way function</strong>. You cannot "decrypt" a SHA-256 hash to reveal the original input. This makes hashing perfect for verifying data integrity, storing passwords securely (when combined with a salt via PBKDF2), and generating unique digital signatures.</p>
                 
-                <h2 class="text-2xl font-bold pt-4">Why use the Web Crypto API for hashing?</h2>
-                <p>Historically, developers had to import heavy JavaScript libraries like <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">crypto-js</code> to generate hashes in the browser. Today, modern browsers provide the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle.digest()</code> method natively. Using the native Web Crypto API provides several massive benefits:</p>
+                <h2 class="text-3xl font-bold pt-4 border-t border-slate-800/50 mt-10">Why use the Web Crypto API for hashing?</h2>
+                <p>Historically, developers had to import heavy, external JavaScript libraries like <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">crypto-js</code> to generate hashes in the browser. Today, modern browsers provide the <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">window.crypto.subtle.digest()</code> method natively. Using the native Web Crypto API provides massive benefits:</p>
                 <ul>
-                    <li><strong>Performance:</strong> Native C++ browser implementations are vastly faster than JavaScript polyfills.</li>
+                    <li><strong>Performance:</strong> Native C++ browser implementations are vastly faster than JS polyfills.</li>
                     <li><strong>Security:</strong> Eliminates the risk of third-party NPM package supply-chain attacks.</li>
                     <li><strong>Privacy:</strong> Data never leaves the client's device, ensuring compliance with strict privacy architectures.</li>
                 </ul>
                 
-                <h2 class="text-2xl font-bold pt-4">How to generate a SHA-256 hash in JavaScript</h2>
+                <h3 class="text-2xl font-bold pt-6 mt-8">How to generate a SHA-256 hash in JavaScript</h3>
                 <p>If you want to implement hashing in your own application, here is the clean, zero-dependency approach using vanilla JavaScript and the SubtleCrypto interface:</p>
-                <pre class="bg-[#020617] border border-slate-800 rounded-xl p-6 text-sm overflow-x-auto"><code class="language-javascript text-emerald-300">async function generateHash(message) {
+                
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center z-10">
+                        <div class="editor-dots">
+                            <div class="editor-dot dot-red"></div><div class="editor-dot dot-yellow"></div><div class="editor-dot dot-green"></div>
+                        </div>
+                        <span class="w-full text-center text-xs text-slate-400 font-mono absolute pointer-events-none">sha-hash.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-1">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-1" class="language-javascript text-emerald-300">async function generateHash(message) {
     const encoder = new TextEncoder();
     const data = encoder.encode(message);
+    
+    // Generate the raw ArrayBuffer digest
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    
+    // Convert the buffer to a Hex string for readability
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
     return hashHex;
 }</code></pre>
+                </div>
             </article>
+
+            <section class="max-w-4xl mx-auto py-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center border-t border-slate-800/50 pt-16">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            What is the difference between hashing and encryption?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Hashing is a one-way mathematical function. You cannot "decrypt" a hash back into the original text. It is used to verify that data hasn't changed. Encryption, on the other hand, is a two-way function where data can be decrypted back into its original form if you possess the correct secret key.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Is my text sent to a server to be hashed?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            No. This tool runs entirely offline in your browser using the native Web Crypto API. The text you type is hashed locally in your device's memory. We do not make any network requests, ensuring absolute privacy for your sensitive data.
+                        </div>
+                    </details>
+                    
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Why is SHA-1 still an option if it's insecure?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            SHA-1 is cryptographically broken and vulnerable to collision attacks. It should never be used for modern security applications. However, we include it as an option solely for developers who need to verify legacy system checksums or interact with older protocols (like basic Git commits) that still rely on SHA-1.
+                        </div>
+                    </details>
+                </div>
+            </section>
         </div>
     </main>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph-fill ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
     </footer>
 
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph-fill ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
+
     <script src="/sha-hash-generator/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Cookie Consent Logic ---
+            const cookieConsent = document.getElementById('cookieConsent');
+            if (cookieConsent && !localStorage.getItem('zerokey_cookies_accepted')) {
+                setTimeout(() => cookieConsent.classList.remove('translate-y-[150%]'), 1000);
+            }
+            const acceptBtn = document.getElementById('acceptCookiesBtn');
+            if(acceptBtn) {
+                acceptBtn.addEventListener('click', () => {
+                    localStorage.setItem('zerokey_cookies_accepted', 'true');
+                    cookieConsent.classList.add('translate-y-[150%]');
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'cookie_consent', { 'event_category': 'Engagement', 'event_label': 'Accepted' });
+                    }
+                });
+            }
+
+            // --- Scroll Reveal Logic ---
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOnScroll = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            reveals.forEach(reveal => revealOnScroll.observe(reveal));
+
+            // --- Code Copy Button Logic ---
+            document.querySelectorAll('.copy-code-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const targetId = btn.getAttribute('data-target');
+                    const codeElement = document.getElementById(targetId);
+                    
+                    if(codeElement) {
+                        await navigator.clipboard.writeText(codeElement.innerText);
+                        
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'click', { 'event_category': 'Tool', 'event_label': 'Copied Code Snippet' });
+                        }
+
+                        const originalHTML = btn.innerHTML;
+                        btn.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> Copied!';
+                        btn.classList.add('text-emerald-400');
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.classList.remove('text-emerald-400');
+                        }, 2000);
+                    }
+                });
+            });
+
+            // --- Parallax Logic ---
+            const parallaxElements = document.querySelectorAll('.parallax');
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        let scrollY = window.scrollY;
+                        parallaxElements.forEach(el => {
+                            let speed = parseFloat(el.getAttribute('data-speed')) || 0.1;
+                            el.style.transform = `translateY(${scrollY * speed}px)`;
+                        });
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        });
+    </script>
 </body>
 </html>
