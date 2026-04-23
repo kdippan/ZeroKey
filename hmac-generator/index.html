@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLS94VX99N');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMAC Signature Generator Online | ZeroKey Tools</title>
+    <meta name="description" content="Free, secure online HMAC generator. Calculate Hash-based Message Authentication Codes (HMAC SHA-256, SHA-512) for webhooks and APIs locally in your browser.">
+    <meta name="keywords" content="HMAC generator, HMAC SHA256 online, webhook signature calculator, API authentication HMAC, Web Crypto API HMAC, client-side signature generation">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <meta property="og:title" content="Secure HMAC Signature Generator | ZeroKey Tools">
+    <meta property="og:description" content="Generate API and webhook HMAC signatures locally in your browser without exposing your secret keys.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zerokey.vercel.app/hmac-generator/index.html">
+
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/hmac-generator/style.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "HMAC Signature Generator",
+      "url": "https://zerokey.vercel.app/hmac-generator/index.html",
+      "description": "Calculate Hash-based Message Authentication Codes (HMAC) entirely in the browser to verify webhooks and test API integrations safely.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Dippan Bhusal"
+      }
+    }
+    </script>
+</head>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    
+    <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
+            </div>
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
+                <i class="ph ph-shield-check"></i> Launch Vault
+            </a>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <header class="mb-12 text-center">
+                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-stamp"></i> Cryptography Utilities
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    HMAC Signature Generator
+                </h1>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
+                    Calculate Hash-based Message Authentication Codes (HMAC) to verify API requests and webhooks. Keys and payloads never leave your browser.
+                </p>
+            </header>
+            
+            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="messageInput" class="block text-sm font-medium text-slate-300">Message / Payload</label>
+                            <button id="clearMessageBtn" class="text-xs text-slate-500 hover:text-red-400 transition-colors"><i class="ph ph-trash"></i> Clear</button>
+                        </div>
+                        <textarea id="messageInput" rows="5" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Enter the raw JSON payload or message string here..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="secretKey" class="block text-sm font-medium text-slate-300 mb-2">Secret Key</label>
+                            <input type="password" id="secretKey" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" placeholder="Your secret signing key">
+                        </div>
+                        <div>
+                            <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2">Algorithm</label>
+                            <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
+                                <option value="SHA-256" selected>HMAC SHA-256 (Standard)</option>
+                                <option value="SHA-384">HMAC SHA-384</option>
+                                <option value="SHA-512">HMAC SHA-512</option>
+                                <option value="SHA-1">HMAC SHA-1 (Legacy)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-800">
+                        <div>
+                            <label class="block text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wider text-xs">Signature (Hex)</label>
+                            <textarea id="outputHex" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-emerald-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-blue-400 mb-2 uppercase tracking-wider text-xs">Signature (Base64)</label>
+                            <textarea id="outputBase64" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-blue-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
+                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-bold text-white mb-3">Authenticity is not Privacy.</h3>
+                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
+                        HMAC guarantees that a message hasn't been tampered with, but it does not encrypt the payload. Anyone intercepting the network request can read your data. If you need to send sensitive information privately, use <strong class="text-emerald-400">ZeroKey</strong> for complete end-to-end encryption.
+                    </p>
+                    <div class="flex gap-4 flex-wrap justify-center">
+                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
+                            <i class="ph ph-shield-check"></i> Launch ZeroKey Vault
+                        </a>
+                    </div>
+                </div>
+            </section>
+            
+            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
+                <h2 class="text-2xl font-bold">What is an HMAC?</h2>
+                <p>HMAC stands for Hash-based Message Authentication Code. It is a specific type of message authentication code involving a cryptographic hash function (like SHA-256) combined with a secret cryptographic key.</p>
+                <p>When two parties share a secret key, HMACs allow them to verify both the <strong class="text-white">data integrity</strong> and the <strong class="text-white">authenticity</strong> of a message. If a hacker intercepts a message and modifies the payload, the HMAC signature will completely change. Because the hacker does not possess the secret key, they cannot generate a new, valid signature for their tampered payload.</p>
+                
+                <h2 class="text-2xl font-bold pt-4">Why are HMACs used for Webhooks?</h2>
+                <p>Major platforms like Stripe, GitHub, Shopify, and Slack use HMAC signatures to secure their webhooks. When these platforms send an HTTP POST request to your backend server, they calculate an HMAC using the raw JSON payload and a secret key they gave you when you registered.</p>
+                <p>They attach this HMAC to a header (e.g., <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">Stripe-Signature</code> or <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">X-Hub-Signature-256</code>). Your server must take the incoming JSON, use your secret key to calculate its own HMAC, and compare it to the header. If they match, you know the webhook genuinely came from the service provider and was not forged by an attacker.</p>
+
+                <h2 class="text-2xl font-bold pt-4">Never expose your Secret Key online</h2>
+                <p>Pasting your Stripe or GitHub webhook secrets into random online calculators is incredibly dangerous. If a remote server logs your secret key, attackers can send malicious webhooks to your application (e.g., faking a successful payment). This <strong class="text-white">ZeroKey Utility</strong> utilizes the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">window.crypto.subtle.sign()</code> API. All signature generation happens locally in your browser memory, ensuring your API secrets are never transmitted across the internet.</p>
+            </article>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+        </div>
+    </footer>
+
+    <script src="/hmac-generator/main.js"></script>
+</body>
+</html>
