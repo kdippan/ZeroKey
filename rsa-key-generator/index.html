@@ -10,28 +10,32 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure RSA Key Pair Generator Online | ZeroKey Tools</title>
-    <meta name="description" content="Free, secure online RSA key generator. Generate 2048-bit and 4096-bit public/private key pairs in PEM format entirely in your browser. Zero-knowledge cryptography.">
-    <meta name="keywords" content="RSA key generator online, generate public private key pair, PEM key generator, 2048 bit RSA, 4096 bit RSA, Web Crypto API RSA, client-side key generation, PKCS8, SPKI">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>Secure RSA Key Pair Generator Online | Free Client-Side Tool | ZeroKey</title>
+    <meta name="description" content="Free, secure online RSA key generator. Generate 2048-bit and 4096-bit public and private key pairs in PEM format entirely in your browser. Zero-knowledge cryptography.">
+    <meta name="keywords" content="RSA key generator online, generate public private key pair, PEM key generator, 2048 bit RSA, 4096 bit RSA, Web Crypto API RSA, client-side key generation, PKCS8, SPKI, local developer tools">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <link rel="canonical" href="https://zerokey.vercel.app/rsa-key-generator">
     
     <meta property="og:title" content="Secure RSA Key Pair Generator | ZeroKey Tools">
     <meta property="og:description" content="Instantly generate cryptographically secure RSA public and private keys locally in your browser.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zerokey.vercel.app/rsa-key-generator/index.html">
+    <meta property="og:url" content="https://zerokey.vercel.app/rsa-key-generator">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/tools.png">
 
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -48,101 +52,186 @@
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/rsa-key-generator/style.css">
 
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        /* Ensure code blocks don't wrap terribly on mobile */
+        pre code {
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+        }
+
+        /* Editor macOS dots */
+        .editor-dots { position: absolute; top: 14px; left: 16px; display: flex; gap: 8px; z-index: 20; }
+        .editor-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; border: 1px solid #e0443e; }
+        .dot-yellow { background: #ffbd2e; border: 1px solid #dea123; }
+        .dot-green { background: #27c93f; border: 1px solid #1aab29; }
+
+        /* Scroll Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* Diagram Animations */
+        @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+        .animate-pulse-glow { animation: pulse-glow 3s infinite ease-in-out; }
+        @keyframes data-flow { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(100px); opacity: 0; } }
+        .animate-data-flow { animation: data-flow 2s infinite linear; }
+    </style>
+
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Secure RSA Key Pair Generator",
-      "url": "https://zerokey.vercel.app/rsa-key-generator/index.html",
-      "description": "Generate secure RSA public and private key pairs (1024, 2048, 4096-bit) in PEM format locally using the Web Crypto API.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Secure RSA Key Pair Generator",
+        "url": "https://zerokey.vercel.app/rsa-key-generator",
+        "description": "Generate secure RSA public and private key pairs (1024, 2048, 4096-bit) in PEM format locally using the Web Crypto API.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dippan Bhusal"
+        }
       },
-      "author": {
-        "@type": "Person",
-        "name": "Dippan Bhusal"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is it safe to generate RSA keys online?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Generating keys on standard online tools is dangerous because the server can log your Private Key. However, this ZeroKey utility is 100% client-side. The keys are mathematically generated using your device's local entropy, meaning your Private Key never leaves your browser."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is PEM Format?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "PEM (Privacy-Enhanced Mail) is a Base64 encoded string of the raw binary cryptographic key, wrapped with explicit header and footer lines. This format allows keys to be easily copied, pasted, and stored in .env files without binary corruption."
+            }
+          }
+        ]
       }
-    }
+    ]
     </script>
 </head>
-<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30 flex flex-col">
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
     
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="/" class="hover:text-white transition-colors">Home</a>
-                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Home' });">Home</a>
+                <a href="/tools" class="hover:text-white transition-colors text-slate-100">Tools</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Blog' });">Blog</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
-                <i class="ph ph-shield-check"></i> Launch Vault
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-0.5" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Vault' });">
+                Launch Vault
             </a>
         </div>
     </nav>
 
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
-            <header class="mb-12 text-center">
-                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
-                    <i class="ph ph-key"></i> Key Management
+            
+            <header class="mb-12 text-center reveal">
+                <div class="flex items-center justify-center gap-2 text-blue-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph-fill ph-key"></i> Key Management
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     RSA Key Pair Generator
                 </h1>
                 <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                    Generate secure RSA public and private keys in PEM format. All cryptographic generation happens instantly in your browser.
+                    Generate secure RSA public and private keys in PEM format. All cryptographic generation happens instantly and safely in your local browser memory.
                 </p>
             </header>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-blue-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all"><i class="ph-fill ph-shield-check"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">100% Client-Side</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">We don't use servers to generate keys. Your private keys are created using your device's local CPU entropy.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-purple-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all"><i class="ph-fill ph-file-code"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Standard PEM Format</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Keys are automatically exported as PKCS#8 and SPKI and wrapped in Base64 for easy `.env` injection.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-emerald-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all"><i class="ph-fill ph-lock-key"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Military-Grade Security</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Support for 2048-bit (standard) and highly secure 4096-bit RSA moduli for SSL, SSH, or JWT configurations.</p>
+                </div>
+            </section>
             
-            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
+            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-16 reveal hover:border-slate-700 transition-colors duration-500">
                 
                 <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 border-b border-slate-800 pb-8">
                     <div class="w-full md:w-auto flex-grow max-w-xs">
-                        <label for="keySize" class="block text-sm font-medium text-slate-300 mb-2">Key Size (Modulus Length)</label>
-                        <select id="keySize" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
-                            <option value="1024">1024-bit (Fast, Less Secure)</option>
-                            <option value="2048" selected>2048-bit (Standard)</option>
-                            <option value="4096">4096-bit (Highly Secure, Slower)</option>
-                        </select>
+                        <label for="keySize" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-gear text-purple-400 mr-1"></i> Key Size (Modulus Length)</label>
+                        <div class="relative">
+                            <select id="keySize" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
+                                <option value="1024">1024-bit (Fast, Less Secure)</option>
+                                <option value="2048" selected>2048-bit (Standard)</option>
+                                <option value="4096">4096-bit (Highly Secure, Slower)</option>
+                            </select>
+                            <i class="ph-bold ph-caret-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                        </div>
                     </div>
                     
-                    <button id="generateBtn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-8 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] mt-6 md:mt-0 flex justify-center items-center gap-2 whitespace-nowrap">
-                        <i class="ph ph-magic-wand font-bold"></i> Generate New Key Pair
+                    <button id="generateBtn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] mt-6 md:mt-0 flex justify-center items-center gap-2 whitespace-nowrap hover:-translate-y-1 text-lg" onclick="gtag('event', 'use_tool', { 'event_category': 'Tool', 'event_label': 'Generated RSA Key' });">
+                        <i class="ph-bold ph-magic-wand"></i> Generate Key Pair
                     </button>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
-                    <div class="flex flex-col h-full">
+                    <div class="flex flex-col h-full relative group">
                         <div class="flex justify-between items-center mb-3">
                             <div>
                                 <label class="block text-sm font-bold text-emerald-400 uppercase tracking-wider">Public Key</label>
                                 <span class="text-xs text-slate-500 font-mono">SPKI / PEM Format</span>
                             </div>
-                            <button id="copyPublicBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50" disabled>
-                                <i class="ph ph-copy"></i> Copy
+                            <button id="copyPublicBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50 border border-slate-700" disabled>
+                                <i class="ph-bold ph-copy"></i> Copy
                             </button>
                         </div>
                         <textarea id="publicKeyOutput" rows="12" readonly class="flex-grow w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-emerald-300 focus:outline-none font-mono text-xs whitespace-pre shadow-inner resize-none" placeholder="Click 'Generate' to create a Public Key..."></textarea>
                     </div>
 
-                    <div class="flex flex-col h-full">
+                    <div class="flex flex-col h-full relative group">
                         <div class="flex justify-between items-center mb-3">
                             <div>
                                 <label class="block text-sm font-bold text-red-400 uppercase tracking-wider">Private Key</label>
                                 <span class="text-xs text-slate-500 font-mono">PKCS#8 / PEM Format (Keep Secret)</span>
                             </div>
-                            <button id="copyPrivateBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50" disabled>
-                                <i class="ph ph-copy"></i> Copy
+                            <button id="copyPrivateBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50 border border-slate-700" disabled>
+                                <i class="ph-bold ph-copy"></i> Copy
                             </button>
                         </div>
                         <textarea id="privateKeyOutput" rows="12" readonly class="flex-grow w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-red-300 focus:outline-none font-mono text-xs whitespace-pre shadow-inner resize-none" placeholder="Click 'Generate' to create a Private Key..."></textarea>
@@ -150,45 +239,249 @@
 
                 </div>
             </section>
-            
-            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
-                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+
+            <section class="mb-16 reveal">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">How Local Generation Works</h2>
+                    <p class="text-slate-400">Your Private Key mathematically never leaves your device's memory.</p>
                 </div>
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">Need to share an API Key securely?</h3>
-                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
-                        Never send RSA private keys, API tokens, or passwords over Slack or email. Use <strong class="text-emerald-400">ZeroKey</strong> to encrypt your sensitive data locally and generate a burn-after-reading link that permanently self-destructs.
-                    </p>
-                    <div class="flex gap-4 flex-wrap justify-center">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Encrypt a Secret
-                        </a>
+                <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-2xl overflow-hidden hidden md:block">
+                    <div class="absolute top-[45%] left-[20%] w-20 h-0.5 bg-blue-500/50 animate-data-flow"></div>
+                    <div class="absolute top-[45%] left-[55%] w-20 h-0.5 bg-purple-500/50 animate-data-flow"></div>
+
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-3xl mb-3 shadow-lg relative z-10 animate-pulse-glow">
+                                <i class="ph-fill ph-cpu"></i>
+                            </div>
+                            <h4 class="text-white font-bold">1. Local Entropy</h4>
+                            <p class="text-xs text-slate-400 mt-1">Browser uses your device's CPU hardware to generate randomness.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                <i class="ph-bold ph-gear text-blue-400"></i> SubtleCrypto
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-purple-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph-fill ph-math-operations"></i>
+                            </div>
+                            <h4 class="text-white font-bold">2. Math Engine</h4>
+                            <p class="text-xs text-slate-400 mt-1">Generates the mathematically linked Public and Private moduli.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/50"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                <i class="ph-fill ph-export text-emerald-400"></i> Export Format
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-900 border border-slate-700 flex items-center justify-center text-emerald-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph-fill ph-file-code"></i>
+                            </div>
+                            <h4 class="text-white font-bold">3. PEM Output</h4>
+                            <p class="text-xs text-slate-400 mt-1">Raw binary keys are Base64 encoded for safe copying.</p>
+                        </div>
                     </div>
                 </div>
             </section>
             
-            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold">What is RSA Asymmetric Cryptography?</h2>
+            <section class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-3xl border-2 border-red-600/50 bg-red-950/20 backdrop-blur-md my-16 relative overflow-hidden group hover:border-red-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl reveal">
+                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="ph-fill ph-shield-warning text-[160px] text-red-500"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Never send a Private Key over email.</h3>
+                    <p class="text-slate-300 mb-8 leading-relaxed max-w-xl mx-auto text-lg">
+                        Your RSA Private Key is the master key to your servers and databases. <strong class="text-white border-b border-red-500">Pasting it into Slack, Discord, or Email means it will be stored in plaintext on their servers forever.</strong>
+                    </p>
+                    <p class="text-slate-400 mb-8 text-sm max-w-lg mx-auto">
+                        If you need to share this newly generated key with a colleague, use <strong class="text-white">ZeroKey</strong> to encrypt it locally and send a link that permanently self-destructs the moment they copy it.
+                    </p>
+                    <a href="/encrypt" class="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_25px_rgba(239,68,68,0.4)] inline-flex items-center gap-2 text-lg hover:scale-105" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'RSA Psycho CTA' });">
+                        <i class="ph-bold ph-lock-key"></i> Encrypt Your Secret Key
+                    </a>
+                </div>
+            </section>
+            
+            <article class="max-w-4xl mx-auto prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 border-t border-slate-800 pt-16 reveal">
+                <h2 class="text-3xl font-bold">What is RSA Asymmetric Cryptography?</h2>
                 <p>RSA (Rivest–Shamir–Adleman) is a public-key cryptosystem widely used for secure data transmission. In an asymmetric cryptographic system, two different mathematically linked keys are generated: a <strong>Public Key</strong> and a <strong>Private Key</strong>.</p>
                 <p>The Public Key can be shared with anyone. It is used to encrypt messages. However, once a message is encrypted with the Public Key, it can <em>only</em> be decrypted by the matching Private Key. The Private Key must be kept absolutely secret. RSA is the foundational technology behind HTTPS/TLS certificates, SSH logins, and JSON Web Token (JWT) RS256 signing.</p>
 
-                <h2 class="text-2xl font-bold pt-4">Why use the Web Crypto API for RSA Generation?</h2>
-                <p>Traditionally, developers use command-line tools like OpenSSL to generate RSA keys. However, relying on online, third-party key generators is extremely dangerous. If a remote server generates your Private Key, the server owner can silently save a copy of it, completely compromising your system's security.</p>
-                <p>This <strong class="text-white">ZeroKey Utility</strong> solves this problem by using the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">window.crypto.subtle.generateKey()</code> API. The keys are mathematically generated using your device's local entropy (CPU randomness). The Private Key never leaves your browser, ensuring absolute zero-knowledge security.</p>
+                <h3 class="text-2xl font-bold pt-6 border-t border-slate-800/50 mt-10">How to generate an RSA Key Pair in JavaScript</h3>
+                <p>You no longer need to execute OpenSSL commands in your terminal or install massive NPM packages to generate RSA keys. You can use the native browser <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">Web Crypto API</code>:</p>
                 
-                <h2 class="text-2xl font-bold pt-4">What is PEM Format?</h2>
-                <p>PEM (Privacy-Enhanced Mail) is the most common format for X.509 certificates and cryptographic keys. It is essentially a Base64 encoded string of the raw binary key, wrapped with explicit header and footer lines (e.g., <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">-----BEGIN PRIVATE KEY-----</code>). This text-based format allows cryptographic keys to be easily copied, pasted, and stored in `.env` files or CI/CD pipelines without binary corruption.</p>
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center z-10">
+                        <div class="editor-dots">
+                            <div class="editor-dot dot-red"></div><div class="editor-dot dot-yellow"></div><div class="editor-dot dot-green"></div>
+                        </div>
+                        <span class="w-full text-center text-xs text-slate-400 font-mono absolute pointer-events-none">rsa-generator.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-1">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-1" class="language-javascript text-emerald-300">async function generateRSA() {
+    // 1. Generate the raw Key Pair
+    const keyPair = await window.crypto.subtle.generateKey(
+        {
+            name: "RSASSA-PKCS1-v1_5",
+            modulusLength: 2048, // Can be 1024, 2048, or 4096
+            publicExponent: new Uint8Array([1, 0, 1]), // 65537 standard
+            hash: "SHA-256"
+        },
+        true, // extractable
+        ["sign", "verify"]
+    );
+
+    // 2. Export them into binary ArrayBuffers
+    const publicKeyBuffer = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+    const privateKeyBuffer = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+    
+    // You would then Base64 encode these buffers to create PEM strings
+    return { publicKeyBuffer, privateKeyBuffer };
+}</code></pre>
+                </div>
             </article>
+
+            <section class="max-w-4xl mx-auto py-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center border-t border-slate-800/50 pt-16">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Is it safe to generate RSA keys online?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Generating keys on standard online tools is extremely dangerous because a malicious remote server could secretly save a copy of your Private Key. However, this <strong class="text-white">ZeroKey Utility</strong> is completely different. It runs 100% locally using your browser's Web Crypto API. The keys are generated mathematically on your own device, and we make zero network requests to fetch or store them.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            What is PEM Format?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            PEM (Privacy-Enhanced Mail) is the most common text format for cryptographic keys and certificates. When the browser generates a key, it outputs raw binary data. PEM takes that binary data, encodes it using Base64, and wraps it with header and footer lines (e.g., <code class="bg-slate-800 px-1 rounded font-mono">-----BEGIN PRIVATE KEY-----</code>). This makes it easy to copy, paste, and store inside `.env` configuration files without risking data corruption.
+                        </div>
+                    </details>
+                </div>
+            </section>
         </div>
     </main>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph-fill ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
     </footer>
 
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph-fill ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
+
     <script src="/rsa-key-generator/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Cookie Consent Logic ---
+            const cookieConsent = document.getElementById('cookieConsent');
+            if (cookieConsent && !localStorage.getItem('zerokey_cookies_accepted')) {
+                setTimeout(() => cookieConsent.classList.remove('translate-y-[150%]'), 1000);
+            }
+            const acceptBtn = document.getElementById('acceptCookiesBtn');
+            if(acceptBtn) {
+                acceptBtn.addEventListener('click', () => {
+                    localStorage.setItem('zerokey_cookies_accepted', 'true');
+                    cookieConsent.classList.add('translate-y-[150%]');
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'cookie_consent', { 'event_category': 'Engagement', 'event_label': 'Accepted' });
+                    }
+                });
+            }
+
+            // --- Scroll Reveal Logic ---
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOnScroll = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            reveals.forEach(reveal => revealOnScroll.observe(reveal));
+
+            // --- Code Copy Button Logic ---
+            document.querySelectorAll('.copy-code-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const targetId = btn.getAttribute('data-target');
+                    const codeElement = document.getElementById(targetId);
+                    
+                    if(codeElement) {
+                        await navigator.clipboard.writeText(codeElement.innerText);
+                        
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'click', { 'event_category': 'Tool', 'event_label': 'Copied Code Snippet' });
+                        }
+
+                        const originalHTML = btn.innerHTML;
+                        btn.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> Copied!';
+                        btn.classList.add('text-emerald-400');
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.classList.remove('text-emerald-400');
+                        }, 2000);
+                    }
+                });
+            });
+
+            // --- Parallax Logic ---
+            const parallaxElements = document.querySelectorAll('.parallax');
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        let scrollY = window.scrollY;
+                        parallaxElements.forEach(el => {
+                            let speed = parseFloat(el.getAttribute('data-speed')) || 0.1;
+                            el.style.transform = `translateY(${scrollY * speed}px)`;
+                        });
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        });
+    </script>
 </body>
 </html>
