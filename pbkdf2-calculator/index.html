@@ -1,111 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PBKDF2 Password Stretching Calculator Online | ZeroKey Tools</title>
-    <meta name="description" content="Free online PBKDF2 calculator. Stretch your passwords securely using Web Crypto API. Test PBKDF2-HMAC-SHA256 and SHA512 iterations directly in your browser.">
-    <meta name="keywords" content="PBKDF2 calculator online, password stretching tool, Web Crypto API PBKDF2, calculate PBKDF2 hash, key derivation function, secure password hashing, zero-knowledge tools">
-    
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg"> <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="pbkdf2-calculator/style.css">
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLS94VX99N"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
+      gtag('config', 'G-SLS94VX99N');
     </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBKDF2 Password Stretching Calculator | ZeroKey Tools</title>
+    <meta name="description" content="Free online PBKDF2 calculator. Stretch your passwords securely using Web Crypto API. Test PBKDF2-HMAC-SHA256 and SHA512 iterations directly in your browser.">
+    <meta name="keywords" content="PBKDF2 calculator online, password stretching tool, Web Crypto API PBKDF2, calculate PBKDF2 hash, key derivation function, secure password hashing, zero-knowledge tools">
+    <meta name="author" content="Dippan Bhusal">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/pbkdf2-calculator/style.css">
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen font-sans selection:bg-cyan-900 selection:text-cyan-100">
-
-    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">🔒</span>
-                <a href="/" class="text-xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors">ZeroKey Tools</a>
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
+                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">Home</a>
+                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
+                <a href="/status" class="hover:text-white transition-colors">Status</a>
+                <a href="/about" class="hover:text-white transition-colors">About</a>
             </div>
-            <a href="https://zerokey.vercel.app" class="text-sm font-medium text-gray-300 hover:text-white border border-gray-700 hover:border-cyan-500 px-4 py-2 rounded-lg transition-all">
-                Main App
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                Launch Vault
             </a>
         </div>
-    </header>
-
-    <main class="max-w-4xl mx-auto px-4 py-10 space-y-12">
-        
-        <div class="text-center space-y-4">
-            <h1 class="text-3xl md:text-4xl font-bold text-white">PBKDF2 Password Calculator</h1>
-            <p class="text-gray-400 max-w-2xl mx-auto">Generate derived keys using the Password-Based Key Derivation Function 2 (PBKDF2) entirely in your browser using the native Web Crypto API.</p>
-        </div>
-
-        <div class="bg-gray-800 rounded-2xl border border-gray-700 p-6 md:p-8 shadow-xl max-w-2xl mx-auto">
-            <div class="space-y-5">
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Password / Passphrase</label>
-                    <input type="text" id="password" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-gray-100 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 outline-none" value="MySuperSecretPassword" placeholder="Enter password">
+    </nav>
+    <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <header class="mb-12 text-center">
+                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph ph-password"></i> Cryptography Tools
                 </div>
-                
-                <div>
-                    <label for="salt" class="block text-sm font-medium text-gray-300 mb-1">Salt (String)</label>
-                    <input type="text" id="salt" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-gray-100 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 outline-none" value="RandomSalt123" placeholder="Enter salt">
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    PBKDF2 Password Calculator
+                </h1>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
+                    Generate derived keys using the Password-Based Key Derivation Function 2 (PBKDF2) locally in your browser.
+                </p>
+            </header>
+            <div class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
+                <div class="space-y-6 relative z-10">
                     <div>
-                        <label for="iterations" class="block text-sm font-medium text-gray-300 mb-1">Iterations</label>
-                        <input type="number" id="iterations" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-gray-100 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 outline-none" value="210000">
-                        <p class="text-xs text-gray-500 mt-1">OWASP recommends 210,000+ for SHA-512</p>
+                        <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Password / Passphrase</label>
+                        <input type="text" id="password" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" value="MySuperSecretPassword">
                     </div>
                     <div>
-                        <label for="hashAlg" class="block text-sm font-medium text-gray-300 mb-1">Hash Algorithm</label>
-                        <select id="hashAlg" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-gray-100 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 outline-none appearance-none">
-                            <option value="SHA-256">SHA-256</option>
-                            <option value="SHA-384">SHA-384</option>
-                            <option value="SHA-512" selected>SHA-512</option>
-                        </select>
+                        <label for="salt" class="block text-sm font-medium text-slate-300 mb-2">Salt (String)</label>
+                        <input type="text" id="salt" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" value="RandomSalt123">
                     </div>
-                </div>
-
-                <button id="calculateBtn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-4">
-                    Generate Derived Key
-                </button>
-
-                <div class="pt-4 border-t border-gray-700 mt-6">
-                    <label class="block text-sm font-medium text-cyan-400 mb-2">Derived Key (Hex Output)</label>
-                    <div class="relative">
-                        <textarea id="outputHex" rows="3" readonly class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-green-400 font-mono text-sm focus:outline-none break-all"></textarea>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="iterations" class="block text-sm font-medium text-slate-300 mb-2">Iterations</label>
+                            <input type="number" id="iterations" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm" value="210000">
+                        </div>
+                        <div>
+                            <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2">Hash Algorithm</label>
+                            <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
+                                <option value="SHA-256">SHA-256</option>
+                                <option value="SHA-384">SHA-384</option>
+                                <option value="SHA-512" selected>SHA-512</option>
+                            </select>
+                        </div>
                     </div>
-                    <p id="timeTaken" class="text-xs text-gray-500 mt-2"></p>
+                    <button id="calculateBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] mt-2 flex justify-center items-center gap-2">
+                        <i class="ph ph-cpu text-lg"></i> Generate Derived Key
+                    </button>
+                    <div class="pt-6 border-t border-slate-800 mt-2">
+                        <label class="block text-sm font-medium text-emerald-400 mb-2 uppercase tracking-wider text-xs">Derived Key (Hex Output)</label>
+                        <textarea id="outputHex" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-emerald-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <p id="timeTaken" class="text-xs text-slate-500 font-mono"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all">
+                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-bold text-white mb-3">See this architecture in action</h3>
+                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
+                        We used this exact cryptographic approach to build <strong class="text-emerald-400">ZeroKey</strong>, an open-source payload delivery system.
+                    </p>
+                    <p class="text-slate-400 mb-6 text-sm">
+                        If you want to test the destruction protocol yourself, generate a payload, open the link, and watch the zero-retention database permanently purge the record.
+                    </p>
+                    <div class="flex gap-4 flex-wrap">
+                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
+                            <i class="ph ph-shield-check"></i> Test the Burn Protocol
+                        </a>
+                        <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
+                            <i class="ph ph-github-logo"></i> View the SQL Schema
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
+                <h2 class="text-2xl font-bold">What is PBKDF2?</h2>
+                <p>Password-Based Key Derivation Function 2 (PBKDF2) is a cryptographic standard designed to reduce vulnerabilities to brute-force attacks. It applies a pseudorandom function, such as HMAC, to an input password along with a salt value, repeating the process many times to produce a secure derived key.</p>
+                <h2 class="text-2xl font-bold pt-4">Why is Password Stretching Important?</h2>
+                <p>Modern graphics cards (GPUs) can guess billions of passwords per second. If an application only hashes a password once (e.g., a simple SHA-256 hash), an attacker can easily crack it using a dictionary attack. PBKDF2 mitigates this by introducing <strong class="text-white">iterations</strong> (password stretching). By forcing the CPU to hash the password hundreds of thousands of times, it artificially slows down the derivation process. This millisecond delay is unnoticeable to a normal user logging in, but computationally devastating for an attacker trying to brute-force millions of hashes.</p>
+                <h2 class="text-2xl font-bold pt-4">How does this tool work securely?</h2>
+                <p>This tool runs entirely in your browser using the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">Web Crypto API</code>. When you click "Generate", no data is transmitted over the network. The JavaScript executes the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle.deriveBits()</code> function locally, making it a completely safe and privacy-respecting utility for developers testing cryptography implementations.</p>
+            </div>
         </div>
-
-        <div class="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl border border-cyan-900 p-8 text-center shadow-2xl max-w-3xl mx-auto">
-            <h3 class="text-2xl font-bold text-white mb-3">Need to share a secret securely?</h3>
-            <p class="text-gray-400 mb-6">Stop sending passwords over chat. ZeroKey is an open-source, burn-after-reading vault. Data is encrypted locally and permanently destroyed after one read.</p>
-            <a href="https://zerokey.vercel.app" target="_blank" class="inline-block bg-white text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition-transform hover:scale-105">
-                Launch ZeroKey Vault 🚀
-            </a>
-        </div>
-
-        <article class="prose prose-invert prose-cyan max-w-3xl mx-auto border-t border-gray-800 pt-10">
-            <h2>What is PBKDF2?</h2>
-            <p><strong>Password-Based Key Derivation Function 2 (PBKDF2)</strong> is a cryptographic standard used to reduce vulnerabilities to brute-force attacks. It applies a pseudorandom function, such as HMAC, to the input password or passphrase along with a salt value and repeats the process many times to produce a derived key.</p>
-            
-            <h3>Why is Password Stretching Important?</h3>
-            <p>Modern graphics cards (GPUs) can guess billions of passwords per second. If your application only hashes a password once (e.g., a simple SHA-256 hash), a hacker can easily crack it using a dictionary attack. PBKDF2 solves this by introducing <strong>iterations</strong> (password stretching). By forcing the computer to hash the password hundreds of thousands of times, it slows down the derivation process. This delay is unnoticeable to a normal user logging in, but computationally devastating for an attacker trying to guess millions of passwords.</p>
-
-            <h3>How does this PBKDF2 Calculator work?</h3>
-            <p>This tool runs entirely in your browser using the native <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" class="text-cyan-400 hover:underline">Web Crypto API</a>. When you click "Generate", no data is sent to our servers. The JavaScript executes the <code>window.crypto.subtle.deriveBits()</code> function locally, making it a safe and privacy-respecting tool for developers testing cryptography implementations.</p>
-        </article>
-
     </main>
-
-    <footer class="border-t border-gray-800 mt-20 py-8 text-center text-gray-500 text-sm">
-        <p>Built for a more secure web by the developers of <a href="https://zerokey.vercel.app" class="text-cyan-500 hover:underline">ZeroKey</a>.</p>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
+            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+        </div>
     </footer>
-
     <script src="/pbkdf2-calculator/main.js"></script>
 </body>
 </html>
