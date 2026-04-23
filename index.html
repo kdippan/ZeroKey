@@ -116,13 +116,14 @@
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30 selection:text-blue-200">
     
-    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="parallax absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0 will-change-transform" data-speed="0.2"></div>
+    <div class="parallax absolute top-[40%] right-1/4 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0 will-change-transform" data-speed="0.1"></div>
+    <div class="parallax absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none z-0 will-change-transform" data-speed="0.3"></div>
 
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400 items-center">
                 <a href="/about" class="hover:text-white transition-colors">How it Works</a>
@@ -130,9 +131,9 @@
                 <a href="/blog" class="hover:text-white transition-colors">Blog</a>
                 <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
                 <a href="/contact" class="hover:text-white transition-colors">Contact</a>
-                <a href="/donate" class="hover:text-red-400 transition-colors flex items-center gap-1"><i class="ph-fill ph-heart text-red-500"></i> Support</a>
+                <a href="/donate" class="hover:text-red-400 transition-colors flex items-center gap-1 group"><i class="ph-fill ph-heart text-red-500 group-hover:scale-110 transition-transform"></i> Support</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]">
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] hover:-translate-y-0.5">
                 Launch Vault
             </a>
         </div>
@@ -140,7 +141,7 @@
 
     <main class="relative z-10">
         <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-6 hover:bg-emerald-500/20 transition-colors cursor-default">
                 <span class="relative flex h-2 w-2">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -156,13 +157,14 @@
             </p>
             
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                <a href="/encrypt" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg px-8 py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 group">
+                <a href="/encrypt" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg px-8 py-4 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_40px_rgba(37,99,235,0.4)] hover:-translate-y-1 flex items-center justify-center gap-2 group">
                     <i class="ph ph-lock-key text-2xl group-hover:scale-110 transition-transform"></i> Encrypt a Payload
                 </a>
             </div>
 
-            <div class="relative mx-auto max-w-4xl">
-                <img src="/assets/og/index.png" alt="ZeroKey dashboard demonstrating client-side AES-GCM encryption and self-destructing message creation" class="rounded-2xl shadow-2xl border border-slate-700/50 w-full object-cover aspect-video bg-slate-900/50">
+            <div class="relative mx-auto max-w-4xl group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <img src="/assets/og/index.png" alt="ZeroKey dashboard demonstrating client-side AES-GCM encryption and self-destructing message creation" class="relative rounded-2xl shadow-2xl border border-slate-700/50 w-full object-cover aspect-video bg-slate-900/50 transition-transform duration-700 group-hover:scale-[1.01]">
             </div>
         </section>
 
@@ -170,30 +172,30 @@
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 class="text-3xl font-bold text-white mb-10 text-center">5 Reasons to Use Client-Side Encryption</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-                        <span class="text-4xl font-black text-blue-500/20 absolute -mt-4 -ml-2">01</span>
-                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Absolute Privacy</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed relative z-10">Unencrypted plaintext never leaves your device. We fundamentally cannot read, scan, or monetize your private data.</p>
+                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] hover:border-slate-600 hover:bg-slate-800/80 group cursor-default">
+                        <span class="text-4xl font-black text-blue-500/20 absolute -mt-4 -ml-2 group-hover:text-blue-500/40 transition-colors">01</span>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-blue-300 transition-colors">Absolute Privacy</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed relative z-10 group-hover:text-slate-300 transition-colors">Unencrypted plaintext never leaves your device. We fundamentally cannot read, scan, or monetize your private data.</p>
                     </article>
-                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-                        <span class="text-4xl font-black text-emerald-500/20 absolute -mt-4 -ml-2">02</span>
-                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Burn After Reading</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed relative z-10">Data is completely eradicated from our PostgreSQL database the millisecond it is decrypted by the recipient.</p>
+                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] hover:border-slate-600 hover:bg-slate-800/80 group cursor-default">
+                        <span class="text-4xl font-black text-emerald-500/20 absolute -mt-4 -ml-2 group-hover:text-emerald-500/40 transition-colors">02</span>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-emerald-300 transition-colors">Burn After Reading</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed relative z-10 group-hover:text-slate-300 transition-colors">Data is completely eradicated from our PostgreSQL database the millisecond it is decrypted by the recipient.</p>
                     </article>
-                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-                        <span class="text-4xl font-black text-purple-500/20 absolute -mt-4 -ml-2">03</span>
-                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Biometric Security</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed relative z-10">Integrates with WebAuthn to require physical human presence (TouchID/FaceID), blocking chat-bots from prematurely burning links.</p>
+                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] hover:border-slate-600 hover:bg-slate-800/80 group cursor-default">
+                        <span class="text-4xl font-black text-purple-500/20 absolute -mt-4 -ml-2 group-hover:text-purple-500/40 transition-colors">03</span>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-purple-300 transition-colors">Biometric Security</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed relative z-10 group-hover:text-slate-300 transition-colors">Integrates with WebAuthn to require physical human presence (TouchID/FaceID), blocking chat-bots from prematurely burning links.</p>
                     </article>
-                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-                        <span class="text-4xl font-black text-orange-500/20 absolute -mt-4 -ml-2">04</span>
-                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Geofencing</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed relative z-10">Restrict payload decryption to a specific 50-meter GPS radius. If they aren't at the location, the data self-destructs.</p>
+                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] hover:border-slate-600 hover:bg-slate-800/80 group cursor-default">
+                        <span class="text-4xl font-black text-orange-500/20 absolute -mt-4 -ml-2 group-hover:text-orange-500/40 transition-colors">04</span>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-orange-300 transition-colors">Geofencing</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed relative z-10 group-hover:text-slate-300 transition-colors">Restrict payload decryption to a specific 50-meter GPS radius. If they aren't at the location, the data self-destructs.</p>
                     </article>
-                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 md:col-span-2 lg:col-span-1">
-                        <span class="text-4xl font-black text-pink-500/20 absolute -mt-4 -ml-2">05</span>
-                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Open Architecture</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed relative z-10">Read our transparent <a href="/about" class="text-blue-400 hover:underline">technical breakdown</a> to understand exactly how the cryptographic engine works.</p>
+                    <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 md:col-span-2 lg:col-span-1 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] hover:border-slate-600 hover:bg-slate-800/80 group cursor-default">
+                        <span class="text-4xl font-black text-pink-500/20 absolute -mt-4 -ml-2 group-hover:text-pink-500/40 transition-colors">05</span>
+                        <h3 class="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-pink-300 transition-colors">Open Architecture</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed relative z-10 group-hover:text-slate-300 transition-colors">Read our transparent <a href="/about" class="text-blue-400 hover:underline">technical breakdown</a> to understand exactly how the cryptographic engine works.</p>
                     </article>
                 </div>
             </div>
@@ -201,73 +203,73 @@
 
         <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div class="text-center mb-12">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4 hover:bg-blue-500/20 transition-colors cursor-default">
                     <i class="ph-fill ph-graph"></i> Architecture
                 </div>
                 <h2 class="text-3xl font-bold text-white mb-4">How Zero-Knowledge Works</h2>
                 <p class="text-slate-400 max-w-2xl mx-auto">Visualizing the flow of data from your device, across the network, and to the recipient. Your decryption key never touches our servers.</p>
             </div>
 
-            <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden mt-8 hidden md:block">
+            <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden mt-8 hidden md:block hover:border-slate-700 transition-colors duration-500">
                 <div class="absolute top-[45%] left-[20%] w-20 h-0.5 bg-blue-500/50 animate-data-flow"></div>
                 <div class="absolute top-[45%] left-[55%] w-20 h-0.5 bg-emerald-500/50 animate-data-flow"></div>
 
                 <div class="flex items-center justify-between relative z-10">
                     
-                    <div class="flex flex-col items-center w-1/3 text-center">
-                        <div class="w-24 h-24 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-4xl mb-4 shadow-lg relative z-10 animate-pulse-glow">
+                    <div class="flex flex-col items-center w-1/3 text-center group cursor-default">
+                        <div class="w-24 h-24 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-4xl mb-4 shadow-lg relative z-10 animate-pulse-glow group-hover:border-blue-500 transition-colors duration-300">
                             <i class="ph ph-laptop"></i>
                         </div>
-                        <h4 class="text-white font-bold text-lg">Your Browser</h4>
+                        <h4 class="text-white font-bold text-lg group-hover:text-blue-300 transition-colors">Your Browser</h4>
                         <p class="text-sm text-slate-400 mt-2">Data is encrypted locally using <strong class="text-blue-300">AES-GCM</strong>. A key is appended to the URL fragment.</p>
                     </div>
 
-                    <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-emerald-500/20"></div>
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                    <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1 group cursor-default">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-emerald-500/20 group-hover:opacity-100 opacity-50 transition-opacity duration-300"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap group-hover:text-white group-hover:border-slate-500 transition-colors">
                             <i class="ph ph-lock-key"></i> Ciphertext Only
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center w-1/3 text-center">
-                        <div class="w-24 h-24 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-400 text-4xl mb-4 shadow-lg relative z-10">
+                    <div class="flex flex-col items-center w-1/3 text-center group cursor-default">
+                        <div class="w-24 h-24 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-400 text-4xl mb-4 shadow-lg relative z-10 group-hover:text-white group-hover:border-slate-400 transition-colors duration-300">
                             <i class="ph ph-database"></i>
                         </div>
                         <h4 class="text-white font-bold text-lg">ZeroKey Database</h4>
                         <p class="text-sm text-slate-400 mt-2">We store the scrambled blob. We are mathematically blind to the actual payload contents.</p>
                     </div>
 
-                    <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
-                        <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-emerald-500/50"></div>
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-emerald-400 whitespace-nowrap">
+                    <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1 group cursor-default">
+                        <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-emerald-500/50 group-hover:opacity-100 opacity-50 transition-opacity duration-300"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-emerald-400 whitespace-nowrap group-hover:border-emerald-500 group-hover:text-emerald-300 transition-colors">
                             <i class="ph ph-fire"></i> Fetch & Burn
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center w-1/3 text-center">
-                        <div class="w-24 h-24 rounded-2xl bg-emerald-900/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-4xl mb-4 shadow-[0_0_30px_rgba(16,185,129,0.2)] relative z-10">
+                    <div class="flex flex-col items-center w-1/3 text-center group cursor-default">
+                        <div class="w-24 h-24 rounded-2xl bg-emerald-900/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-4xl mb-4 shadow-[0_0_30px_rgba(16,185,129,0.2)] relative z-10 group-hover:bg-emerald-800/40 transition-colors duration-300">
                             <i class="ph ph-device-mobile"></i>
                         </div>
-                        <h4 class="text-white font-bold text-lg">Recipient Device</h4>
+                        <h4 class="text-white font-bold text-lg group-hover:text-emerald-300 transition-colors">Recipient Device</h4>
                         <p class="text-sm text-slate-400 mt-2">URL hash key decrypts the blob locally. The database record is permanently destroyed.</p>
                     </div>
                 </div>
             </div>
 
             <div class="md:hidden space-y-6 mt-8">
-                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center">
+                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center hover:border-blue-500/50 transition-colors">
                     <i class="ph ph-laptop text-4xl text-blue-400 mb-2"></i>
                     <h4 class="text-white font-bold">1. Your Browser</h4>
                     <p class="text-sm text-slate-400 mt-1">Data encrypted locally via AES-GCM.</p>
                 </div>
                 <div class="text-center text-slate-600"><i class="ph-bold ph-arrow-down text-2xl"></i></div>
-                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center">
+                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center hover:border-slate-500 transition-colors">
                     <i class="ph ph-database text-4xl text-slate-400 mb-2"></i>
                     <h4 class="text-white font-bold">2. ZeroKey Database</h4>
                     <p class="text-sm text-slate-400 mt-1">Ciphertext stored. Mathematically blind to contents.</p>
                 </div>
                 <div class="text-center text-slate-600"><i class="ph-bold ph-arrow-down text-2xl"></i></div>
-                <div class="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-6 text-center">
+                <div class="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-6 text-center hover:border-emerald-400 transition-colors">
                     <i class="ph ph-device-mobile text-4xl text-emerald-400 mb-2"></i>
                     <h4 class="text-white font-bold">3. Recipient Device</h4>
                     <p class="text-sm text-slate-400 mt-1">Decrypted locally. Database record burned.</p>
@@ -277,7 +279,7 @@
 
         <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-8">
             <div class="text-center mb-12">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-4 cursor-default hover:bg-purple-500/20 transition-colors">
                     <i class="ph-fill ph-terminal-window"></i> Built For Engineers
                 </div>
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Free Developer Security Tools</h2>
@@ -285,49 +287,49 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <a href="/jwt-decoder" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-emerald-500/50 transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-2xl mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
+                <a href="/jwt-decoder" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-emerald-500/50 hover:-translate-y-1 hover:bg-slate-800/60 hover:shadow-xl transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-2xl mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner group-hover:scale-110">
                         <i class="ph ph-brackets-curly"></i>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">Secure JWT Decoder</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Decode JSON Web Tokens entirely offline without sending session data to external servers.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 group-hover:text-slate-300 transition-colors">Decode JSON Web Tokens entirely offline without sending session data to external servers.</p>
                 </a>
 
-                <a href="/rsa-key-generator" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-blue-500/50 transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-2xl mb-4 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-inner">
+                <a href="/rsa-key-generator" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-blue-500/50 hover:-translate-y-1 hover:bg-slate-800/60 hover:shadow-xl transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-2xl mb-4 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-inner group-hover:scale-110">
                         <i class="ph ph-key"></i>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">RSA Key Generator</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Generate 2048/4096-bit public and private key pairs instantly using your browser's entropy.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 group-hover:text-slate-300 transition-colors">Generate 2048/4096-bit public and private key pairs instantly using your browser's entropy.</p>
                 </a>
 
-                <a href="/aes-encryption-tool" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-purple-500/50 transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-2xl mb-4 group-hover:bg-purple-500 group-hover:text-white transition-all shadow-inner">
+                <a href="/aes-encryption-tool" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-purple-500/50 hover:-translate-y-1 hover:bg-slate-800/60 hover:shadow-xl transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-2xl mb-4 group-hover:bg-purple-500 group-hover:text-white transition-all shadow-inner group-hover:scale-110">
                         <i class="ph ph-lock-key"></i>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">AES-GCM Encryptor</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Test AES-256-GCM authenticated encryption and decryption logic directly in your browser.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 group-hover:text-slate-300 transition-colors">Test AES-256-GCM authenticated encryption and decryption logic directly in your browser.</p>
                 </a>
 
-                <a href="/hmac-generator" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 text-2xl mb-4 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-inner">
+                <a href="/hmac-generator" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 hover:-translate-y-1 hover:bg-slate-800/60 hover:shadow-xl transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 text-2xl mb-4 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-inner group-hover:scale-110">
                         <i class="ph ph-stamp"></i>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">HMAC Generator</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4">Calculate Hash-based Message Authentication Codes to securely verify webhooks and APIs.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 group-hover:text-slate-300 transition-colors">Calculate Hash-based Message Authentication Codes to securely verify webhooks and APIs.</p>
                 </a>
             </div>
 
             <div class="text-center">
-                <a href="/tools" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] text-lg">
-                    <i class="ph ph-wrench"></i> Explore All Developer Tools
+                <a href="/tools" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:-translate-y-1 text-lg group">
+                    <i class="ph ph-wrench group-hover:rotate-12 transition-transform"></i> Explore All Developer Tools
                 </a>
             </div>
         </section>
 
         <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-8 border-t border-slate-800/50">
             <div class="text-center mb-12">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4 hover:bg-indigo-500/20 transition-colors cursor-default">
                     <i class="ph-fill ph-books"></i> Open Source Architecture
                 </div>
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">ZeroKey Engineering Blog</h2>
@@ -335,37 +337,37 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <a href="/blog/the-url-fragment-exploit-zero-knowledge" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-indigo-500/50 transition-all group flex flex-col">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-2xl mb-4 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-inner">
+                <a href="/blog/the-url-fragment-exploit-zero-knowledge" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/50 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-2xl mb-4 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-inner group-hover:scale-110">
                         <i class="ph ph-link"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">The URL Fragment Exploit</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow">How we use the URL hash to securely pass decryption keys without the server ever seeing them.</p>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">The URL Fragment Exploit</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow group-hover:text-slate-300 transition-colors">How we use the URL hash to securely pass decryption keys without the server ever seeing them.</p>
                     <div class="text-indigo-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">Read Article <i class="ph ph-arrow-right font-bold"></i></div>
                 </a>
 
-                <a href="/blog/why-xss-defeats-client-side-encryption" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-fuchsia-500/50 transition-all group flex flex-col">
-                    <div class="w-12 h-12 rounded-xl bg-fuchsia-500/10 flex items-center justify-center text-fuchsia-400 text-2xl mb-4 group-hover:bg-fuchsia-500 group-hover:text-white transition-all shadow-inner">
+                <a href="/blog/why-xss-defeats-client-side-encryption" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-fuchsia-500/50 hover:bg-slate-800/50 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-fuchsia-500/10 flex items-center justify-center text-fuchsia-400 text-2xl mb-4 group-hover:bg-fuchsia-500 group-hover:text-white transition-all shadow-inner group-hover:scale-110">
                         <i class="ph ph-bug"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-fuchsia-400 transition-colors">Why XSS Defeats Encryption</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow">Military-grade AES encryption is useless if an attacker can run JavaScript on your page.</p>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-fuchsia-300 transition-colors">Why XSS Defeats Encryption</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow group-hover:text-slate-300 transition-colors">Military-grade AES encryption is useless if an attacker can run JavaScript on your page.</p>
                     <div class="text-fuchsia-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">Read Article <i class="ph ph-arrow-right font-bold"></i></div>
                 </a>
 
-                <a href="/blog/how-to-prevent-ui-freezing-with-web-workers" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all group flex flex-col">
-                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 text-2xl mb-4 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-inner">
+                <a href="/blog/how-to-prevent-ui-freezing-with-web-workers" class="glass-panel p-6 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 hover:bg-slate-800/50 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group flex flex-col">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 text-2xl mb-4 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-inner group-hover:scale-110">
                         <i class="ph ph-cpu"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">Preventing UI Freezing</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow">Offload heavy Web Crypto API operations to background threads using Web Workers.</p>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-orange-300 transition-colors">Preventing UI Freezing</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-grow group-hover:text-slate-300 transition-colors">Offload heavy Web Crypto API operations to background threads using Web Workers.</p>
                     <div class="text-orange-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">Read Article <i class="ph ph-arrow-right font-bold"></i></div>
                 </a>
             </div>
 
             <div class="text-center">
-                <a href="/blog" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold transition-all hover:shadow-lg">
-                    View All Technical Articles <i class="ph ph-arrow-right font-bold"></i>
+                <a href="/blog" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group">
+                    View All Technical Articles <i class="ph ph-arrow-right font-bold group-hover:translate-x-1 transition-transform"></i>
                 </a>
             </div>
         </section>
@@ -375,7 +377,7 @@
                 <h2 class="text-3xl font-bold text-white mb-10 text-center">Frequently Asked Questions</h2>
                 
                 <div class="space-y-4">
-                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
                         <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
                             Can ZeroKey or law enforcement read my messages?
                             <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
@@ -385,7 +387,7 @@
                         </div>
                     </details>
 
-                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
                         <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
                             What happens to my uploaded images?
                             <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
@@ -395,7 +397,7 @@
                         </div>
                     </details>
 
-                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
                         <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
                             Why do I need to scan my fingerprint to read a message?
                             <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
@@ -413,12 +415,13 @@
     <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight">
-                    <i class="ph ph-fingerprint text-slate-500"></i> ZeroKey
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
                 </div>
                 <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
                     <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
-                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
                     <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
                     <a href="/terms" class="hover:text-blue-400 transition-colors">Terms & Conditions</a>
                     <a href="/disclaimer" class="hover:text-blue-400 transition-colors">Disclaimer</a>
@@ -434,5 +437,26 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const parallaxElements = document.querySelectorAll('.parallax');
+            
+            // Fast, requestAnimationFrame-based scroll listener
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        let scrollY = window.scrollY;
+                        parallaxElements.forEach(el => {
+                            let speed = parseFloat(el.getAttribute('data-speed')) || 0.1;
+                            el.style.transform = `translateY(${scrollY * speed}px)`;
+                        });
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        });
+    </script>
 </body>
 </html>
