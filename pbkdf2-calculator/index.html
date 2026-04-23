@@ -10,20 +10,32 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PBKDF2 Password Stretching Calculator | ZeroKey Tools</title>
-    <meta name="description" content="Free online PBKDF2 calculator. Stretch your passwords securely using Web Crypto API. Test PBKDF2-HMAC-SHA256 and SHA512 iterations directly in your browser.">
-    <meta name="keywords" content="PBKDF2 calculator online, password stretching tool, Web Crypto API PBKDF2, calculate PBKDF2 hash, key derivation function, secure password hashing, zero-knowledge tools">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>PBKDF2 Password Stretching Calculator | Free Online Tool | ZeroKey</title>
+    <meta name="description" content="Free, 100% client-side PBKDF2 calculator. Stretch passwords and generate derived keys securely using the native Web Crypto API. Test HMAC-SHA256 and SHA512 iterations.">
+    <meta name="keywords" content="PBKDF2 calculator online, password stretching tool, Web Crypto API PBKDF2, calculate PBKDF2 hash, key derivation function, secure password hashing, brute-force protection">
     <meta name="author" content="Dippan Bhusal">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <link rel="canonical" href="https://zerokey.vercel.app/pbkdf2-calculator">
+    
+    <meta property="og:title" content="Secure PBKDF2 Password Calculator | ZeroKey Tools">
+    <meta property="og:description" content="Stretch passwords and generate secure cryptographic keys entirely in your browser using PBKDF2.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zerokey.vercel.app/pbkdf2-calculator">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/tools.png">
+
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -36,114 +48,442 @@
             }
         }
     </script>
+    
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/pbkdf2-calculator/style.css">
+
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        /* Ensure code blocks don't wrap terribly on mobile */
+        pre code {
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+        }
+
+        /* Editor macOS dots */
+        .editor-dots { position: absolute; top: 14px; left: 16px; display: flex; gap: 8px; z-index: 20; }
+        .editor-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; border: 1px solid #e0443e; }
+        .dot-yellow { background: #ffbd2e; border: 1px solid #dea123; }
+        .dot-green { background: #27c93f; border: 1px solid #1aab29; }
+
+        /* Scroll Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* Diagram Animations */
+        @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+        .animate-pulse-glow { animation: pulse-glow 3s infinite ease-in-out; }
+        @keyframes data-flow { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(100px); opacity: 0; } }
+        .animate-data-flow { animation: data-flow 2s infinite linear; }
+    </style>
+
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "PBKDF2 Password Calculator",
+        "url": "https://zerokey.vercel.app/pbkdf2-calculator",
+        "description": "Generate derived keys using the Password-Based Key Derivation Function 2 (PBKDF2) entirely in your browser using the native Web Crypto API.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dippan Bhusal"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is PBKDF2?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "PBKDF2 (Password-Based Key Derivation Function 2) is a cryptographic standard used to reduce vulnerabilities to brute-force attacks by applying a pseudorandom function to a password and salt many times."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why do we need password iterations?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Modern GPUs can guess billions of passwords per second. By introducing iterations (e.g., 210,000 times), PBKDF2 artificially slows down the derivation process, making dictionary and brute-force attacks computationally devastating for hackers."
+            }
+          }
+        ]
+      }
+    ]
+    </script>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
+    
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="/" class="hover:text-white transition-colors">Home</a>
-                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Home' });">Home</a>
+                <a href="/tools" class="hover:text-white transition-colors text-slate-100">Tools</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Blog' });">Blog</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-0.5" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Vault' });">
                 Launch Vault
             </a>
         </div>
     </nav>
+
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl mx-auto">
-            <header class="mb-12 text-center">
+        <div class="max-w-6xl mx-auto">
+            
+            <header class="mb-12 text-center reveal">
                 <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
-                    <i class="ph ph-password"></i> Cryptography Tools
+                    <i class="ph-fill ph-password"></i> Cryptography Tools
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     PBKDF2 Password Calculator
                 </h1>
                 <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                    Generate derived keys using the Password-Based Key Derivation Function 2 (PBKDF2) locally in your browser.
+                    Generate derived keys using the Password-Based Key Derivation Function 2 (PBKDF2) safely and locally in your browser.
                 </p>
             </header>
-            <div class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-emerald-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all"><i class="ph-fill ph-shield-check"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">GPU Brute-Force Protection</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">By forcing thousands of iterations, PBKDF2 makes dictionary attacks computationally devastating for attackers.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-blue-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all"><i class="ph-fill ph-drop"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Cryptographic Salting</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Adding a unique Salt string ensures that even if two users have the same password, their derived keys are completely different.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-purple-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all"><i class="ph-fill ph-cpu"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">100% Client-Side Engine</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Powered by the browser's native Web Crypto API. Your raw password and derived keys never touch a network request.</p>
+                </div>
+            </section>
+            
+            <section class="max-w-3xl mx-auto bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-16 reveal hover:border-slate-700 transition-colors duration-500">
                 <div class="space-y-6 relative z-10">
                     <div>
-                        <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Password / Passphrase</label>
-                        <input type="text" id="password" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" value="MySuperSecretPassword">
+                        <label for="password" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-lock-key text-emerald-400 mr-1"></i> Password / Passphrase</label>
+                        <input type="text" id="password" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all font-mono text-sm placeholder-slate-600" value="MySuperSecretPassword">
                     </div>
+                    
                     <div>
-                        <label for="salt" class="block text-sm font-medium text-slate-300 mb-2">Salt (String)</label>
-                        <input type="text" id="salt" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" value="RandomSalt123">
+                        <label for="salt" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-drop text-blue-400 mr-1"></i> Salt (String)</label>
+                        <input type="text" id="salt" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" value="RandomSalt123">
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="iterations" class="block text-sm font-medium text-slate-300 mb-2">Iterations</label>
-                            <input type="number" id="iterations" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm" value="210000">
+                            <label for="iterations" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-arrows-clockwise text-purple-400 mr-1"></i> Iterations</label>
+                            <input type="number" id="iterations" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 outline-none transition-all font-mono text-sm" value="210000">
+                            <p class="text-xs text-slate-500 mt-2 flex items-center gap-1"><i class="ph-fill ph-info"></i> OWASP recommends 210,000+ for SHA-512</p>
                         </div>
                         <div>
-                            <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2">Hash Algorithm</label>
-                            <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
-                                <option value="SHA-256">SHA-256</option>
-                                <option value="SHA-384">SHA-384</option>
-                                <option value="SHA-512" selected>SHA-512</option>
-                            </select>
+                            <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-gear text-orange-400 mr-1"></i> Hash Algorithm</label>
+                            <div class="relative">
+                                <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
+                                    <option value="SHA-256">SHA-256</option>
+                                    <option value="SHA-384">SHA-384</option>
+                                    <option value="SHA-512" selected>SHA-512</option>
+                                </select>
+                                <i class="ph-bold ph-caret-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                            </div>
                         </div>
                     </div>
-                    <button id="calculateBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] mt-2 flex justify-center items-center gap-2">
-                        <i class="ph ph-cpu text-lg"></i> Generate Derived Key
+
+                    <button id="calculateBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] mt-4 flex justify-center items-center gap-2 hover:-translate-y-1 text-lg">
+                        <i class="ph-bold ph-cpu"></i> Generate Derived Key
                     </button>
-                    <div class="pt-6 border-t border-slate-800 mt-2">
-                        <label class="block text-sm font-medium text-emerald-400 mb-2 uppercase tracking-wider text-xs">Derived Key (Hex Output)</label>
+
+                    <div class="pt-8 border-t border-slate-800 mt-6">
+                        <label class="block text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wider text-xs">Derived Key (Hex Output)</label>
                         <textarea id="outputHex" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-emerald-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
-                        <div class="flex justify-between items-center mt-2">
+                        <div class="flex justify-between items-center mt-3">
                             <p id="timeTaken" class="text-xs text-slate-500 font-mono"></p>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all">
-                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+            </section>
+
+            <section class="mb-16 reveal">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">How Zero-Knowledge Works</h2>
+                    <p class="text-slate-400">ZeroKey uses PBKDF2 to convert your password into an unbreakable 256-bit AES-GCM key.</p>
                 </div>
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">See this architecture in action</h3>
-                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl">
-                        We used this exact cryptographic approach to build <strong class="text-emerald-400">ZeroKey</strong>, an open-source payload delivery system.
-                    </p>
-                    <p class="text-slate-400 mb-6 text-sm">
-                        If you want to test the destruction protocol yourself, generate a payload, open the link, and watch the zero-retention database permanently purge the record.
-                    </p>
-                    <div class="flex gap-4 flex-wrap">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Test the Burn Protocol
-                        </a>
-                        <a href="https://github.com/kdippan/zerokey" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-xl transition-all border border-slate-700 inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-github-logo"></i> View the SQL Schema
-                        </a>
+                <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-2xl overflow-hidden hidden md:block">
+                    <div class="absolute top-[45%] left-[20%] w-20 h-0.5 bg-blue-500/50 animate-data-flow"></div>
+                    <div class="absolute top-[45%] left-[55%] w-20 h-0.5 bg-emerald-500/50 animate-data-flow"></div>
+
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-3xl mb-3 shadow-lg relative z-10 animate-pulse-glow">
+                                <i class="ph-fill ph-password"></i>
+                            </div>
+                            <h4 class="text-white font-bold">1. User Input</h4>
+                            <p class="text-xs text-slate-400 mt-1">Raw password and cryptographic salt.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                <i class="ph-bold ph-arrows-clockwise text-purple-400"></i> 100k Iterations
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-purple-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph-fill ph-cpu"></i>
+                            </div>
+                            <h4 class="text-white font-bold">2. PBKDF2 Engine</h4>
+                            <p class="text-xs text-slate-400 mt-1">Password is mathematically stretched.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/50"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-emerald-400 whitespace-nowrap">
+                                <i class="ph-fill ph-key"></i> Key Ready
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-emerald-900/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-3xl mb-3 shadow-[0_0_30px_rgba(16,185,129,0.2)] relative z-10">
+                                <i class="ph-fill ph-lock-key"></i>
+                            </div>
+                            <h4 class="text-white font-bold">3. AES-GCM Encrypt</h4>
+                            <p class="text-xs text-slate-400 mt-1">Derived key used to lock payloads securely.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold">What is PBKDF2?</h2>
+            </section>
+            
+            <section class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-3xl border-2 border-blue-600/50 bg-blue-950/20 backdrop-blur-md my-16 relative overflow-hidden group hover:border-blue-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl reveal">
+                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="ph-fill ph-shield-warning text-[160px] text-blue-500"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Brute-forcing is cheaper than ever.</h3>
+                    <p class="text-slate-300 mb-8 leading-relaxed max-w-xl mx-auto text-lg">
+                        If you only hash a password once (like standard SHA-256), modern GPUs can crack it in milliseconds. <strong class="text-white">PBKDF2 is non-negotiable for modern security.</strong>
+                    </p>
+                    <p class="text-slate-400 mb-8 text-sm max-w-lg mx-auto">
+                        <strong class="text-emerald-400">ZeroKey</strong> automatically implements 100,000+ PBKDF2 iterations and salts on every single message you send, ensuring your payloads are mathematically impossible to brute-force.
+                    </p>
+                    <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_25px_rgba(37,99,235,0.4)] inline-flex items-center gap-2 text-lg hover:scale-105" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'PBKDF2 Psycho CTA' });">
+                        <i class="ph-bold ph-shield-check"></i> Launch ZeroKey Vault
+                    </a>
+                </div>
+            </section>
+            
+            <article class="max-w-4xl mx-auto prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 border-t border-slate-800 pt-16 reveal">
+                <h2 class="text-3xl font-bold">What is PBKDF2?</h2>
                 <p>Password-Based Key Derivation Function 2 (PBKDF2) is a cryptographic standard designed to reduce vulnerabilities to brute-force attacks. It applies a pseudorandom function, such as HMAC, to an input password along with a salt value, repeating the process many times to produce a secure derived key.</p>
-                <h2 class="text-2xl font-bold pt-4">Why is Password Stretching Important?</h2>
-                <p>Modern graphics cards (GPUs) can guess billions of passwords per second. If an application only hashes a password once (e.g., a simple SHA-256 hash), an attacker can easily crack it using a dictionary attack. PBKDF2 mitigates this by introducing <strong class="text-white">iterations</strong> (password stretching). By forcing the CPU to hash the password hundreds of thousands of times, it artificially slows down the derivation process. This millisecond delay is unnoticeable to a normal user logging in, but computationally devastating for an attacker trying to brute-force millions of hashes.</p>
-                <h2 class="text-2xl font-bold pt-4">How does this tool work securely?</h2>
-                <p>This tool runs entirely in your browser using the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">Web Crypto API</code>. When you click "Generate", no data is transmitted over the network. The JavaScript executes the <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">window.crypto.subtle.deriveBits()</code> function locally, making it a completely safe and privacy-respecting utility for developers testing cryptography implementations.</p>
-            </div>
+                
+                <h2 class="text-3xl font-bold pt-4">Why is Password Stretching Important?</h2>
+                <p>Modern graphics cards (GPUs) can guess billions of passwords per second. If an application only hashes a password once (e.g., a simple SHA-256 hash), an attacker can easily crack it using a dictionary attack. PBKDF2 mitigates this by introducing <strong class="text-white border-b border-blue-500">iterations</strong> (password stretching). By forcing the CPU to hash the password hundreds of thousands of times, it artificially slows down the derivation process. This millisecond delay is unnoticeable to a normal user logging in, but computationally devastating for an attacker trying to brute-force millions of hashes.</p>
+                
+                <h3 class="text-2xl font-bold pt-6 border-t border-slate-800/50 mt-10">How to implement PBKDF2 in JavaScript</h3>
+                <p>You can generate secure keys natively in the browser without importing massive NPM libraries by utilizing the <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">Web Crypto API</code>:</p>
+                
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center z-10">
+                        <div class="editor-dots">
+                            <div class="editor-dot dot-red"></div><div class="editor-dot dot-yellow"></div><div class="editor-dot dot-green"></div>
+                        </div>
+                        <span class="w-full text-center text-xs text-slate-400 font-mono absolute pointer-events-none">pbkdf2-derive.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-1">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-1" class="language-javascript text-emerald-300">async function derivePBKDF2Key(password, saltString) {
+    const encoder = new TextEncoder();
+    
+    // 1. Import the raw password
+    const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        encoder.encode(password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits", "deriveKey"]
+    );
+
+    // 2. Derive the bits using 210,000 iterations
+    const derivedBits = await window.crypto.subtle.deriveBits(
+        {
+            name: "PBKDF2",
+            salt: encoder.encode(saltString),
+            iterations: 210000,
+            hash: "SHA-512"
+        },
+        keyMaterial,
+        256 // Output 32 bytes (256 bits) for AES-256
+    );
+
+    return derivedBits;
+}</code></pre>
+                </div>
+            </article>
+
+            <section class="max-w-4xl mx-auto py-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center border-t border-slate-800/50 pt-16">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            What is the recommended number of iterations for PBKDF2?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            As hardware improves, the recommended iteration count increases. Currently, OWASP recommends at least <strong class="text-white">210,000 iterations for PBKDF2-HMAC-SHA512</strong> and at least 600,000 for PBKDF2-HMAC-SHA256.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Why is Salting important?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            A salt is a random string added to the password before hashing. It ensures that two users with the exact same password ("password123") will have completely different resulting hashes. This entirely defeats Rainbow Table attacks, where hackers pre-compute hashes for common passwords.
+                        </div>
+                    </details>
+                </div>
+            </section>
         </div>
     </main>
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto w-full">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph-fill ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
     </footer>
+
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph-fill ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
+
     <script src="/pbkdf2-calculator/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Cookie Consent Logic ---
+            const cookieConsent = document.getElementById('cookieConsent');
+            if (cookieConsent && !localStorage.getItem('zerokey_cookies_accepted')) {
+                setTimeout(() => cookieConsent.classList.remove('translate-y-[150%]'), 1000);
+            }
+            const acceptBtn = document.getElementById('acceptCookiesBtn');
+            if(acceptBtn) {
+                acceptBtn.addEventListener('click', () => {
+                    localStorage.setItem('zerokey_cookies_accepted', 'true');
+                    cookieConsent.classList.add('translate-y-[150%]');
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'cookie_consent', { 'event_category': 'Engagement', 'event_label': 'Accepted' });
+                    }
+                });
+            }
+
+            // --- Scroll Reveal Logic ---
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOnScroll = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            reveals.forEach(reveal => revealOnScroll.observe(reveal));
+
+            // --- Code Copy Button Logic ---
+            document.querySelectorAll('.copy-code-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const targetId = btn.getAttribute('data-target');
+                    const codeElement = document.getElementById(targetId);
+                    
+                    if(codeElement) {
+                        await navigator.clipboard.writeText(codeElement.innerText);
+                        
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'click', { 'event_category': 'Tool', 'event_label': 'Copied Code Snippet' });
+                        }
+
+                        const originalHTML = btn.innerHTML;
+                        btn.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> Copied!';
+                        btn.classList.add('text-emerald-400');
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.classList.remove('text-emerald-400');
+                        }, 2000);
+                    }
+                });
+            });
+
+            // --- Parallax Logic ---
+            const parallaxElements = document.querySelectorAll('.parallax');
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        let scrollY = window.scrollY;
+                        parallaxElements.forEach(el => {
+                            let speed = parseFloat(el.getAttribute('data-speed')) || 0.1;
+                            el.style.transform = `translateY(${scrollY * speed}px)`;
+                        });
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        });
+    </script>
 </body>
 </html>
