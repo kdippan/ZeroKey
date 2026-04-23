@@ -10,28 +10,32 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMAC Signature Generator Online | ZeroKey Tools</title>
-    <meta name="description" content="Free, secure online HMAC generator. Calculate Hash-based Message Authentication Codes (HMAC SHA-256, SHA-512) for webhooks and APIs locally in your browser.">
-    <meta name="keywords" content="HMAC generator, HMAC SHA256 online, webhook signature calculator, API authentication HMAC, Web Crypto API HMAC, client-side signature generation">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>HMAC Signature Generator Online | Free Client-Side Tool | ZeroKey</title>
+    <meta name="description" content="Free, 100% secure online HMAC generator. Calculate Hash-based Message Authentication Codes (HMAC SHA-256, SHA-512) for webhooks and APIs locally in your browser.">
+    <meta name="keywords" content="HMAC generator, HMAC SHA256 online, webhook signature calculator, API authentication HMAC, Web Crypto API HMAC, client-side signature generation, Stripe webhook tester, secure API tools">
     <meta name="author" content="Dippan Bhusal">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     
+    <link rel="canonical" href="https://zerokey.vercel.app/hmac-generator">
+    
     <meta property="og:title" content="Secure HMAC Signature Generator | ZeroKey Tools">
-    <meta property="og:description" content="Generate API and webhook HMAC signatures locally in your browser without exposing your secret keys.">
+    <meta property="og:description" content="Generate API and webhook HMAC signatures locally in your browser without exposing your secret keys to a server.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zerokey.vercel.app/hmac-generator/index.html">
+    <meta property="og:url" content="https://zerokey.vercel.app/hmac-generator">
+    <meta property="og:image" content="https://zerokey.vercel.app/assets/og/tools.png">
 
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180x180.png">
-    <meta name="msapplication-TileColor" content="#0f172a">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -49,92 +53,138 @@
     <link rel="stylesheet" href="/hmac-generator/style.css">
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "HMAC Signature Generator",
-      "url": "https://zerokey.vercel.app/hmac-generator/index.html",
-      "description": "Calculate Hash-based Message Authentication Codes (HMAC) entirely in the browser to verify webhooks and test API integrations safely.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "HMAC Signature Generator",
+        "url": "https://zerokey.vercel.app/hmac-generator",
+        "description": "Calculate Hash-based Message Authentication Codes (HMAC) entirely in the browser to verify webhooks and test API integrations safely.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dippan Bhusal"
+        }
       },
-      "author": {
-        "@type": "Person",
-        "name": "Dippan Bhusal"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is it safe to paste my API secret key here?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. This HMAC generator runs entirely client-side using the Web Crypto API. Your secret keys and payload data never leave your browser and are never sent to a remote server."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why are HMACs used for Webhooks?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Platforms like Stripe and GitHub use HMAC signatures to secure webhooks. They hash the payload with a shared secret key. Your server must calculate the same hash to verify the payload was not forged by an attacker."
+            }
+          }
+        ]
       }
-    }
+    ]
     </script>
 </head>
 <body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-emerald-500/30 flex flex-col">
-    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
     
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight">
-                <i class="ph ph-fingerprint text-blue-500"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
+            <a href="/" class="flex items-center gap-2 text-slate-100 font-bold text-2xl tracking-tight group">
+                <i class="ph ph-fingerprint text-blue-500 group-hover:rotate-12 transition-transform"></i> ZeroKey <span class="text-slate-500 font-medium text-lg ml-1">Tools</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="/" class="hover:text-white transition-colors">Home</a>
-                <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-                <a href="/status" class="hover:text-white transition-colors">Status</a>
-                <a href="/about" class="hover:text-white transition-colors">About</a>
+                <a href="/" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Home' });">Home</a>
+                <a href="/tools" class="hover:text-white transition-colors text-slate-100">Tools</a>
+                <a href="/blog" class="hover:text-white transition-colors" onclick="gtag('event', 'click', { 'event_category': 'Nav', 'event_label': 'Blog' });">Blog</a>
             </div>
-            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2">
-                <i class="ph ph-shield-check"></i> Launch Vault
+            <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:-translate-y-0.5" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'Nav Vault' });">
+                Launch Vault
             </a>
         </div>
     </nav>
 
     <main class="relative z-10 flex-grow py-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto">
-            <header class="mb-12 text-center">
-                <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm font-mono uppercase tracking-widest mb-3">
-                    <i class="ph ph-stamp"></i> Cryptography Utilities
+        <div class="max-w-6xl mx-auto">
+            
+            <header class="mb-12 text-center reveal">
+                <div class="flex items-center justify-center gap-2 text-orange-400 text-sm font-mono uppercase tracking-widest mb-3">
+                    <i class="ph-fill ph-stamp"></i> Cryptography Utilities
                 </div>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                     HMAC Signature Generator
                 </h1>
                 <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                    Calculate Hash-based Message Authentication Codes (HMAC) to verify API requests and webhooks. Keys and payloads never leave your browser.
+                    Calculate Hash-based Message Authentication Codes (HMAC) to securely verify API requests and webhooks. Keys and payloads never leave your browser.
                 </p>
             </header>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-orange-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="ph-fill ph-shield-check"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">100% Client-Side</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Pasting production API keys online is dangerous. This tool executes entirely within your browser memory. We log nothing.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-blue-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all"><i class="ph-fill ph-cpu"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Native Web Crypto</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Powered by the blazing-fast <code class="text-xs bg-slate-800 px-1 rounded">crypto.subtle.sign()</code> API built directly into modern web browsers.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:-translate-y-1 hover:border-purple-500/50 transition-all duration-300 group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all"><i class="ph-fill ph-webhook"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-2">Webhook Verification</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Instantly verify incoming Stripe, GitHub, or Shopify webhook payloads against your stored server secrets.</p>
+                </div>
+            </section>
             
-            <section class="bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-12">
+            <section class="max-w-4xl mx-auto bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-sm relative overflow-hidden mb-16 reveal hover:border-slate-700 transition-colors duration-500">
                 <div class="space-y-6">
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <label for="messageInput" class="block text-sm font-medium text-slate-300">Message / Payload</label>
+                            <label for="messageInput" class="block text-sm font-medium text-slate-300"><i class="ph-fill ph-file-text text-blue-400 mr-1"></i> Message / Payload</label>
                             <button id="clearMessageBtn" class="text-xs text-slate-500 hover:text-red-400 transition-colors"><i class="ph ph-trash"></i> Clear</button>
                         </div>
-                        <textarea id="messageInput" rows="5" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Enter the raw JSON payload or message string here..."></textarea>
+                        <textarea id="messageInput" rows="6" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600 shadow-inner" placeholder="Enter the raw JSON payload or message string here..."></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="secretKey" class="block text-sm font-medium text-slate-300 mb-2">Secret Key</label>
-                            <input type="password" id="secretKey" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm placeholder-slate-600" placeholder="Your secret signing key">
+                            <label for="secretKey" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-key text-emerald-400 mr-1"></i> Secret Key</label>
+                            <input type="password" id="secretKey" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all font-mono text-sm placeholder-slate-600" placeholder="Your secret signing key">
                         </div>
                         <div>
-                            <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2">Algorithm</label>
-                            <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
-                                <option value="SHA-256" selected>HMAC SHA-256 (Standard)</option>
-                                <option value="SHA-384">HMAC SHA-384</option>
-                                <option value="SHA-512">HMAC SHA-512</option>
-                                <option value="SHA-1">HMAC SHA-1 (Legacy)</option>
-                            </select>
+                            <label for="hashAlg" class="block text-sm font-medium text-slate-300 mb-2"><i class="ph-fill ph-gear text-purple-400 mr-1"></i> Algorithm</label>
+                            <div class="relative">
+                                <select id="hashAlg" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-4 text-slate-100 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 outline-none transition-all font-mono text-sm appearance-none cursor-pointer">
+                                    <option value="SHA-256" selected>HMAC SHA-256 (Standard)</option>
+                                    <option value="SHA-384">HMAC SHA-384</option>
+                                    <option value="SHA-512">HMAC SHA-512</option>
+                                    <option value="SHA-1">HMAC SHA-1 (Legacy)</option>
+                                </select>
+                                <i class="ph-bold ph-caret-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-800">
-                        <div>
-                            <label class="block text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wider text-xs">Signature (Hex)</label>
-                            <textarea id="outputHex" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-emerald-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 border-t border-slate-800">
+                        <div class="relative group">
+                            <label class="block text-sm font-bold text-orange-400 mb-2 uppercase tracking-wider text-xs">Signature (Hex)</label>
+                            <textarea id="outputHex" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-orange-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
                         </div>
-                        <div>
+                        <div class="relative group">
                             <label class="block text-sm font-bold text-blue-400 mb-2 uppercase tracking-wider text-xs">Signature (Base64)</label>
                             <textarea id="outputBase64" rows="3" readonly class="w-full bg-[#020617] border border-slate-800 rounded-xl p-4 text-blue-400 font-mono text-sm focus:outline-none break-all shadow-inner"></textarea>
                         </div>
@@ -142,43 +192,177 @@
                 </div>
             </section>
             
-            <section class="glass-panel p-8 rounded-2xl border-2 border-emerald-600/50 bg-emerald-950/20 backdrop-blur-md my-12 relative overflow-hidden group hover:border-emerald-500/80 transition-all text-center">
-                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i class="ph-fill ph-fire text-[160px] text-emerald-500"></i>
+            <section class="mb-16 reveal">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">How Zero-Knowledge Works</h2>
+                    <p class="text-slate-400">ZeroKey uses cryptographic primitives to deliver payloads securely.</p>
                 </div>
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">Authenticity is not Privacy.</h3>
-                    <p class="text-slate-300 mb-6 leading-relaxed max-w-xl mx-auto">
-                        HMAC guarantees that a message hasn't been tampered with, but it does not encrypt the payload. Anyone intercepting the network request can read your data. If you need to send sensitive information privately, use <strong class="text-emerald-400">ZeroKey</strong> for complete end-to-end encryption.
-                    </p>
-                    <div class="flex gap-4 flex-wrap justify-center">
-                        <a href="/encrypt" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-flex items-center gap-2 text-base">
-                            <i class="ph ph-shield-check"></i> Launch ZeroKey Vault
-                        </a>
+                <div class="relative bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-2xl overflow-hidden hidden md:block">
+                    <div class="absolute top-[45%] left-[20%] w-20 h-0.5 bg-blue-500/50 animate-data-flow"></div>
+                    <div class="absolute top-[45%] left-[55%] w-20 h-0.5 bg-emerald-500/50 animate-data-flow"></div>
+
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-blue-400 text-3xl mb-3 shadow-lg relative z-10 animate-pulse-glow">
+                                <i class="ph ph-laptop"></i>
+                            </div>
+                            <h4 class="text-white font-bold">1. Client Device</h4>
+                            <p class="text-xs text-slate-400 mt-1">Data encrypted locally using AES-GCM.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-emerald-500/20"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-slate-400 whitespace-nowrap">
+                                Ciphertext Only
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-400 text-3xl mb-3 shadow-lg relative z-10">
+                                <i class="ph ph-database"></i>
+                            </div>
+                            <h4 class="text-white font-bold">2. ZeroKey DB</h4>
+                            <p class="text-xs text-slate-400 mt-1">We store scrambled blob. We cannot read it.</p>
+                        </div>
+
+                        <div class="h-0.5 w-full bg-slate-800 relative -mx-8 flex-1">
+                            <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-emerald-500/50"></div>
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#020617] border border-slate-700 px-3 py-1 rounded-full text-xs text-emerald-400 whitespace-nowrap">
+                                Fetch & Burn
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center w-1/3 text-center">
+                            <div class="w-20 h-20 rounded-2xl bg-emerald-900/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-3xl mb-3 shadow-[0_0_30px_rgba(16,185,129,0.2)] relative z-10">
+                                <i class="ph ph-device-mobile"></i>
+                            </div>
+                            <h4 class="text-white font-bold">3. Recipient</h4>
+                            <p class="text-xs text-slate-400 mt-1">Decrypts locally. Server wipes record.</p>
+                        </div>
                     </div>
                 </div>
             </section>
+
+            <section class="max-w-4xl mx-auto glass-panel p-8 md:p-12 rounded-3xl border-2 border-blue-600/50 bg-blue-950/20 backdrop-blur-md my-16 relative overflow-hidden group hover:border-blue-500/80 transition-all text-center hover:-translate-y-1 shadow-2xl reveal">
+                <div class="absolute -top-10 -right-10 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <i class="ph-fill ph-shield-warning text-[160px] text-blue-500"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Authenticity is not Privacy.</h3>
+                    <p class="text-slate-300 mb-8 leading-relaxed max-w-xl mx-auto text-lg">
+                        HMAC guarantees that a message hasn't been tampered with, but it <strong class="text-white border-b border-red-500">does not encrypt</strong> the payload. Anyone intercepting the network request can still read your data in plaintext.
+                    </p>
+                    <p class="text-slate-400 mb-8 text-sm max-w-lg mx-auto">
+                        If you need to send highly sensitive configuration files, database credentials, or API keys to a colleague, you need end-to-end AES encryption, not just an HMAC signature.
+                    </p>
+                    <a href="/encrypt" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_25px_rgba(37,99,235,0.4)] inline-flex items-center gap-2 text-lg hover:scale-105" onclick="gtag('event', 'click', { 'event_category': 'CTA', 'event_label': 'HMAC Psycho CTA' });">
+                        <i class="ph-bold ph-shield-check"></i> Launch ZeroKey Vault
+                    </a>
+                </div>
+            </section>
             
-            <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 mt-12 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold">What is an HMAC?</h2>
+            <article class="max-w-4xl mx-auto prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-bold prose-a:text-blue-400 hover:prose-a:underline prose-strong:text-slate-100 prose-code:text-emerald-300 text-slate-300 text-lg leading-relaxed space-y-8 border-t border-slate-800 pt-16 reveal">
+                <h2 class="text-3xl font-bold">What is an HMAC?</h2>
                 <p>HMAC stands for Hash-based Message Authentication Code. It is a specific type of message authentication code involving a cryptographic hash function (like SHA-256) combined with a secret cryptographic key.</p>
                 <p>When two parties share a secret key, HMACs allow them to verify both the <strong class="text-white">data integrity</strong> and the <strong class="text-white">authenticity</strong> of a message. If a hacker intercepts a message and modifies the payload, the HMAC signature will completely change. Because the hacker does not possess the secret key, they cannot generate a new, valid signature for their tampered payload.</p>
                 
-                <h2 class="text-2xl font-bold pt-4">Why are HMACs used for Webhooks?</h2>
-                <p>Major platforms like Stripe, GitHub, Shopify, and Slack use HMAC signatures to secure their webhooks. When these platforms send an HTTP POST request to your backend server, they calculate an HMAC using the raw JSON payload and a secret key they gave you when you registered.</p>
-                <p>They attach this HMAC to a header (e.g., <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">Stripe-Signature</code> or <code class="bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-300">X-Hub-Signature-256</code>). Your server must take the incoming JSON, use your secret key to calculate its own HMAC, and compare it to the header. If they match, you know the webhook genuinely came from the service provider and was not forged by an attacker.</p>
+                <h3 class="text-2xl font-bold pt-6 border-t border-slate-800/50 mt-10">How to generate an HMAC in JavaScript</h3>
+                <p>If you need to implement webhook verification or API signing in your own Node.js or browser application, you should use the native <code class="bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm text-emerald-300">Web Crypto API</code>. Here is the framework-free approach:</p>
+                
+                <div class="relative group mt-6 mb-8">
+                    <div class="absolute top-0 left-0 w-full h-12 bg-[#0f172a] rounded-t-xl border-b border-slate-800 flex items-center px-4 gap-2 z-10">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="ml-3 text-xs text-slate-400 font-mono">hmac-signer.js</span>
+                        <button class="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs font-semibold copy-code-btn" data-target="code-block-1">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="bg-[#020617] border border-slate-800 rounded-xl pt-16 pb-6 px-6 text-sm overflow-x-auto shadow-inner m-0"><code id="code-block-1" class="language-javascript text-emerald-300">async function generateHMAC(secret, payloadStr) {
+    const encoder = new TextEncoder();
+    
+    // 1. Import the raw secret key
+    const key = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(secret),
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"]
+    );
 
-                <h2 class="text-2xl font-bold pt-4">Never expose your Secret Key online</h2>
-                <p>Pasting your Stripe or GitHub webhook secrets into random online calculators is incredibly dangerous. If a remote server logs your secret key, attackers can send malicious webhooks to your application (e.g., faking a successful payment). This <strong class="text-white">ZeroKey Utility</strong> utilizes the native <code class="bg-slate-800 px-1 py-0.5 rounded font-mono">window.crypto.subtle.sign()</code> API. All signature generation happens locally in your browser memory, ensuring your API secrets are never transmitted across the internet.</p>
+    // 2. Sign the payload to generate the buffer
+    const signatureBuffer = await crypto.subtle.sign(
+        "HMAC",
+        key,
+        encoder.encode(payloadStr)
+    );
+
+    // 3. Convert buffer to Hex string
+    const hashArray = Array.from(new Uint8Array(signatureBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}</code></pre>
+                </div>
             </article>
+
+            <section class="max-w-4xl mx-auto py-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center border-t border-slate-800/50 pt-16">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Why are HMACs used for Webhooks?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Major platforms like Stripe, GitHub, Shopify, and Slack use HMAC signatures to secure their webhooks. When these platforms send an HTTP POST request to your backend server, they calculate an HMAC using the raw JSON payload and a secret key they gave you when you registered. They attach this HMAC to a header (e.g., <code class="bg-slate-800 px-1 rounded font-mono">Stripe-Signature</code>). Your server must calculate the same hash to verify the payload was not forged by an attacker.
+                        </div>
+                    </details>
+
+                    <details class="group glass-panel rounded-xl bg-slate-900/40 border border-slate-800 [&_summary::-webkit-details-marker]:hidden hover:border-slate-600 transition-colors">
+                        <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-white">
+                            Is it safe to paste my API secret key here?
+                            <i class="ph ph-caret-down text-slate-400 transition-transform group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/50 pt-4 mt-2">
+                            Yes. Pasting your Stripe or GitHub webhook secrets into standard online calculators is dangerous because remote servers can log your keys. However, this <strong class="text-white">ZeroKey Utility</strong> runs 100% locally using JavaScript in your browser memory. We make zero network requests, ensuring your API secrets are completely isolated and safe.
+                        </div>
+                    </details>
+                </div>
+            </section>
         </div>
     </main>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-10 pb-8 mt-auto w-full">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-            <p>&copy; 2026 ZeroKey. Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" class="text-blue-400 hover:text-blue-300">Dippan Bhusal</a>.</p>
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
+                    <i class="ph-fill ph-fingerprint text-slate-500 group-hover:text-blue-500 transition-colors"></i> ZeroKey
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+                    <a href="/about" class="hover:text-blue-400 transition-colors">About</a>
+                    <a href="/tools" class="hover:text-blue-400 transition-colors">Developer Tools</a> 
+                    <a href="/blog" class="hover:text-blue-400 transition-colors">Blog</a>
+                    <a href="/privacy" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="/contact" class="hover:text-blue-400 transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 border-t border-slate-800/50 pt-6">
+                <p>&copy; 2026 ZeroKey. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Built for digital privacy by <a href="https://github.com/kdippan" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Dippan Bhusal</a>.</p>
+            </div>
         </div>
     </footer>
+
+    <div id="cookieConsent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[100] transform translate-y-[150%] transition-transform duration-500 ease-in-out">
+        <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-2xl">
+            <h4 class="text-white font-bold mb-2 flex items-center gap-2"><i class="ph-fill ph-cookie text-emerald-400 text-xl"></i> Privacy First</h4>
+            <p class="text-slate-400 text-sm mb-4 leading-relaxed">We use essential cookies & analytics strictly to improve our free tools. No PII or cryptography secrets are ever tracked.</p>
+            <div class="flex gap-3">
+                <button id="acceptCookiesBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors text-sm shadow-[0_0_10px_rgba(37,99,235,0.2)]">Accept</button>
+                <a href="/privacy" class="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 rounded-xl transition-colors text-sm border border-slate-700">Policy</a>
+            </div>
+        </div>
+    </div>
 
     <script src="/hmac-generator/main.js"></script>
 </body>
