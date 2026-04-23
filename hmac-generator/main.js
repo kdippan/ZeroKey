@@ -67,3 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateHMAC();
     });
 });
+// --- Cookie Consent Logic ---
+const cookieConsent = document.getElementById('cookieConsent');
+if (cookieConsent && !localStorage.getItem('zerokey_cookies_accepted')) {
+    setTimeout(() => cookieConsent.classList.remove('translate-y-[150%]'), 1000);
+}
+const acceptBtn = document.getElementById('acceptCookiesBtn');
+if(acceptBtn) {
+    acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('zerokey_cookies_accepted', 'true');
+        cookieConsent.classList.add('translate-y-[150%]');
+        if (typeof gtag === 'function') {
+            gtag('event', 'cookie_consent', { 'event_category': 'Engagement', 'event_label': 'Accepted' });
+        }
+    });
+}
