@@ -86,9 +86,13 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        
+        /* Architecture Diagram Animations */
         @keyframes pulse-glow {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.05); }
+            50% { opacity: 0.7; transform: scale(1.05); box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
         }
         .animate-pulse-glow {
             animation: pulse-glow 3s infinite ease-in-out;
@@ -102,6 +106,23 @@
         .animate-data-flow {
             animation: data-flow 2s infinite linear;
         }
+
+        /* Scroll Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
     </style>
     
     <link rel="stylesheet" href="/style.css">
@@ -114,11 +135,11 @@
       gtag('config', 'G-SLS94VX99N');
     </script>
 </head>
-<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30 selection:text-blue-200">
+<body class="bg-[#0f172a] text-slate-300 min-h-screen font-sans overflow-x-hidden relative selection:bg-blue-500/30 selection:text-blue-200 flex flex-col">
     
-    <div class="parallax absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0 will-change-transform" data-speed="0.2"></div>
-    <div class="parallax absolute top-[40%] right-1/4 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none z-0 will-change-transform" data-speed="0.1"></div>
-    <div class="parallax absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none z-0 will-change-transform" data-speed="0.3"></div>
+    <div class="parallax fixed top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.15"></div>
+    <div class="parallax fixed top-[40%] right-1/4 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.1"></div>
+    <div class="parallax fixed bottom-0 left-1/3 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none -z-10 will-change-transform" data-speed="0.2"></div>
 
     <nav class="relative z-50 border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-md sticky top-0">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -139,8 +160,8 @@
         </div>
     </nav>
 
-    <main class="relative z-10">
-        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
+    <main class="relative z-10 flex-grow">
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center reveal">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-6 hover:bg-emerald-500/20 transition-colors cursor-default">
                 <span class="relative flex h-2 w-2">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -169,7 +190,7 @@
         </section>
 
         <section class="bg-slate-900/30 border-y border-slate-800/50 py-20">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
                 <h2 class="text-3xl font-bold text-white mb-10 text-center">5 Reasons to Use Client-Side Encryption</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <article class="glass-panel p-6 rounded-2xl bg-slate-900/60 border border-slate-800 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] hover:border-slate-600 hover:bg-slate-800/80 group cursor-default">
@@ -201,7 +222,7 @@
             </div>
         </section>
 
-        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 reveal">
             <div class="text-center mb-12">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4 hover:bg-blue-500/20 transition-colors cursor-default">
                     <i class="ph-fill ph-graph"></i> Architecture
@@ -277,7 +298,7 @@
             </div>
         </section>
 
-        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-8">
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-8 reveal">
             <div class="text-center mb-12">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-4 cursor-default hover:bg-purple-500/20 transition-colors">
                     <i class="ph-fill ph-terminal-window"></i> Built For Engineers
@@ -327,7 +348,7 @@
             </div>
         </section>
 
-        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-8 border-t border-slate-800/50">
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-8 border-t border-slate-800/50 reveal">
             <div class="text-center mb-12">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4 hover:bg-indigo-500/20 transition-colors cursor-default">
                     <i class="ph-fill ph-books"></i> Open Source Architecture
@@ -372,7 +393,7 @@
             </div>
         </section>
 
-        <section class="bg-slate-900/30 border-t border-slate-800/50 py-20">
+        <section class="bg-slate-900/30 border-t border-slate-800/50 py-20 reveal">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 class="text-3xl font-bold text-white mb-10 text-center">Frequently Asked Questions</h2>
                 
@@ -412,7 +433,7 @@
 
     </main>
 
-    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8">
+    <footer class="border-t border-slate-800/50 bg-[#0f172a] relative z-10 pt-12 pb-8 mt-auto">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
                 <div class="flex items-center gap-2 text-slate-100 font-bold text-xl tracking-tight group cursor-default">
@@ -439,10 +460,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const parallaxElements = document.querySelectorAll('.parallax');
             
-            // Fast, requestAnimationFrame-based scroll listener
+            // 1. Hardware Accelerated Parallax Engine
+            const parallaxElements = document.querySelectorAll('.parallax');
             let ticking = false;
+            
             window.addEventListener('scroll', () => {
                 if (!ticking) {
                     window.requestAnimationFrame(() => {
@@ -456,6 +478,31 @@
                     ticking = true;
                 }
             }, { passive: true });
+
+            // 2. Premium Scroll Reveal Animation via Intersection Observer
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const revealOptions = {
+                threshold: 0.1, // Trigger when 10% of the element is visible
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    } else {
+                        entry.target.classList.add('active');
+                        // Stop observing once revealed to prevent re-animating
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+
+            reveals.forEach(reveal => {
+                revealOnScroll.observe(reveal);
+            });
+            
         });
     </script>
 </body>
